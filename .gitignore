@@ -24,4 +24,3 @@ yarn-error.log*
 
 /src/data
 /src/firebaseconfig.js
-/src/pages/test.jsx
