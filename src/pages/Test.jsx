@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStateContext } from '../contexts/ContextProvider';
 
 const Test = () => {
-  const { getMenuItem, setMenuItem, addAddonToMenuItem } = useStateContext();
+  const { getMenuItem, setMenuItem, addAddonToMenuItem, uploadImage } = useStateContext();
   const { id, item_id } = useParams();
   const [item, setItem] = useState(null);
   const [ItemImage, setItemImage] = useState(null);
@@ -26,11 +26,18 @@ const Test = () => {
     const { name, value } = e.target;
     setItem(prevItem => ({
       ...prevItem,
-      [name]: value
+      [name]: name === "item_price" ? parseFloat(value) : value
     }));
   };
 
   const handleSaveChanges = async () => {
+    if (ItemImage) {
+      const mainImageUrl = await uploadImage(ItemImage);
+      setItem(prevItem => ({
+        ...prevItem,
+        item_image: mainImageUrl
+      }))
+    }
     if (item) {
       await setMenuItem(id, item_id, item);
     }
@@ -54,7 +61,7 @@ const Test = () => {
 
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl shadow-lg">
-      <button onClick={back} className='mb-2 bg-gray-500 rounded-lg'><span  className='bg-white rounded-lg m-0.5 px-4'>&#x2190;</span></button>
+      <button onClick={back} className='mb-2 bg-gray-500 rounded-lg'><span className='bg-white rounded-lg m-0.5 px-4'>&#x2190;</span></button>
       {item && (
         <div>
           <div className='bg-gray-200 flex flex-col p-1 gap-1'>
@@ -77,6 +84,17 @@ const Test = () => {
                 placeholder="Item Price"
                 className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
               />
+              <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item discount:</label>
+              <input
+                type="text"
+                name="item_price"
+                value={item.item_discount}
+                onChange={handleInputChange}
+                placeholder="Item Price"
+                className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+              />
+              <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item sizes:</label>
+              
               <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item Description:</label>
               <textarea
                 name="item_description"
@@ -99,16 +117,18 @@ const Test = () => {
                 <option value={false}>Not Available</option>
               </select>
 
-              <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item Image URL:</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item Image:</label>
               <input
-                type="text"
-                name="item_image"
-                value={item.item_image}
+                type="file"  // Change the input type to file
                 onChange={handleFileInputChange}
-                placeholder="Item Image URL"
-                className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+                className='mb-4'
               />
-              <img className="object-cover h-48 w-full mt-4" src={item.item_image} alt="Preview" />
+
+              {item.item_image && (
+                <div>
+                  <img className="object-cover h-48 w-full mt-4" src={item.item_image} alt="Preview" />
+                </div>
+              )}
 
               <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item Category:</label>
               <input

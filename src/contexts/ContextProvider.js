@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { collection, getDocs, doc, getDoc, updateDoc, addDoc } from 'firebase/firestore';
 import { ref, onValue } from 'firebase/database';
 import db, { fsdb } from '../utils/firebaseconfig';
+import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
 
 const StateContext = createContext();
 
@@ -25,12 +26,12 @@ export const ContextProvider = ({ children }) => {
   const [cards, setCards] = useState([]);
 
   const handleClick = (clicked) => {
-    if (clicked!=-1) {
+    if (clicked != -1) {
       setIsClicked({ ...initialState, [clicked]: true });
     } else {
-      setIsClicked({ ...initialState})
+      setIsClicked({ ...initialState })
     }
-    
+
   };
   const onDriversChange = (snapshot) => {
     const driversArray = snapshot.exists()
@@ -75,6 +76,20 @@ export const ContextProvider = ({ children }) => {
       console.log(error)
     }
   }
+  const uploadImage = async (file) => {
+    const storage = getStorage();
+    const storageReference = storageRef(storage, `images/${file.name}`);
+    try {
+      console.log('Uploading to:', storageReference.fullPath);
+      const snapshot = await uploadBytes(storageReference, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      console.log('File available at:', downloadURL);
+      return downloadURL;
+    } catch (error) {
+      console.error('Error during file upload:', error);
+      throw error;
+    }
+  };
   const getRestaurantsMenu = async (id) => {
     try {
       const querySnapshot = await getDocs(collection(fsdb, `restaurants/${id}/menu_items`));
@@ -160,7 +175,8 @@ export const ContextProvider = ({ children }) => {
         addAddonToMenuItem,
         drivers,
         orders,
-        updateOrderStatus
+        updateOrderStatus,
+        uploadImage
       }}
     >
       {children}

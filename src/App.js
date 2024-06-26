@@ -7,7 +7,6 @@ import { AuthProvider, useAuth } from './contexts/AuthProvider';
 import { Navbar, Footer, Sidebar, ThemeSettings } from "./components"
 import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage } from "./pages"
 import './App.css';
-
 import { useStateContext } from './contexts/ContextProvider';
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();

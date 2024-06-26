@@ -1,6 +1,6 @@
-import React,{useState} from 'react'
+import React, { useState } from 'react'
 
-export default function SizesForm({handleSizeChange}) {
+ export default function SizesForm({ handleSizeChange }) {
     const [sizesForm, setSizesForm] = useState([]);
     const addSize = () => {
         setSizesForm(prev => [...prev, { name: "", value: 0 }]);

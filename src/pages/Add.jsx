@@ -6,22 +6,23 @@ import { fsdb } from '../utils/firebaseconfig';
 import { Header, SizesForm, Map } from '../components';
 import { restaurantGrid, menuGrid } from '../data/dummy';
 import { useNavigate } from 'react-router-dom';
+import { useStateContext } from '../contexts/ContextProvider';
 
 function Add() {
-
+  const { uploadImage } = useStateContext();
   const Navigate = useNavigate();
   const [page, setPage] = useState(false);
   const [sizesForm, setSizesForm] = useState([]);
   const [progress, setProgress] = useState(0);
   const [userCreationComplete, setUserCreationComplete] = useState(false);
-
+  const titles = ['featured on swift bites', 'international', 'coming soon'];
   const [imageFiles, setImageFiles] = useState({
     main_image: null,
     bg_image: null,
     item_image: null
   });
   const [formData, setFormData] = useState({
-    category: [],
+    Category: [],
     isClosed: false,
     bg_image: '',
     likes: [],
@@ -39,25 +40,29 @@ function Add() {
   });
   const [menuData, setMenuData] = useState(
     {
-      item_category: "", // Replace with actual input if needed
-      isAvailable: true,
+      item_category: "",
+      available: true,
       ordersCount: 0,
-      preferences: "",
-      combo: {
-
-      },
+      // preferences: "",
+      combo: {},
       item_description: "",
       item_name: "",
       item_price: 0,
+      item_discount: 0,
       likes: [],
       orders_count: 0,
       sizes: {}
     })
-
+  const handleSelectChange = (e) => {
+    setFormData(prevState => ({
+      ...prevState,
+      title: e.target.value
+    }));
+  };
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: "AIzaSyDM7PY2pGPq_ZlOBqH0Dhq3np8nNmXbVf0"
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY
   });
 
   const onMapClick = useCallback((event) => {
@@ -85,7 +90,7 @@ function Add() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "category" || name === "sub_categories" || name === "title") {
+    if (name === "category" || name === "sub_categories") {
       setFormData(prevState => ({
         ...prevState,
         [name]: value.split(',')
@@ -93,7 +98,7 @@ function Add() {
     } else if (menuGrid.some(item => item.value === name)) {
       setMenuData(prevState => ({
         ...prevState,
-        [name]: value
+        [name]: name === "item_price" ? parseFloat(value) : value
       }));
     } else {
       setFormData(prevState => ({
@@ -104,20 +109,20 @@ function Add() {
   };
 
 
-  const uploadImage = async (file) => {
-    const storage = getStorage();
-    const storageReference = storageRef(storage, `images/${file.name}`);
-    try {
-      console.log('Uploading to:', storageReference.fullPath);
-      const snapshot = await uploadBytes(storageReference, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      console.log('File available at:', downloadURL);
-      return downloadURL;
-    } catch (error) {
-      console.error('Error during file upload:', error);
-      throw error;
-    }
-  };
+  // const uploadImage = async (file) => {
+  //   const storage = getStorage();
+  //   const storageReference = storageRef(storage, `images/${file.name}`);
+  //   try {
+  //     console.log('Uploading to:', storageReference.fullPath);
+  //     const snapshot = await uploadBytes(storageReference, file);
+  //     const downloadURL = await getDownloadURL(snapshot.ref);
+  //     console.log('File available at:', downloadURL);
+  //     return downloadURL;
+  //   } catch (error) {
+  //     console.error('Error during file upload:', error);
+  //     throw error;
+  //   }
+  // };
 
 
   const handleSubmit = async (e) => {
@@ -157,7 +162,7 @@ function Add() {
 
       const menuRef = collection(fsdb, `restaurants/${docRef.id}/menu_items`);
       const menuItemRef = await addDoc(menuRef, menuData);
-      await setDoc(menuItemRef, { menu_item_id: menuItemRef.id }, { merge: true })
+      await setDoc(menuItemRef, { item_id: menuItemRef.id }, { merge: true })
       console.log("Menu item added with ID: ", menuItemRef.id);
       setProgress(60);
 
@@ -192,18 +197,33 @@ function Add() {
           <React.Fragment key={item.value}>
             {item.value == "location" ?
               <Map markerPosition={markerPosition} onMapClick={onMapClick} isLoaded={isLoaded} />
-              :
-              <div key={item.value} className="w-full md:w-1/2 p-2">
-                <label className='block'>{item.headerText}</label>
-                <input
-                  className='bg-gray-200 rounded-lg p-1 w-full'
-                  type={item.inputType}
-                  name={item.value}
-                  value={item.inputType === "file" ? undefined : formData[item.value]}
-                  onChange={item.inputType === "file" ? handleFileInputChange : handleChange}
-                  placeholder={item.placeholder || ""}
-                />
-              </div>}
+              : item.value == 'title' ?
+                <div key={item.value} className='p-2 rounded-xl'>
+                  <div className='bg-gray-200 shadow-lg p-2 rounded-xl'>
+                    <label className='block'>Title</label>
+                    <select
+                      // required
+                      className=' bg-white p-1 rounded-xl text-center'
+                      onChange={handleSelectChange}>
+                      {titles.map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                :
+                <div key={item.value} className="w-full md:w-1/2 p-2">
+                  <label className='block'>{item.headerText}</label>
+                  <input
+                    // required
+                    className='bg-gray-200 rounded-lg p-1 w-full'
+                    type={item.inputType}
+                    name={item.value}
+                    value={item.inputType === "file" ? undefined : formData[item.value]}
+                    onChange={item.inputType === "file" ? handleFileInputChange : handleChange}
+                    placeholder={item.placeholder || ""}
+                  />
+                </div>}
           </React.Fragment>
         )) :
           menuGrid.map((item) => (
@@ -212,16 +232,17 @@ function Add() {
               {item.value === "sizes" ? (
                 <SizesForm handleSizeChange={handleSizeChange} />
 
-              ) : (
-                <input
-                  className='bg-gray-200 rounded-lg p-1 w-full'
-                  type={item.inputType}
-                  name={item.value}
-                  value={item.inputType === "file" ? undefined : menuData[item.value]}
-                  onChange={item.inputType === "file" ? handleFileInputChange : handleChange}
-                  placeholder={item.placeholder || ""}
-                />
-              )}
+              )
+                : (
+                  <input
+                    className='bg-gray-200 rounded-lg p-1 w-full'
+                    type={item.inputType}
+                    name={item.value}
+                    value={item.inputType === "file" ? undefined : menuData[item.value]}
+                    onChange={item.inputType === "file" ? handleFileInputChange : handleChange}
+                    placeholder={item.placeholder || ""}
+                  />
+                )}
 
             </div>))
         }

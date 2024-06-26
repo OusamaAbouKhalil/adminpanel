@@ -4,11 +4,11 @@ import { getStorage, uploadBytes, getDownloadURL, ref as storageRef } from 'fire
 import { fsdb } from '../utils/firebaseconfig';
 import { menuGrid } from '../data/dummy';
 import { useNavigate, useParams } from 'react-router-dom'
-import { Header } from '../components';
+import { Header, SizesForm } from '../components';
 function AddItem() {
     const { id } = useParams();
     const Navigate = useNavigate();
-
+    const [sizesForm, setSizesForm] = useState([])
     const [menuData, setMenuData] = useState({
         item_category: "",
         isAvailable: true,
@@ -41,8 +41,13 @@ function AddItem() {
         const { name, value } = e.target;
         setMenuData(prevState => ({
             ...prevState,
-            [name]: value
+            [name]: name === "item_price" ? parseFloat(value) : value
         }));
+    };
+    const handleSizeChange = (index, field, value) => {
+        const newSizes = [...sizesForm];
+        newSizes[index] = { ...newSizes[index], [field]: value };
+        setSizesForm(newSizes);
     };
 
     const uploadImage = async (file) => {
@@ -83,23 +88,18 @@ function AddItem() {
 
     return (
         <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
-            <Header category="Page" title="Add Item"/>
+            <Header category="Page" title="Add Item" />
             <div>
                 <form onSubmit={handleSubmit} className='flex flex-wrap'>
                     {menuGrid.map((item) => (
                         <div key={item.value} className="w-full md:w-1/2 p-2">
                             <label className='block'>{item.headerText}</label>
                             {item.value === "sizes" ? (
-                                <input
-                                    className='bg-gray-200 rounded-lg p-1 w-full'
-                                    type="text"
-                                    name={item.value}
-                                    value={`${menuData.sizes.small}, ${menuData.sizes.medium}, ${menuData.sizes.large}`}
-                                    onChange={handleChange}
-                                    placeholder="Enter sizes as small, medium, large"
-                                />
+                                <SizesForm handleSizeChange={handleSizeChange} />
+
                             ) : (
                                 <input
+                                    // required
                                     className='bg-gray-200 rounded-lg p-1 w-full'
                                     type={item.inputType}
                                     name={item.value}

@@ -12,7 +12,7 @@ const OrderRequest = ({ order, onAccept }) => {
   };
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: "AIzaSyDM7PY2pGPq_ZlOBqH0Dhq3np8nNmXbVf0"
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY
   });
 
   const onLoad = useCallback(function callback(map) {
