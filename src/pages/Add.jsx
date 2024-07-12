@@ -15,7 +15,7 @@ function Add() {
   const [sizesForm, setSizesForm] = useState([]);
   const [progress, setProgress] = useState(0);
   const [userCreationComplete, setUserCreationComplete] = useState(false);
-  const titles = ['featured on swift bites', 'international', 'coming soon'];
+  const titles = ['Featured on SwiftBites', 'National Brands', 'Coming Soon', 'In a hurry?', 'Wallet Friendly'];
   const [imageFiles, setImageFiles] = useState({
     main_image: null,
     bg_image: null,
@@ -42,7 +42,6 @@ function Add() {
     {
       item_category: "",
       available: true,
-      ordersCount: 0,
       // preferences: "",
       combo: {},
       item_description: "",
@@ -54,9 +53,10 @@ function Add() {
       sizes: {}
     })
   const handleSelectChange = (e) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
     setFormData(prevState => ({
       ...prevState,
-      title: e.target.value
+      title: selectedOptions
     }));
   };
 
@@ -202,8 +202,8 @@ function Add() {
                   <div className='bg-gray-200 shadow-lg p-2 rounded-xl'>
                     <label className='block'>Title</label>
                     <select
-                      // required
-                      className=' bg-white p-1 rounded-xl text-center'
+                      multiple // Allow multiple selections
+                      className='bg-white p-1 rounded-xl text-center'
                       onChange={handleSelectChange}>
                       {titles.map(option => (
                         <option key={option} value={option}>{option}</option>
@@ -215,7 +215,6 @@ function Add() {
                 <div key={item.value} className="w-full md:w-1/2 p-2">
                   <label className='block'>{item.headerText}</label>
                   <input
-                    // required
                     className='bg-gray-200 rounded-lg p-1 w-full'
                     type={item.inputType}
                     name={item.value}
@@ -230,7 +229,7 @@ function Add() {
             <div key={item.value} className="w-full md:w-1/2 p-2">
               <label className='block'>{item.headerText}</label>
               {item.value === "sizes" ? (
-                <SizesForm handleSizeChange={handleSizeChange} />
+                <SizesForm sizesForm={sizesForm} setSizesForm={setSizesForm} handleSizeChange={handleSizeChange} />
 
               )
                 : (

@@ -11,24 +11,35 @@ const Test = () => {
   const [addonPrice, setAddonPrice] = useState('');
   const [showAddonsForm, setShowAddonsForm] = useState(false);
   const Navigate = useNavigate();
-  const back = () => {
-    Navigate(`/restaurants/${id}`);
-  }
+
   useEffect(() => {
     const fetchItem = async () => {
       const item_data = await getMenuItem(id, item_id);
       setItem(item_data);
     };
     fetchItem();
-  }, [id, item_id, getMenuItem]);
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    // if (value == "true") {
+    //   console.log('true')
+    //   value = true
+    // }
     setItem(prevItem => ({
       ...prevItem,
-      [name]: name === "item_price" ? parseFloat(value) : value
+      [name]: name === ("item_price" || name === "item_discount") ? parseFloat(value) : name === "available" ? value == "true" : value
     }));
   };
+
+
+  const handleFileInputChange = (e) => {
+    e.preventDefault();
+    const file = e.target.files[0];
+    if (file) {
+      setItemImage(file);
+    }
+  }
 
   const handleSaveChanges = async () => {
     if (ItemImage) {
@@ -42,13 +53,7 @@ const Test = () => {
       await setMenuItem(id, item_id, item);
     }
   };
-  const handleFileInputChange = (e) => {
-    e.preventDefault();
-    const file = e.target.files[0];
-    if (file) {
-      setItemImage(file);
-    }
-  }
+
   const handleAddAddon = () => {
     const addonData = {
       name: addonName,
@@ -58,6 +63,10 @@ const Test = () => {
     setAddonName('');
     setAddonPrice('');
   };
+
+  const back = () => {
+    Navigate(`/restaurants/${id}`);
+  }
 
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl shadow-lg">
@@ -87,14 +96,14 @@ const Test = () => {
               <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item discount:</label>
               <input
                 type="text"
-                name="item_price"
+                name="item_discount"
                 value={item.item_discount}
                 onChange={handleInputChange}
-                placeholder="Item Price"
+                placeholder="Item Discount"
                 className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
               />
               <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item sizes:</label>
-              
+
               <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item Description:</label>
               <textarea
                 name="item_description"
@@ -108,7 +117,7 @@ const Test = () => {
             <div className="flex flex-col mt-10">
               <label className="block text-gray-700 text-sm font-bold mb-2">Availability:</label>
               <select
-                name="isAvailable"
+                name="available"
                 onChange={handleInputChange}
                 value={item.isAvailable}
                 className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
@@ -119,7 +128,7 @@ const Test = () => {
 
               <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">Item Image:</label>
               <input
-                type="file"  // Change the input type to file
+                type="file"
                 onChange={handleFileInputChange}
                 className='mb-4'
               />

@@ -4,7 +4,6 @@ import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 const containerStyle = { height: "200px", width: "100%" };
 
 const OrderRequest = ({ order, onAccept }) => {
-  const [map, setMap] = useState(null);
 
   const center = {
     lat: parseFloat(order?.user_location._lat),

@@ -1,16 +1,14 @@
 import React, { useState } from 'react'
 
- export default function SizesForm({ handleSizeChange }) {
-    const [sizesForm, setSizesForm] = useState([]);
+const SizesForm = ({ sizesForm, setSizesForm, handleSizeChange }) => {
     const addSize = () => {
-        setSizesForm(prev => [...prev, { name: "", value: 0 }]);
+      setSizesForm(prev => [...prev, { name: "", value: 0 }]);
     };
-
-
+  
     const removeSize = (index) => {
-        const newSizes = [...sizesForm];
-        newSizes.splice(index, 1);
-        setSizesForm(newSizes);
+      const newSizes = [...sizesForm];
+      newSizes.splice(index, 1);
+      setSizesForm(newSizes);
     };
 
 
@@ -39,3 +37,4 @@ import React, { useState } from 'react'
         </>
     );
 }
+export default SizesForm;

@@ -95,7 +95,8 @@ function AddItem() {
                         <div key={item.value} className="w-full md:w-1/2 p-2">
                             <label className='block'>{item.headerText}</label>
                             {item.value === "sizes" ? (
-                                <SizesForm handleSizeChange={handleSizeChange} />
+                                <SizesForm sizesForm={sizesForm} setSizesForm={setSizesForm} handleSizeChange={handleSizeChange} />
+
 
                             ) : (
                                 <input
