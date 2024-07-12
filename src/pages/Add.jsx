@@ -53,12 +53,25 @@ function Add() {
       sizes: {}
     })
   const handleSelectChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
-    setFormData(prevState => ({
-      ...prevState,
-      title: selectedOptions
-    }));
+    const clickedOption = e.target.value;
+    const isSelected = formData.title.includes(clickedOption);
+
+    if (isSelected) {
+      // Remove the clicked option from formData.title
+      setFormData(prevState => ({
+        ...prevState,
+        title: prevState.title.filter(title => title !== clickedOption)
+      }));
+    } else {
+      // Add the clicked option to formData.title
+      setFormData(prevState => ({
+        ...prevState,
+        title: [...prevState.title, clickedOption]
+      }));
+    }
+    console.log(formData.title);
   };
+
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -204,11 +217,19 @@ function Add() {
                     <select
                       multiple // Allow multiple selections
                       className='bg-white p-1 rounded-xl text-center'
-                      onChange={handleSelectChange}>
+                      onClick={handleSelectChange}
+                    >
                       {titles.map(option => (
-                        <option key={option} value={option}>{option}</option>
+                        <option
+                          key={option}
+                          value={option}
+                          className={`p-2 ${formData.title.includes(option) ? 'bg-blue-500 text-white' : 'bg-gray-200'} rounded-sm`}
+                        >
+                          {option}
+                        </option>
                       ))}
                     </select>
+
                   </div>
                 </div>
                 :
