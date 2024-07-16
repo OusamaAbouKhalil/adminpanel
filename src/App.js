@@ -1,10 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Navigate, Outlet } from 'react-router-dom';
-import { FiSettings } from 'react-icons/fi';
-import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
-import { Navbar, Footer, Sidebar, ThemeSettings } from "./components"
+import { Navbar, Sidebar} from "./components"
 import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage } from "./pages"
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
@@ -18,7 +16,6 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const App = () => {
-  const { activeMenu } = useStateContext();
 
   return (
     <AuthProvider>
