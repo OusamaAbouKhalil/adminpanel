@@ -54,7 +54,7 @@ const PendingOrders = () => {
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       onClick={handleOutsideClick}
     >
-      <div className="bg-white p-4 rounded shadow-lg relative max-w-4xl w-full overflow-y-auto">
+      <div className="bg-white p-4 rounded shadow-lg relative max-w-6xl w-full h-5/6 overflow-y-auto">
         <button
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded absolute top-2 right-2"
           onClick={handleClosePage}

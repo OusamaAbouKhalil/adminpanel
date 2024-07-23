@@ -3,7 +3,7 @@ import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 
 const containerStyle = { height: "200px", width: "100%" };
 
-const OrderRequest = ({ order, onAccept }) => {
+const OrderRequest = ({ order, onAccept, onReject }) => {
   const center = {
     lat: parseFloat(order?.user_location._lat),
     lng: parseFloat(order?.user_location._long),
@@ -28,27 +28,35 @@ const OrderRequest = ({ order, onAccept }) => {
   }
 
   return (
-    <div className="p-4 border rounded shadow max-w-md w-full">
+    <div className="p-4 border rounded shadow max-w-screen-xl w-full">
       <h2 className="text-lg font-bold">Order Request:</h2>
       <p>
-        <strong>Recipient:</strong> {order.recipient_name}
+        <strong>Recipient Name:</strong> {order.recipient_name}
       </p>
-      {/* item name, combo, quantity */}
-      <p>
-        <strong>Item Name:</strong> {order.item_name}
-      </p>
-      <p>
-        <strong>Combo:</strong> {order.combo_name}
-      </p>
-      <p>
-        <strong>Size:</strong> {order.size}
-      </p>
-      <p>
-        <strong>Quantity:</strong> {order.quantity}
-      </p>
+      {order.items &&
+      
+        order.items.map((item, index) => (
+          <div key={index} className="my-2 p-2 border rounded">
+            <p>
+              <strong>Item Name:</strong> {item.item_name}
+            </p>
+            <p>
+              <strong>Quantity:</strong> {item.quantity}
+            </p>
+            <p>
+              <strong>Combo:</strong> {item.combo.join(", ")}
+            </p>
+            <p>
+              <strong>Size:</strong> {item.size}
+            </p>
+            <p>
+              <strong>Price:</strong> ${item.total}
+            </p>
+          </div>
+        ))}
       <p>
         {/* total = total + delivery fee */}
-        {/* <strong>Total:</strong> ${order.total} + ${order.delivery_fee} */}
+        <strong>Total:</strong> ${order.total + order.delivery_fee}
       </p>
       <p>
         <strong>Cost in Credits:</strong> {order.costInCredits}
@@ -78,7 +86,6 @@ const OrderRequest = ({ order, onAccept }) => {
           View on Google Maps
         </a>
       </p>
-
       <div style={containerStyle}>
         {isLoaded ? (
           <GoogleMap
@@ -101,9 +108,22 @@ const OrderRequest = ({ order, onAccept }) => {
           borderRadius: "12%",
           padding: "8px",
           marginTop: "3px",
+          marginRight: "10px",
         }}
       >
         Accept
+      </button>
+      <button
+        onClick={onReject}
+        style={{
+          backgroundColor: "red",
+          color: "white",
+          borderRadius: "12%",
+          padding: "8px",
+          marginTop: "3px",
+        }}
+      >
+        Reject
       </button>
     </div>
   );
