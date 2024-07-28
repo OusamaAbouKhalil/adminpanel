@@ -29,12 +29,12 @@ const OrderRequest = ({ order, onAccept, onReject }) => {
 
   return (
     <div className="p-4 border rounded shadow max-w-screen-xl w-full">
-      <h2 className="text-lg font-bold">Order Request:</h2>
+      <h1 className="text-xl font-bold">Order Request:</h1>
       <p>
         <strong>Recipient Name:</strong> {order.recipient_name}
       </p>
+      {/* {console.log("hmmm",order.items)} */}
       {order.items &&
-      
         order.items.map((item, index) => (
           <div key={index} className="my-2 p-2 border rounded">
             <p>
@@ -43,9 +43,9 @@ const OrderRequest = ({ order, onAccept, onReject }) => {
             <p>
               <strong>Quantity:</strong> {item.quantity}
             </p>
-            <p>
+            {/* <p>
               <strong>Combo:</strong> {item.combo.join(", ")}
-            </p>
+            </p> */}
             <p>
               <strong>Size:</strong> {item.size}
             </p>

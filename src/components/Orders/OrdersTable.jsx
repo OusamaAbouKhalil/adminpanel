@@ -94,7 +94,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                         {order.recipient_name}
                       </td>
                       <td className="border px-4 py-2 sm:text-base text-xs">
-                        ${order.total}
+                        ${order.total + order.delivery_fee}
                       </td>
                       <td className="border px-4 py-2 sm:text-base text-xs">
                         {order.status}

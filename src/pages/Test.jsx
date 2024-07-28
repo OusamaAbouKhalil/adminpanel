@@ -51,6 +51,7 @@ const Test = () => {
     }
     if (item) {
       await setMenuItem(id, item_id, item);
+      Navigate(`/restaurants/${id}`);
     }
   };
 

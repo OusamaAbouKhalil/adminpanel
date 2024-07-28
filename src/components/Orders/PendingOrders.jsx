@@ -15,14 +15,28 @@ const PendingOrders = () => {
     [orders]
   );
 
+  // const handleAccept = (order) => {
+  //   setSelectedOrder(order);
+  //   setIsModalOpen(true);
+  // };
+
+  // const handleReject = (order) => {
+  //   const updatedOrder = { ...order, status: "rejected" };
+  //   updateOrderStatus(updatedOrder);
+  // };
+
   const handleAccept = (order) => {
-    setSelectedOrder(order);
-    setIsModalOpen(true);
+    const updatedOrder = { ...order, status: "accepted" };
+    updateOrderStatus(updatedOrder);
+    setSelectedOrder(null);
+    setIsModalOpen(false);
   };
 
   const handleReject = (order) => {
     const updatedOrder = { ...order, status: "rejected" };
     updateOrderStatus(updatedOrder);
+    setSelectedOrder(null);
+    setIsModalOpen(false);
   };
 
   const handleCloseModal = () => {
