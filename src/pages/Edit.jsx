@@ -18,6 +18,10 @@ function Edit() {
   const bgImageRef = useRef(null);
   const [categoriesForm, setCategoriesForm] = useState([]);
   const [subCategoriesForm, setSubCategoriesForm] = useState([]);
+  const [images, setImages] = useState({
+    main_image: null,
+    bg_image: null,
+  });
 
   const titles = [
     "Featured on SwiftBites",
@@ -128,6 +132,10 @@ function Edit() {
         ...prev,
         [e.target.name]: URL.createObjectURL(file),
       }));
+      setImages((prev) => ({
+        ...prev,
+        [e.target.name]: file,
+      }));
     }
   };
 
@@ -169,14 +177,14 @@ function Edit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (imageFiles.main_image) {
-        const mainImageUrl = await uploadImage(imageFiles.main_image);
+      if (images.main_image) {
+        const mainImageUrl = await uploadImage(images.main_image);
         formData.main_image = mainImageUrl;
       }
       setProgress(20);
 
-      if (imageFiles.bg_image) {
-        const bgImageUrl = await uploadImage(imageFiles.bg_image);
+      if (images.bg_image) {
+        const bgImageUrl = await uploadImage(images.bg_image);
         formData.bg_image = bgImageUrl;
       }
       setProgress(60);
