@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Header } from '../components'
-import { useStateContext } from '../contexts/ContextProvider'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useMemo, useState } from "react";
+import { Header } from "../components";
+import { useStateContext } from "../contexts/ContextProvider";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 export default function Menu() {
   const { getRestaurantsMenu } = useStateContext();
@@ -9,10 +9,10 @@ export default function Menu() {
   const Navigate = useNavigate();
 
   const [menu, setMenu] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
-  const tableMenuDsiplay = ["", "Name", "Price", "Description", "Order Count"]
+  const tableMenuDsiplay = ["", "Name", "Price", "Description", "Order Count"];
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -23,7 +23,7 @@ export default function Menu() {
   }, [id, getRestaurantsMenu]);
 
   const filteredItems = useMemo(() => {
-    return menu.filter(item =>
+    return menu.filter((item) =>
       item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [menu, searchTerm]);
@@ -33,9 +33,9 @@ export default function Menu() {
   const currentRows = filteredItems.slice(indexOfFirstRow, indexOfLastRow);
   const totalPages = Math.ceil(filteredItems.length / rowsPerPage);
 
-  const additem = ()=>{
-    Navigate(`/restaurants/${id}/additem`)
-  }
+  const additem = () => {
+    Navigate(`/restaurants/${id}/additem`);
+  };
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -51,9 +51,9 @@ export default function Menu() {
       <div className="flex justify-between mb-4">
         <button
           onClick={additem}
-          className="bg-lightgray text-black text-xs px-4 py-2 rounded-md"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
-          Add 
+          Add
         </button>
         <input
           type="text"
@@ -76,25 +76,27 @@ export default function Menu() {
           </thead>
           <tbody>
             {currentRows.map((item, index) => (
-              <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 text-left">
-                <td className='py-4 px-6'>
-                  <img src={item.item_image} className='min-w-20 w-32' alt="" />
+              <tr
+                key={index}
+                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 text-left"
+              >
+                <td className="py-4 px-6">
+                  <img src={item.item_image} className="min-w-20 w-32" alt="" />
                 </td>
                 <td className="py-4 px-6">
-                  <Link to={`/restaurants/${id}/${item.item_id}`} className="font-medium text-gray-900 dark:text-white hover:underline">
+                  <Link
+                    to={`/restaurants/${id}/${
+                      item.item_id || item.menu_item_id
+                    }`}
+                    className="font-medium text-gray-900 dark:text-white hover:underline"
+                  >
                     {item.item_name}
                   </Link>
                 </td>
-                <td className='py-4 px-6'>
-                  {item.item_price}
-                </td>
-                <td className='py-4 px-6'>
-                  {item.item_description}
-                </td>
+                <td className="py-4 px-6">{item.item_price}</td>
+                <td className="py-4 px-6">{item.item_description}</td>
 
-                <td className='py-4 px-6'>
-                  {item.orders_count}
-                </td>
+                <td className="py-4 px-6">{item.orders_count}</td>
               </tr>
             ))}
           </tbody>
@@ -107,10 +109,11 @@ export default function Menu() {
               <li key={number}>
                 <button
                   onClick={() => goToPage(number + 1)}
-                  className={`py-2 px-3 leading-tight ${currentPage === number + 1
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white text-gray-500'
-                    } border border-gray-300 hover:bg-blue-500 hover:text-white`}
+                  className={`py-2 px-3 leading-tight ${
+                    currentPage === number + 1
+                      ? "bg-blue-500 text-white"
+                      : "bg-white text-gray-500"
+                  } border border-gray-300 hover:bg-blue-500 hover:text-white`}
                 >
                   {number + 1}
                 </button>
@@ -120,5 +123,5 @@ export default function Menu() {
         </nav>
       </div>
     </div>
-  )
+  );
 }

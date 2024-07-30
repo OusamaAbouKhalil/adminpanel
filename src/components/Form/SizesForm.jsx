@@ -2,13 +2,13 @@ import React, { useState } from 'react'
 
 const SizesForm = ({ sizesForm, setSizesForm, handleSizeChange }) => {
     const addSize = () => {
-      setSizesForm(prev => [...prev, { name: "", value: 0 }]);
+        setSizesForm(prev => [...prev, { name: "", value: 0 }]);
     };
-  
+
     const removeSize = (index) => {
-      const newSizes = [...sizesForm];
-      newSizes.splice(index, 1);
-      setSizesForm(newSizes);
+        const newSizes = [...sizesForm];
+        newSizes.splice(index, 1);
+        setSizesForm(newSizes);
     };
 
 
@@ -33,7 +33,7 @@ const SizesForm = ({ sizesForm, setSizesForm, handleSizeChange }) => {
                     <button type='button' onClick={() => removeSize(index)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">X</button>
                 </div>
             ))}
-            <button key="addSize" type="button" onClick={addSize} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Add Size</button>
+            <button key="addSize" type="button" onClick={addSize} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Size</button>
         </>
     );
 }

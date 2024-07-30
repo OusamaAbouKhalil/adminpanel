@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     if (idleTimeout) {
       clearTimeout(idleTimeout);
     }
-    setIdleTimeout(setTimeout(logOut, 20 * 60 * 1000)); // Set a new idle timeout for 20 minutes
+    // setIdleTimeout(setTimeout(logOut, 30 * 60 * 1000)); // Set a new idle timeout for 30 minutes
   };
 
   useEffect(() => {

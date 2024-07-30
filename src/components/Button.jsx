@@ -11,7 +11,7 @@ const Button = ({ bgColor, color, size, text, borderRadius,action }) => {
       type='button'
       style={{ backgroundColor: bgColor, color, borderRadius }}
       className={`text-${size} p-3 hover:drop-shadow-xl mb-3`}
-      onClick={action === "add"?add:null}
+      onClick={action === "add"?add:null} //
     >
       {text}
     </button>

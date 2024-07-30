@@ -51,6 +51,7 @@ const Test = () => {
     }
     if (item) {
       await setMenuItem(id, item_id, item);
+      Navigate(`/restaurants/${id}`);
     }
   };
 
@@ -143,7 +144,7 @@ const Test = () => {
               <input
                 type="text"
                 name="item_category"
-                value={item.item_category}
+                value={item.item_category} 
                 onChange={handleInputChange}
                 placeholder="Item Category"
                 className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'

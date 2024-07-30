@@ -1,11 +1,16 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Navigate, Outlet } from 'react-router-dom';
+import { FiSettings } from 'react-icons/fi';
+import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
-import { Navbar, Sidebar} from "./components"
+import { Navbar, Footer, Sidebar, ThemeSettings } from "./components"
 import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage } from "./pages"
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
+import Edit from './pages/Edit';
+import PendingOrders from './components/Orders/PendingOrders';
+
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
   if (!currentUser) {
@@ -16,6 +21,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const App = () => {
+  const { activeMenu } = useStateContext();
 
   return (
     <AuthProvider>
@@ -27,9 +33,11 @@ const App = () => {
             <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="restaurants" element={<ProtectedRoute><Restaurants /></ProtectedRoute>} />
             <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+            <Route path="orders/pendingOrders" element={<ProtectedRoute><PendingOrders /></ProtectedRoute>} />
             <Route path="add" element={<ProtectedRoute><Add /></ProtectedRoute>} />
             <Route path="restaurants/:id/additem" element={<ProtectedRoute><AddItem /></ProtectedRoute>} />
             <Route path="restaurants/:id" element={<ProtectedRoute><Menu /></ProtectedRoute>} />
+            <Route path="restaurants/:id/edit" element={<ProtectedRoute><Edit /></ProtectedRoute>} />
             <Route path="restaurants/:id/:item_id" element={<ProtectedRoute><Test /></ProtectedRoute>} />
             <Route path="kanban" element={<ProtectedRoute><Kanban /></ProtectedRoute>} />
             <Route path="calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
