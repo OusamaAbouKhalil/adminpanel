@@ -16,8 +16,8 @@ function AddItem() {
   const [sizesForm, setSizesForm] = useState([]);
   const [menuData, setMenuData] = useState({
     item_category: "",
-    isAvailable: true,
-    ordersCount: 0,
+    available: true,
+    orders_count: 0,
     preferences: "",
     combo: {},
     item_description: "",
@@ -25,11 +25,7 @@ function AddItem() {
     item_price: 0,
     likes: [],
     orders_count: 0,
-    sizes: {
-      large: 0,
-      medium: 0,
-      small: 0,
-    },
+    sizes: {},
   });
 
   const [itemImage, setItemImage] = useState(null);
