@@ -40,7 +40,7 @@ function Add() {
     item_image: null,
   });
   const [formData, setFormData] = useState({
-    Category: [],
+    category: [],
     isClosed: false,
     bg_image: "",
     likes: [],
@@ -268,207 +268,203 @@ function Add() {
       <>
         {page == 0
           ? restaurantGrid.map((item) => (
-              <React.Fragment key={item.value}>
-                {item.value == "location" ? (
-                  <div className="w-full p-2">
-                    <Map
-                      markerPosition={markerPosition}
-                      onMapClick={onMapClick}
-                      isLoaded={isLoaded}
-                    />
-                    <label className="block">Location Link</label>
-                    <input
-                      type="text"
-                      value={formData.mapLink || ""}
-                      readOnly
-                      className="bg-gray-200 rounded-lg p-1 w-full"
-                    />
-                  </div>
-                ) : item.value == "title" ? (
-                  <div key={item.value} className="w-full md:w-1/2 p-2">
-                    <label className="block">Title</label>
-                    <div className="bg-gray-200 shadow-lg p-2 rounded-xl">
-                      <select
-                        multiple // Allow multiple selections
-                        className="bg-white p-1 rounded-xl text-center w-full"
-                        onClick={handleSelectChange}
-                      >
-                        {titles.map((option) => (
-                          <option
-                            key={option}
-                            value={option}
-                            className={`p-2 ${
-                              formData.title.includes(option)
-                                ? "bg-blue-500 text-white"
-                                : "bg-gray-200"
+            <React.Fragment key={item.value}>
+              {item.value == "location" ? (
+                <div className="w-full p-2">
+                  <Map
+                    markerPosition={markerPosition}
+                    onMapClick={onMapClick}
+                    isLoaded={isLoaded}
+                  />
+                  <label className="block">Location Link</label>
+                  <input
+                    type="text"
+                    value={formData.mapLink || ""}
+                    readOnly
+                    className="bg-gray-200 rounded-lg p-1 w-full"
+                  />
+                </div>
+              ) : item.value == "title" ? (
+                <div key={item.value} className="w-full md:w-1/2 p-2">
+                  <label className="block">Title</label>
+                  <div className="bg-gray-200 shadow-lg p-2 rounded-xl">
+                    <select
+                      multiple // Allow multiple selections
+                      className="bg-white p-1 rounded-xl text-center w-full"
+                      onClick={handleSelectChange}
+                    >
+                      {titles.map((option) => (
+                        <option
+                          key={option}
+                          value={option}
+                          className={`p-2 ${formData.title.includes(option)
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-200"
                             } rounded-sm`}
-                          >
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                        >
+                          {option}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                ) : item.value == "Category" ? (
-                  <div className="w-full md:w-1/2 p-2">
-                    <label className="block">Category</label>
-                    <CategoriesForm
-                      categoriesForm={categoriesForm}
-                      setCategoriesForm={setCategoriesForm}
-                      handleCategoryChange={handleCategoryChange}
-                      title={"Add a Category"}
-                    />
-                  </div>
-                ) : item.value == "sub_categories" ? (
-                  <div className="w-full md:w-1/2 p-2">
-                    <label className="block">Sub-Category</label>
-                    <CategoriesForm
-                      categoriesForm={subCategoriesForm}
-                      setCategoriesForm={setSubCategoriesForm}
-                      handleCategoryChange={(index, field, value) =>
-                        handleCategoryChange(index, field, value, true)
-                      }
-                      title={"Add a Sub-category"}
-                    />
-                  </div>
-                ) : (
-                  <div key={item.value} className="w-full md:w-1/2 p-2">
-                    <label className="block">{item.headerText}</label>
-                    <div className="flex items-center">
-                      <input
-                        ref={
-                          item.value === "main_image"
-                            ? mainImageRef
-                            : item.value === "bg_image"
+                </div>
+              ) : item.value == "Category" ? (
+                <div className="w-full md:w-1/2 p-2">
+                  <label className="block">Category</label>
+                  <CategoriesForm
+                    categoriesForm={categoriesForm}
+                    setCategoriesForm={setCategoriesForm}
+                    handleCategoryChange={handleCategoryChange}
+                    title={"Add a Category"}
+                  />
+                </div>
+              ) : item.value == "sub_categories" ? (
+                <div className="w-full md:w-1/2 p-2">
+                  <label className="block">Sub-Category</label>
+                  <CategoriesForm
+                    categoriesForm={subCategoriesForm}
+                    setCategoriesForm={setSubCategoriesForm}
+                    handleCategoryChange={(index, field, value) =>
+                      handleCategoryChange(index, field, value, true)
+                    }
+                    title={"Add a Sub-category"}
+                  />
+                </div>
+              ) : (
+                <div key={item.value} className="w-full md:w-1/2 p-2">
+                  <label className="block">{item.headerText}</label>
+                  <div className="flex items-center">
+                    <input
+                      ref={
+                        item.value === "main_image"
+                          ? mainImageRef
+                          : item.value === "bg_image"
                             ? bgImageRef
                             : null
-                        }
-                        className={`bg-gray-200 rounded-lg p-1 ${
-                          item.inputType === "file" && imageFiles[item.value]
-                            ? "hidden"
-                            : ""
-                        } ${
-                          item.inputType === "checkbox"
-                            ? "form-checkbox h-5 w-5"
-                            : "w-full"
+                      }
+                      className={`bg-gray-200 rounded-lg p-1 ${item.inputType === "file" && imageFiles[item.value]
+                          ? "hidden"
+                          : ""
+                        } ${item.inputType === "checkbox"
+                          ? "form-checkbox h-5 w-5"
+                          : "w-full"
                         }`}
-                        type={item.inputType}
-                        name={item.value}
-                        value={
-                          item.inputType === "file"
-                            ? undefined
-                            : formData[item.value]
-                        }
-                        checked={
-                          item.inputType === "checkbox"
-                            ? formData.isClosed
-                            : undefined
-                        }
-                        onChange={
-                          item.inputType === "file"
-                            ? handleFileInputChange
-                            : handleChange
-                        }
-                        placeholder={item.placeholder || ""}
-                      />
-                      {imageFiles[item.value] && (
-                        <div className="relative mt-2">
-                          <div
-                            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-bold opacity-0 hover:opacity-100 transition-opacity"
-                            style={{ zIndex: 10 }}
-                            onClick={() => {
-                              if (item.value === "main_image") {
-                                mainImageRef.current.click();
-                              } else if (item.value === "bg_image") {
-                                bgImageRef.current.click();
-                              }
-                            }}
-                          >
-                            Change Image
-                          </div>
-                          <img
-                            src={imageFiles[item.value]}
-                            alt={item.headerText}
-                            style={{
-                              objectFit: "cover",
-                              width: "100%",
-                              height: "100%",
-                              maxHeight: "200px",
-                            }}
-                            className="rounded-md w-16 h-16 border-2 border-gray-300 object-cover"
-                          />
-                        </div>
-                      )}
-                      {item.inputType === "checkbox" && (
-                        <span className="ml-2 text-gray-700">
-                          {formData.isClosed ? "Closed" : "Open"}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </React.Fragment>
-            ))
-          : menuGrid.map((item) => (
-              <div key={item.value} className="w-full md:w-1/2 p-2">
-                <label className="block">{item.headerText}</label>
-                {item.value === "sizes" ? (
-                  <SizesForm
-                    sizesForm={sizesForm}
-                    setSizesForm={setSizesForm}
-                    handleSizeChange={handleSizeChange}
-                  />
-                ) : (
-                  <input
-                    ref={item.value === "item_image" ? itemImageRef : null}
-                    className={`bg-gray-200 rounded-lg p-1 w-full ${
-                      item.inputType === "file" && imageFiles[item.value]
-                        ? "hidden"
-                        : ""
-                    }`}
-                    type={item.inputType}
-                    name={item.value}
-                    value={
-                      item.inputType === "file"
-                        ? undefined
-                        : menuData[item.value]
-                    }
-                    onChange={
-                      item.inputType === "file"
-                        ? handleFileInputChange
-                        : handleChange
-                    }
-                    placeholder={item.placeholder || ""}
-                  />
-                )}
-                {imageFiles[item.value] && (
-                  <div className="relative mt-2">
-                    <div
-                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-bold opacity-0 hover:opacity-100 transition-opacity"
-                      style={{ zIndex: 10 }}
-                      onClick={() => {
-                        if (item.value === "item_image") {
-                          itemImageRef.current.click();
-                        }
-                      }}
-                    >
-                      Change Image
-                    </div>
-                    <img
-                      src={imageFiles[item.value]}
-                      alt={item.headerText}
-                      style={{
-                        objectFit: "cover",
-                        width: "100%",
-                        height: "100%",
-                        maxHeight: "200px",
-                      }}
-                      className="rounded-md w-16 h-16 border-2 border-gray-300 object-cover"
+                      type={item.inputType}
+                      name={item.value}
+                      value={
+                        item.inputType === "file"
+                          ? undefined
+                          : formData[item.value]
+                      }
+                      checked={
+                        item.inputType === "checkbox"
+                          ? formData.isClosed
+                          : undefined
+                      }
+                      onChange={
+                        item.inputType === "file"
+                          ? handleFileInputChange
+                          : handleChange
+                      }
+                      placeholder={item.placeholder || ""}
                     />
+                    {imageFiles[item.value] && (
+                      <div className="relative mt-2">
+                        <div
+                          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-bold opacity-0 hover:opacity-100 transition-opacity"
+                          style={{ zIndex: 10 }}
+                          onClick={() => {
+                            if (item.value === "main_image") {
+                              mainImageRef.current.click();
+                            } else if (item.value === "bg_image") {
+                              bgImageRef.current.click();
+                            }
+                          }}
+                        >
+                          Change Image
+                        </div>
+                        <img
+                          src={imageFiles[item.value]}
+                          alt={item.headerText}
+                          style={{
+                            objectFit: "cover",
+                            width: "100%",
+                            height: "100%",
+                            maxHeight: "200px",
+                          }}
+                          className="rounded-md w-16 h-16 border-2 border-gray-300 object-cover"
+                        />
+                      </div>
+                    )}
+                    {item.inputType === "checkbox" && (
+                      <span className="ml-2 text-gray-700">
+                        {formData.isClosed ? "Closed" : "Open"}
+                      </span>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              )}
+            </React.Fragment>
+          ))
+          : menuGrid.map((item) => (
+            <div key={item.value} className="w-full md:w-1/2 p-2">
+              <label className="block">{item.headerText}</label>
+              {item.value === "sizes" ? (
+                <SizesForm
+                  sizesForm={sizesForm}
+                  setSizesForm={setSizesForm}
+                  handleSizeChange={handleSizeChange}
+                />
+              ) : (
+                <input
+                  ref={item.value === "item_image" ? itemImageRef : null}
+                  className={`bg-gray-200 rounded-lg p-1 w-full ${item.inputType === "file" && imageFiles[item.value]
+                      ? "hidden"
+                      : ""
+                    }`}
+                  type={item.inputType}
+                  name={item.value}
+                  value={
+                    item.inputType === "file"
+                      ? undefined
+                      : menuData[item.value]
+                  }
+                  onChange={
+                    item.inputType === "file"
+                      ? handleFileInputChange
+                      : handleChange
+                  }
+                  placeholder={item.placeholder || ""}
+                />
+              )}
+              {imageFiles[item.value] && (
+                <div className="relative mt-2">
+                  <div
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-bold opacity-0 hover:opacity-100 transition-opacity"
+                    style={{ zIndex: 10 }}
+                    onClick={() => {
+                      if (item.value === "item_image") {
+                        itemImageRef.current.click();
+                      }
+                    }}
+                  >
+                    Change Image
+                  </div>
+                  <img
+                    src={imageFiles[item.value]}
+                    alt={item.headerText}
+                    style={{
+                      objectFit: "cover",
+                      width: "100%",
+                      height: "100%",
+                      maxHeight: "200px",
+                    }}
+                    className="rounded-md w-16 h-16 border-2 border-gray-300 object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          ))}
       </>
     );
   };

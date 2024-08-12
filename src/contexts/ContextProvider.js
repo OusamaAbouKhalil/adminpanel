@@ -50,9 +50,9 @@ export const ContextProvider = ({ children }) => {
   const onDriversChange = (snapshot) => {
     const driversArray = snapshot.exists()
       ? Object.entries(snapshot.val()).map(([key, value]) => ({
-          id: key,
-          ...value,
-        }))
+        id: key,
+        ...value,
+      }))
       : [];
     setDrivers(driversArray);
   };

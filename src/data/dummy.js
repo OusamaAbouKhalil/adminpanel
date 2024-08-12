@@ -77,7 +77,7 @@ export const restaurantGrid = [
   },
   {
     headerText: "Category",
-    value: "Category",
+    value: "category",
     inputType: "text",
     placeholder: "Categories (comma separated)",
   },
