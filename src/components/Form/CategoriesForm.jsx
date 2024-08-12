@@ -8,7 +8,7 @@ const CategoriesForm = ({
 }) => {
   // console.log(categoriesForm);
   const addCategory = () => {
-    setCategoriesForm((prev) => [...prev, { name: "" }]);
+    setCategoriesForm((prev) => [...prev, ""]);
   };
 
   const removeCategory = (index) => {

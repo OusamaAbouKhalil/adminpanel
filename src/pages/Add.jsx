@@ -40,7 +40,7 @@ function Add() {
     item_image: null,
   });
   const [formData, setFormData] = useState({
-    category: [],
+    category: '',
     isClosed: false,
     bg_image: "",
     likes: [],
@@ -257,10 +257,12 @@ function Add() {
     const newCategories = isSubCategory
       ? [...subCategoriesForm]
       : [...categoriesForm];
-    newCategories[index] = { ...newCategories[index], [field]: value };
+    newCategories[index] = value;
     isSubCategory
       ? setSubCategoriesForm(newCategories)
       : setCategoriesForm(newCategories);
+    console.log(subCategoriesForm);
+    console.log(categoriesForm);
   };
 
   const renderFormFields = () => {
@@ -308,7 +310,7 @@ function Add() {
                     </select>
                   </div>
                 </div>
-              ) : item.value == "Category" ? (
+              ) : item.value == "category" ? (
                 <div className="w-full md:w-1/2 p-2">
                   <label className="block">Category</label>
                   <CategoriesForm
