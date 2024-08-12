@@ -102,7 +102,8 @@ export const ContextProvider = ({ children }) => {
 
   const uploadImage = async (file) => {
     const storage = getStorage();
-    const storageReference = storageRef(storage, `images/${file.name}`);
+    const filename = Date.now() + "." + file.name.split('.').pop();
+    const storageReference = storageRef(storage, `images/${filename}`);
     try {
       console.log("Uploading to:", storageReference.fullPath);
       const snapshot = await uploadBytes(storageReference, file);

@@ -102,7 +102,7 @@ function Edit() {
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   });
 
   const onMapClick = useCallback((event) => {
@@ -158,21 +158,20 @@ function Edit() {
     const newCategories = isSubCategory
       ? [...subCategoriesForm]
       : [...categoriesForm];
-    newCategories[index] = { ...newCategories[index], [field]: value };
-    if (isSubCategory) {
-      setSubCategoriesForm(newCategories);
-      setFormData((prevState) => ({
-        ...prevState,
-        sub_categories: newCategories,
-      }));
+
+    if (value === '') {
+      // Remove category if value is empty
+      newCategories.splice(index, 1);
     } else {
-      setCategoriesForm(newCategories);
-      setFormData((prevState) => ({
-        ...prevState,
-        Category: newCategories,
-      }));
+      // Add or update category
+      newCategories[index] = value;
     }
+
+    isSubCategory
+      ? setSubCategoriesForm(newCategories)
+      : setCategoriesForm(newCategories);
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -189,17 +188,26 @@ function Edit() {
       }
       setProgress(60);
 
-      // console.log("Form Data: ", formData);
+      // Ensure categories and sub-categories are arrays of strings
+      console.log(subCategoriesForm);
+      if (categoriesForm.length > 0) {
+        formData.Category = categoriesForm.map(item => item.name ?? item);
+      }
+      if (subCategoriesForm.length > 0) {
+        formData.sub_categories = subCategoriesForm;
+      }
+
       const collectionRef = doc(fsdb, "restaurants", id);
       await updateDoc(collectionRef, formData);
 
       setProgress(100);
       setUserUpdatingComplete(true);
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error updating document: ", error);
       setProgress(0);
     }
   };
+
 
   const renderFormFields = () => {
     return (
@@ -236,11 +244,10 @@ function Edit() {
                       <option
                         key={option}
                         value={option}
-                        className={`p-2 ${
-                          formData.title.includes(option)
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-200"
-                        } rounded-sm`}
+                        className={`p-2 ${formData.title.includes(option)
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200"
+                          } rounded-sm`}
                       >
                         {option}
                       </option>
@@ -279,18 +286,16 @@ function Edit() {
                       item.value === "main_image"
                         ? mainImageRef
                         : item.value === "bg_image"
-                        ? bgImageRef
-                        : null
+                          ? bgImageRef
+                          : null
                     }
-                    className={`bg-gray-200 rounded-lg p-1 ${
-                      item.inputType === "file" && imageFiles[item.value]
-                        ? "hidden"
-                        : ""
-                    } ${
-                      item.inputType === "checkbox"
+                    className={`bg-gray-200 rounded-lg p-1 ${item.inputType === "file" && imageFiles[item.value]
+                      ? "hidden"
+                      : ""
+                      } ${item.inputType === "checkbox"
                         ? "form-checkbox h-5 w-5"
                         : "w-full"
-                    }`}
+                      }`}
                     type={item.inputType}
                     name={item.value}
                     value={

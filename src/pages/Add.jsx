@@ -40,7 +40,7 @@ function Add() {
     item_image: null,
   });
   const [formData, setFormData] = useState({
-    category: '',
+    Category: '',
     isClosed: false,
     bg_image: "",
     likes: [],
@@ -99,16 +99,6 @@ function Add() {
     return `https://www.google.com/maps?q=${lat},${lng}`;
   };
 
-  // const onMapClick = useCallback((event) => {
-  //   const lat = event.latLng.lat();
-  //   const lng = event.latLng.lng();
-  //   setMarkerPosition({ lat, lng });
-  //   setFormData((prevState) => ({
-  //     ...prevState,
-  //     location: new GeoPoint(lat, lng),
-  //   }));
-  // }, []);
-
   const onMapClick = useCallback((event) => {
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
@@ -127,17 +117,6 @@ function Add() {
       mapLink: mapLink,
     }));
   });
-
-  // const handleFileInputChange = (e) => {
-  //   e.preventDefault();
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     setImageFiles((prev) => ({
-  //       ...prev,
-  //       [e.target.name]: file,
-  //     }));
-  //   }
-  // };
 
   const handleFileInputChange = (e) => {
     e.preventDefault();
@@ -172,21 +151,6 @@ function Add() {
     }
   };
 
-  // const uploadImage = async (file) => {
-  //   const storage = getStorage();
-  //   const storageReference = storageRef(storage, `images/${file.name}`);
-  //   try {
-  //     console.log('Uploading to:', storageReference.fullPath);
-  //     const snapshot = await uploadBytes(storageReference, file);
-  //     const downloadURL = await getDownloadURL(snapshot.ref);
-  //     console.log('File available at:', downloadURL);
-  //     return downloadURL;
-  //   } catch (error) {
-  //     console.error('Error during file upload:', error);
-  //     throw error;
-  //   }
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -207,6 +171,8 @@ function Add() {
         menuData.item_image = itemImageUrl;
       }
       setProgress(30);
+      formData.Category = categoriesForm;
+      formData.sub_categories = subCategoriesForm;
 
       var subSizes = {};
       console.log(sizesForm);
@@ -261,8 +227,6 @@ function Add() {
     isSubCategory
       ? setSubCategoriesForm(newCategories)
       : setCategoriesForm(newCategories);
-    console.log(subCategoriesForm);
-    console.log(categoriesForm);
   };
 
   const renderFormFields = () => {
@@ -310,7 +274,7 @@ function Add() {
                     </select>
                   </div>
                 </div>
-              ) : item.value == "category" ? (
+              ) : item.value == "Category" ? (
                 <div className="w-full md:w-1/2 p-2">
                   <label className="block">Category</label>
                   <CategoriesForm
