@@ -92,7 +92,7 @@ function Add() {
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   });
 
   const generateMapLink = (lat, lng) => {
@@ -298,8 +298,8 @@ function Add() {
                           key={option}
                           value={option}
                           className={`p-2 ${formData.title.includes(option)
-                              ? "bg-blue-500 text-white"
-                              : "bg-gray-200"
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-200"
                             } rounded-sm`}
                         >
                           {option}
@@ -343,8 +343,8 @@ function Add() {
                             : null
                       }
                       className={`bg-gray-200 rounded-lg p-1 ${item.inputType === "file" && imageFiles[item.value]
-                          ? "hidden"
-                          : ""
+                        ? "hidden"
+                        : ""
                         } ${item.inputType === "checkbox"
                           ? "form-checkbox h-5 w-5"
                           : "w-full"
@@ -419,8 +419,8 @@ function Add() {
                 <input
                   ref={item.value === "item_image" ? itemImageRef : null}
                   className={`bg-gray-200 rounded-lg p-1 w-full ${item.inputType === "file" && imageFiles[item.value]
-                      ? "hidden"
-                      : ""
+                    ? "hidden"
+                    : ""
                     }`}
                   type={item.inputType}
                   name={item.value}
