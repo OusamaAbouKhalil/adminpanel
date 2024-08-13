@@ -29,11 +29,12 @@ function Add() {
 
   const titles = [
     "Featured on SwiftBites",
-    "National Brands",
+    "Now on SwiftBites",
     "Coming Soon",
     "In a hurry?",
     "Wallet Friendly",
     "Breakfast",
+    "National Brands",
   ];
   const [imageFiles, setImageFiles] = useState({
     main_image: null,
