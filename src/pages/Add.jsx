@@ -39,6 +39,11 @@ function Add() {
     bg_image: null,
     item_image: null,
   });
+  const [imageFilesUrls, setImageFilesUrls] = useState({
+    main_image: null,
+    bg_image: null,
+    item_image: null,
+  });
   const [formData, setFormData] = useState({
     Category: '',
     isClosed: false,
@@ -122,11 +127,14 @@ function Add() {
     e.preventDefault();
     const file = e.target.files[0];
     if (file) {
-      //when a file is selected, we create a URL for it and store it in the imageFiles state
       const fileURL = URL.createObjectURL(file);
-      setImageFiles((prev) => ({
+      setImageFilesUrls((prev) => ({
         ...prev,
         [e.target.name]: fileURL,
+      }));
+      setImageFiles((prev) => ({
+        ...prev,
+        [e.target.name]: file,
       }));
     }
   };
@@ -308,7 +316,7 @@ function Add() {
                             ? bgImageRef
                             : null
                       }
-                      className={`bg-gray-200 rounded-lg p-1 ${item.inputType === "file" && imageFiles[item.value]
+                      className={`bg-gray-200 rounded-lg p-1 ${item.inputType === "file" && imageFilesUrls[item.value]
                         ? "hidden"
                         : ""
                         } ${item.inputType === "checkbox"
@@ -334,7 +342,7 @@ function Add() {
                       }
                       placeholder={item.placeholder || ""}
                     />
-                    {imageFiles[item.value] && (
+                    {imageFilesUrls[item.value] && (
                       <div className="relative mt-2">
                         <div
                           className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-bold opacity-0 hover:opacity-100 transition-opacity"
@@ -350,7 +358,7 @@ function Add() {
                           Change Image
                         </div>
                         <img
-                          src={imageFiles[item.value]}
+                          src={imageFilesUrls[item.value]}
                           alt={item.headerText}
                           style={{
                             objectFit: "cover",
@@ -384,7 +392,7 @@ function Add() {
               ) : (
                 <input
                   ref={item.value === "item_image" ? itemImageRef : null}
-                  className={`bg-gray-200 rounded-lg p-1 w-full ${item.inputType === "file" && imageFiles[item.value]
+                  className={`bg-gray-200 rounded-lg p-1 w-full ${item.inputType === "file" && imageFilesUrls[item.value]
                     ? "hidden"
                     : ""
                     }`}
@@ -403,7 +411,7 @@ function Add() {
                   placeholder={item.placeholder || ""}
                 />
               )}
-              {imageFiles[item.value] && (
+              {imageFilesUrls[item.value] && (
                 <div className="relative mt-2">
                   <div
                     className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-bold opacity-0 hover:opacity-100 transition-opacity"
@@ -417,7 +425,7 @@ function Add() {
                     Change Image
                   </div>
                   <img
-                    src={imageFiles[item.value]}
+                    src={imageFilesUrls[item.value]}
                     alt={item.headerText}
                     style={{
                       objectFit: "cover",

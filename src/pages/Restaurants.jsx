@@ -110,16 +110,16 @@ export default function Drivers() {
                 </td>
                 <td className="py-4 px-6">{restaurant.time}</td>
                 <td className="py-4 px-6">
-                <div className="flex items-center justify-center h-full">
-                  <button
-                    className="text-blue-500"
-                    onClick={() =>
-                      navigate(`/restaurants/${restaurant.rest_id}/edit`)
-                    }
-                  >
-                    <FaEdit />
-                  </button>
-                </div>
+                  <div className="flex items-center justify-center h-full">
+                    <button
+                      className="text-blue-500"
+                      onClick={() =>
+                        navigate(`/restaurants/${restaurant.rest_id}/edit`)
+                      }
+                    >
+                      <FaEdit />
+                    </button>
+                  </div>
                 </td>
                 <td className="py-4 px-6">
                   {restaurant.isClosed ? (
@@ -140,11 +140,10 @@ export default function Drivers() {
               <li key={number}>
                 <button
                   onClick={() => goToPage(number + 1)}
-                  className={`py-2 px-3 leading-tight ${
-                    currentPage === number + 1
+                  className={`py-2 px-3 leading-tight ${currentPage === number + 1
                       ? "bg-blue-500 text-white"
                       : "bg-white text-gray-500"
-                  } border border-gray-300 hover:bg-blue-500 hover:text-white`}
+                    } border border-gray-300 hover:bg-blue-500 hover:text-white`}
                 >
                   {number + 1}
                 </button>
