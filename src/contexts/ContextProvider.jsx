@@ -11,12 +11,7 @@ import {
 import { getDatabase, ref, get, onValue } from "firebase/database";
 
 import db, { fsdb, functions, httpsCallable } from "../utils/firebaseconfig";
-import {
-  getDownloadURL,
-  getStorage,
-  ref as storageRef,
-  uploadBytes,
-} from "firebase/storage";
+import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 const StateContext = createContext();
 
@@ -102,7 +97,7 @@ export const ContextProvider = ({ children }) => {
 
   const uploadImage = async (file) => {
     const storage = getStorage();
-    const filename = Date.now() + "." + file.name.split('.').pop();
+    const filename = Date.now();
     const storageReference = storageRef(storage, `images/${filename}`);
     try {
       console.log("Uploading to:", storageReference.fullPath);
