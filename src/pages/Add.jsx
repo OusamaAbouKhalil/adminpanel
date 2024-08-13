@@ -33,6 +33,7 @@ function Add() {
     "Coming Soon",
     "In a hurry?",
     "Wallet Friendly",
+    "Breakfast",
   ];
   const [imageFiles, setImageFiles] = useState({
     main_image: null,
