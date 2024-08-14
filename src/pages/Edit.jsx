@@ -13,6 +13,28 @@ function Edit() {
   const { data: restaurant, isPending: isLoading, error } = useGetRestaurantById(id);
   const [progress, setProgress] = useState(0);
   const [userUpdatingComplete, setUserUpdatingComplete] = useState(false);
+  const mainImageRef = useRef(null);
+  const bgImageRef = useRef(null);
+  const [categoriesForm, setCategoriesForm] = useState([]);
+  const [subCategoriesForm, setSubCategoriesForm] = useState([]);
+  const [images, setImages] = useState({
+    main_image: null,
+    bg_image: null,
+  });
+
+  const titles = [
+    "Featured on SwiftBites",
+    "Now on SwiftBites",
+    "Coming Soon",
+    "In a hurry?",
+    "Wallet Friendly",
+    "Breakfast",
+    "National Brands",
+  ];
+  const [imageFiles, setImageFiles] = useState({
+    main_image: null,
+    bg_image: null,
+  });
   const [formData, setFormData] = useState({
     Category: [],
     isClosed: false,
@@ -31,25 +53,6 @@ function Edit() {
     lat: 33.26968841037753,
     lng: 35.20611613326288,
   });
-  const [categoriesForm, setCategoriesForm] = useState([]);
-  const [subCategoriesForm, setSubCategoriesForm] = useState([]);
-  const [imageFiles, setImageFiles] = useState({
-    main_image: null,
-    bg_image: null,
-  });
-  const [images, setImages] = useState({
-    main_image: null,
-    bg_image: null,
-  });
-  const mainImageRef = useRef(null);
-  const bgImageRef = useRef(null);
-  const titles = [
-    "Featured on SwiftBites",
-    "National Brands",
-    "Coming Soon",
-    "In a hurry?",
-    "Wallet Friendly",
-  ];
   useEffect(() => {
     if (restaurant) {
       setFormData({
