@@ -1,14 +1,48 @@
-import React, { useState, useMemo } from "react";
-import { useStateContext } from "../contexts/ContextProvider";
-import { OrdersTable, SpecialOrderCard } from "../components";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { OrdersTable, SpecialOrderCard } from "../components";
+import { useUpdateOrderStatus } from "../lib/query/queries";
+import { onSnapshot, collection, doc, updateDoc } from "firebase/firestore";
+import { fsdb } from "../utils/firebaseconfig";
 
 const Orders = () => {
   const [specialOrders, setSpecialOrders] = useState([]);
-  const { orders, updateOrderStatus } = useStateContext();
+  const [ordersList, setOrdersList] = useState([]);
+  const { mutate: updateOrderStatus } = useUpdateOrderStatus();
   const navigate = useNavigate();
 
-  const pendingOrdersCount = orders.filter(
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(fsdb, "orders"), (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const orderData = { ...change.doc.data() };
+
+        setOrdersList((prevOrdersList) => {
+          const existingOrderIndex = prevOrdersList.findIndex(order => order.order_id === orderData.order_id);
+
+          if (existingOrderIndex !== -1) {
+            // Order exists, update it
+            const updatedOrdersList = [...prevOrdersList];
+            updatedOrdersList[existingOrderIndex] = orderData;
+            return updatedOrdersList;
+          } else {
+            // New order, add it to the list
+            return [...prevOrdersList, orderData];
+          }
+        });
+      });
+    }, (error) => {
+      console.error("Snapshot error:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleStatusChange = (order, newStatus) => {
+    const updatedOrder = { ...order, status: newStatus };
+    updateOrderStatus(updatedOrder);
+  };
+
+  const pendingOrdersCount = ordersList.filter(
     (order) => order.status === "pending"
   ).length;
 
@@ -16,35 +50,32 @@ const Orders = () => {
     navigate("/orders/pendingOrders");
   };
 
-  const handleStatusChange = (order, newStatus) => {
-    const updatedOrder = { ...order, status: newStatus };
-    updateOrderStatus(updatedOrder);
-  };
-
   return (
-    <div className="container mx-auto p-4">
-      <button
-        className="relative bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={handlePendingOrdersClick}
-      >
-        Pending Orders
-        {pendingOrdersCount > 0 && (
-          <span className="absolute -top-3 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-            {pendingOrdersCount}
-          </span>
+    <>
+      <div className="container mx-auto p-4">
+        <button
+          className="relative bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handlePendingOrdersClick}
+        >
+          Pending Orders
+          {pendingOrdersCount > 0 && (
+            <span className="absolute -top-3 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              {pendingOrdersCount}
+            </span>
+          )}
+        </button>
+
+        {specialOrders.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {specialOrders.map((order) => (
+              <SpecialOrderCard key={order.id} order={order} />
+            ))}
+          </div>
         )}
-      </button>
 
-      {specialOrders.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {specialOrders.map((order) => (
-            <SpecialOrderCard key={order.id} order={order} />
-          ))}
-        </div>
-      )}
-
-      <OrdersTable orders={orders} onStatusChange={handleStatusChange} />
-    </div>
+        <OrdersTable orders={ordersList} onStatusChange={handleStatusChange} />
+      </div>
+    </>
   );
 };
 

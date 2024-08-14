@@ -11,15 +11,14 @@ const OrdersTable = ({ orders, onStatusChange }) => {
   return (
     <div className="my-10">
       <div className="flex justify-center">
-        {" "}
+
         {/* Center the status buttons */}
         {statuses.map((status) => (
           <div key={status} className="relative inline-block mr-4">
             <button
               key={status}
-              className={`rounded-t-lg p-2 mr-2 lg:text-lg text-sm font-bold text-gray-700 ${
-                activeTab === status ? "bg-gray-200" : "bg-white"
-              }`}
+              className={`rounded-t-lg p-2 mr-2 lg:text-lg text-sm font-bold text-gray-700 ${activeTab === status ? "bg-gray-200" : "bg-white"
+                }`}
               onClick={() => setActiveTab(status)}
             >
               {status.toUpperCase()}
@@ -39,22 +38,20 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       {statuses.map((status) => (
         <div
           key={status}
-          className={`${
-            activeTab === status ? "block" : "hidden"
-          } shadow-lg rounded-lg p-4 bg-white`}
+          className={`${activeTab === status ? "block" : "hidden"
+            } shadow-lg rounded-lg p-4 bg-white`}
         >
           <h2 className="text-lg font-bold text-gray-700 mb-4">
             {status.toUpperCase()}
           </h2>
           <div className="overflow-x-auto">
-            {" "}
             {/* Add horizontal scroll for smaller screens */}
             <table className="min-w-full table-fixed">
               <thead className="bg-gray-100">
                 <tr>
                   {status !== "accepted" && (
                     <th className="px-4 py-2 w-1/4">Actions</th>
-                  )}{" "}
+                  )}
                   <th className="px-4 py-2 w-1/4">Order ID</th>
                   <th className="px-4 py-2 w-1/4">Recipient</th>
                   <th className="px-4 py-2 w-1/4">Total</th>
