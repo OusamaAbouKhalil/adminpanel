@@ -138,12 +138,12 @@ export const updateOrderStatus = async (order) => {
         const userSnapshot = await get(userRef);
         if (userSnapshot.exists()) {
             const userData = userSnapshot.val();
-            if (order.status === "accepted" && userData.firebaseMessagingToken) {
+            if (userData.firebaseMessagingToken) {
                 // console.log("Sending notification to user");
                 await sendNotification(
                     userData.firebaseMessagingToken,
-                    "Order Accepted",
-                    "Your order has been accepted."
+                    "Order " + order.status[0, 1].toUpperCase() + order.status[1, order.status.length - 1],
+                    "Your order is " + order.status
                 );
             }
         } else {
