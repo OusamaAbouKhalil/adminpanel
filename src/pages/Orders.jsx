@@ -5,7 +5,6 @@ import { useUpdateOrderStatus } from "../lib/query/queries";
 import { onSnapshot, collection, doc, updateDoc } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
 
-
 const Orders = () => {
   const [specialOrders, setSpecialOrders] = useState([]);
   const [ordersList, setOrdersList] = useState([]);
@@ -21,10 +20,12 @@ const Orders = () => {
           const existingOrderIndex = prevOrdersList.findIndex(order => order.order_id === orderData.order_id);
 
           if (existingOrderIndex !== -1) {
+            // Order exists, update it
             const updatedOrdersList = [...prevOrdersList];
             updatedOrdersList[existingOrderIndex] = orderData;
             return updatedOrdersList;
           } else {
+            // New order, add it to the list
             return [...prevOrdersList, orderData];
           }
         });
@@ -49,42 +50,32 @@ const Orders = () => {
     navigate("/orders/pendingOrders");
   };
 
-  const handleOrderClick = (orderId) => {
-    navigate(`/orders/${orderId}`);
-  };
-
   return (
-    <div className="container mx-auto p-4">
-      <button
-        className="relative bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={handlePendingOrdersClick}
-      >
-        Pending Orders
-        {pendingOrdersCount > 0 && (
-          <span className="absolute -top-3 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-            {pendingOrdersCount}
-          </span>
+    <>
+      <div className="container mx-auto p-4">
+        <button
+          className="relative bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handlePendingOrdersClick}
+        >
+          Pending Orders
+          {pendingOrdersCount > 0 && (
+            <span className="absolute -top-3 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              {pendingOrdersCount}
+            </span>
+          )}
+        </button>
+
+        {specialOrders.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {specialOrders.map((order) => (
+              <SpecialOrderCard key={order.id} order={order} />
+            ))}
+          </div>
         )}
-      </button>
 
-      {specialOrders.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-          {specialOrders.map((order) => (
-            <SpecialOrderCard
-              key={order.order_id}
-              order={order}
-              onClick={() => handleOrderClick(order.order_id)}
-            />
-          ))}
-        </div>
-      )}
-
-      <OrdersTable
-        orders={ordersList}
-        onStatusChange={handleStatusChange}
-        onOrderClick={handleOrderClick}
-      />
-    </div>
+        <OrdersTable orders={ordersList} onStatusChange={handleStatusChange} />
+      </div>
+    </>
   );
 };
 
