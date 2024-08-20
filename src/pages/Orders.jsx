@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { OrdersTable, SpecialOrderCard } from "../components";
 import { useUpdateOrderStatus } from "../lib/query/queries";
-import { onSnapshot, collection } from "firebase/firestore";
+import { onSnapshot, collection, doc, updateDoc } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
+
 
 const Orders = () => {
   const [specialOrders, setSpecialOrders] = useState([]);
