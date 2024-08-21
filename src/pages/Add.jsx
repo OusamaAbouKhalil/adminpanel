@@ -167,41 +167,41 @@ function Add() {
     try {
       setIsRestaurantPending(true);
 
-      // if (imageFiles.main_image) {
-      //   const mainImageUrl = await uploadImage(imageFiles.main_image);
-      //   formData.main_image = mainImageUrl;
-      // }
-      // setProgress(10);
+      if (imageFiles.main_image) {
+        const mainImageUrl = await uploadImage(imageFiles.main_image);
+        formData.main_image = mainImageUrl;
+      }
+      setProgress(10);
 
-      // if (imageFiles.bg_image) {
-      //   const bgImageUrl = await uploadImage(imageFiles.bg_image);
-      //   formData.bg_image = bgImageUrl;
-      // }
-      // setProgress(20);
+      if (imageFiles.bg_image) {
+        const bgImageUrl = await uploadImage(imageFiles.bg_image);
+        formData.bg_image = bgImageUrl;
+      }
+      setProgress(20);
 
-      // if (imageFiles.item_image) {
-      //   const itemImageUrl = await uploadImage(imageFiles.item_image);
-      //   menuData.item_image = itemImageUrl;
-      // }
-      // setProgress(30);
-      // formData.Category = categoriesForm;
-      // formData.sub_categories = subCategoriesForm;
+      if (imageFiles.item_image) {
+        const itemImageUrl = await uploadImage(imageFiles.item_image);
+        menuData.item_image = itemImageUrl;
+      }
+      setProgress(30);
+      formData.Category = categoriesForm;
+      formData.sub_categories = subCategoriesForm;
 
-      // var subSizes = {};
-      // console.log(sizesForm);
-      // sizesForm.map((item) => (subSizes[item.name] = parseFloat(item.value)));
-      // menuData.sizes = subSizes;
-      // setProgress(40);
+      var subSizes = {};
+      console.log(sizesForm);
+      sizesForm.map((item) => (subSizes[item.name] = parseFloat(item.value)));
+      menuData.sizes = subSizes;
+      setProgress(40);
 
-      // console.log(formData, menuData);
-      // const restRef = await createRestaurant({ formData: formData, menuData: menuData });
+      console.log(formData, menuData);
+      const restRef = await createRestaurant({ formData: formData, menuData: menuData });
 
       setProgress(100);
       setUserCreationComplete(true);
       setIsRestaurantPending(false);
-      // setTimeout(() => {
-      //   Navigate(`/restaurants/${restRef.id}`);
-      // }, 2000);
+      setTimeout(() => {
+        Navigate(`/restaurants/${restRef.id}`);
+      }, 2000);
     } catch (error) {
       console.error("Error adding document: ", error);
       setProgress(0);
