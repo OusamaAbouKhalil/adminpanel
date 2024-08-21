@@ -7,7 +7,7 @@ import {
     ref as storageRef,
     uploadBytes,
 } from "firebase/storage";
-import { collection, doc, getDoc, getDocs, onSnapshot, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { getLocationByCoordinates } from "../utils";
 
 
@@ -79,11 +79,14 @@ export const uploadImage = async (file) => {
     const filename = Date.now() + "." + file.name.split('.').pop();
     const storageReference = storageRef(storage, `images/${filename}`);
     try {
+        console.log("Uploading to:", storageReference.fullPath);
         const snapshot = await uploadBytes(storageReference, file);
         const downloadURL = await getDownloadURL(snapshot.ref);
+        console.log("File available at:", downloadURL);
         return downloadURL;
     } catch (error) {
         console.error("Error during file upload:", error);
+        throw error;
     }
 };
 export const getRestaurantsMenu = async (id) => {
@@ -168,5 +171,32 @@ const sendNotification = async (token, title, body) => {
         }
     } catch (error) {
         console.error("Error sending notification:", error);
+    }
+};
+export const createRestaurant = async (formData, menuData) => {
+    try {
+        const collectionRef = collection(fsdb, "restaurants");
+        const docRef = await addDoc(collectionRef, formData);
+
+        console.log("Document written with ID: ", docRef.id);
+
+        const menuRef = collection(fsdb, `restaurants/${docRef.id}/menu_items`);
+        const menuItemRef = await addDoc(menuRef, menuData);
+
+        await setDoc(menuItemRef, { item_id: menuItemRef.id }, { merge: true });
+        console.log("Menu item added with ID: ", menuItemRef.id);
+
+        const reviewsRef = collection(fsdb, `restaurants/${docRef.id}/reviews`);
+
+        await addDoc(reviewsRef, { initial: true });
+
+        await setDoc(
+            docRef,
+            { ...formData, rest_id: docRef.id },
+            { merge: true }
+        );
+    } catch (error) {
+        console.error("Error adding document: ", error);
+        return null;  // Explicitly return null in case of error
     }
 };

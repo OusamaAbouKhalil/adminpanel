@@ -1,31 +1,30 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import { collection, addDoc, setDoc, GeoPoint } from "firebase/firestore";
-import {
-  getStorage,
-  uploadBytes,
-  getDownloadURL,
-  ref as storageRef,
-} from "firebase/storage";
-import { fsdb } from "../utils/firebaseconfig";
+import { GeoPoint } from "firebase/firestore";
 import { Header, SizesForm, Map } from "../components";
 import { restaurantGrid, menuGrid } from "../data/dummy";
 import { useNavigate } from "react-router-dom";
-import { useStateContext } from "../contexts/ContextProvider";
 import CategoriesForm from "../components/Form/CategoriesForm";
+import { useCreateRestaurant } from "../lib/query/queries";
+import { uploadImage } from "../lib/firebase/api";
 
 function Add() {
-  const { uploadImage } = useStateContext();
-  const Navigate = useNavigate();
-  const [page, setPage] = useState(false);
+  const { mutate: createRestaurant } = useCreateRestaurant();
+
   const [sizesForm, setSizesForm] = useState([]);
   const [categoriesForm, setCategoriesForm] = useState([]);
   const [subCategoriesForm, setSubCategoriesForm] = useState([]);
-  const [progress, setProgress] = useState(0);
+
+  const [isRestaurantPending, setIsRestaurantPending] = useState(false);
+  const [page, setPage] = useState(false);
   const [userCreationComplete, setUserCreationComplete] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   const mainImageRef = useRef(null);
   const bgImageRef = useRef(null);
   const itemImageRef = useRef(null);
+
+  const Navigate = useNavigate();
 
   const titles = [
     "Featured on SwiftBites",
@@ -36,6 +35,16 @@ function Add() {
     "Breakfast",
     "National Brands",
   ];
+
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+  });
+
+  const generateMapLink = (lat, lng) => {
+    return `https://www.google.com/maps?q=${lat},${lng}`;
+  };
+
   const [imageFiles, setImageFiles] = useState({
     main_image: null,
     bg_image: null,
@@ -97,15 +106,6 @@ function Add() {
     console.log(formData.title);
   };
 
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-  });
-
-  const generateMapLink = (lat, lng) => {
-    return `https://www.google.com/maps?q=${lat},${lng}`;
-  };
-
   const onMapClick = useCallback((event) => {
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
@@ -163,64 +163,49 @@ function Add() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      if (imageFiles.main_image) {
-        const mainImageUrl = await uploadImage(imageFiles.main_image);
-        formData.main_image = mainImageUrl;
-      }
-      setProgress(10);
+      setIsRestaurantPending(true);
 
-      if (imageFiles.bg_image) {
-        const bgImageUrl = await uploadImage(imageFiles.bg_image);
-        formData.bg_image = bgImageUrl;
-      }
-      setProgress(20);
+      // if (imageFiles.main_image) {
+      //   const mainImageUrl = await uploadImage(imageFiles.main_image);
+      //   formData.main_image = mainImageUrl;
+      // }
+      // setProgress(10);
 
-      if (imageFiles.item_image) {
-        const itemImageUrl = await uploadImage(imageFiles.item_image);
-        menuData.item_image = itemImageUrl;
-      }
-      setProgress(30);
-      formData.Category = categoriesForm;
-      formData.sub_categories = subCategoriesForm;
+      // if (imageFiles.bg_image) {
+      //   const bgImageUrl = await uploadImage(imageFiles.bg_image);
+      //   formData.bg_image = bgImageUrl;
+      // }
+      // setProgress(20);
 
-      var subSizes = {};
-      console.log(sizesForm);
-      sizesForm.map((item) => (subSizes[item.name] = parseFloat(item.value)));
-      menuData.sizes = subSizes;
-      setProgress(40);
+      // if (imageFiles.item_image) {
+      //   const itemImageUrl = await uploadImage(imageFiles.item_image);
+      //   menuData.item_image = itemImageUrl;
+      // }
+      // setProgress(30);
+      // formData.Category = categoriesForm;
+      // formData.sub_categories = subCategoriesForm;
 
-      //
+      // var subSizes = {};
+      // console.log(sizesForm);
+      // sizesForm.map((item) => (subSizes[item.name] = parseFloat(item.value)));
+      // menuData.sizes = subSizes;
+      // setProgress(40);
 
-      const collectionRef = collection(fsdb, "restaurants");
-      const docRef = await addDoc(collectionRef, formData);
-      console.log("Document written with ID: ", docRef.id);
-      setProgress(50);
+      // console.log(formData, menuData);
+      // const restRef = await createRestaurant({ formData: formData, menuData: menuData });
 
-      const menuRef = collection(fsdb, `restaurants/${docRef.id}/menu_items`);
-      const menuItemRef = await addDoc(menuRef, menuData);
-      await setDoc(menuItemRef, { item_id: menuItemRef.id }, { merge: true });
-      console.log("Menu item added with ID: ", menuItemRef.id);
-      setProgress(60);
-
-      // Optionally, initialize the "reviews" subcollection with an empty document
-      const reviewsRef = collection(fsdb, `restaurants/${docRef.id}/reviews`);
-      await addDoc(reviewsRef, { initial: true }); // You can remove or modify this part as needed
-      setProgress(70);
-      // Update the document with the menu item ID
-      await setDoc(
-        docRef,
-        { ...formData, rest_id: docRef.id },
-        { merge: true }
-      );
       setProgress(100);
       setUserCreationComplete(true);
-      setTimeout(() => {
-        Navigate(`/restaurants/${docRef.id}`);
-      }, 2000);
+      setIsRestaurantPending(false);
+      // setTimeout(() => {
+      //   Navigate(`/restaurants/${restRef.id}`);
+      // }, 2000);
     } catch (error) {
       console.error("Error adding document: ", error);
       setProgress(0);
+      setIsRestaurantPending(false);
     }
   };
   const handleSizeChange = (index, field, value) => {
@@ -233,7 +218,7 @@ function Add() {
     const newCategories = isSubCategory
       ? [...subCategoriesForm]
       : [...categoriesForm];
-    newCategories[index] = value;
+    newCategories[index] = value.trim();
     isSubCategory
       ? setSubCategoriesForm(newCategories)
       : setCategoriesForm(newCategories);
@@ -253,7 +238,7 @@ function Add() {
                     isLoaded={isLoaded}
                   />
                   <label className="block">Location Link</label>
-                  <input
+                  <input required
                     type="text"
                     value={formData.mapLink || ""}
                     readOnly
@@ -265,6 +250,7 @@ function Add() {
                   <label className="block">Title</label>
                   <div className="bg-gray-200 shadow-lg p-2 rounded-xl">
                     <select
+                      required
                       multiple // Allow multiple selections
                       className="bg-white p-1 rounded-xl text-center w-full"
                       onClick={handleSelectChange}
@@ -310,7 +296,7 @@ function Add() {
                 <div key={item.value} className="w-full md:w-1/2 p-2">
                   <label className="block">{item.headerText}</label>
                   <div className="flex items-center">
-                    <input
+                    <input required
                       ref={
                         item.value === "main_image"
                           ? mainImageRef
@@ -392,7 +378,7 @@ function Add() {
                   handleSizeChange={handleSizeChange}
                 />
               ) : (
-                <input
+                <input required
                   ref={item.value === "item_image" ? itemImageRef : null}
                   className={`bg-gray-200 rounded-lg p-1 w-full ${item.inputType === "file" && imageFilesUrls[item.value]
                     ? "hidden"
@@ -462,7 +448,9 @@ function Add() {
             <button
               key="submit"
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 mx-2 rounded mt-4"
+              disabled={isRestaurantPending}  // Disable the button if the restaurant creation is in progress
+              className={`bg-blue-500 text-white font-bold py-1 px-4 mx-2 rounded mt-4 ${isRestaurantPending ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+                }`}
             >
               Submit
             </button>
