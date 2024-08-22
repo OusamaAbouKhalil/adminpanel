@@ -3,33 +3,24 @@ import OrderRequest from "./OrderRequest";
 import { useStateContext } from "../../contexts/ContextProvider";
 import Modal from "./Modal";
 import { useNavigate } from "react-router-dom";
+import { useGetOrders, useUpdateOrderStatus } from "../../lib/query/queries";
 
 const PendingOrders = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const { drivers, orders, updateOrderStatus } = useStateContext();
+  const { drivers } = useStateContext();
+  const { data: orders } = useGetOrders();
+  const { mutate: updateOrderStatus } = useUpdateOrderStatus();
   const navigate = useNavigate();
 
   const pendingOrders = useMemo(
-    () => orders.filter((order) => order.status === "pending"),
+    () => orders?.filter((order) => order.status === "pending"),
     [orders]
   );
 
-  // const handleAccept = (order) => {
-  //   setSelectedOrder(order);
-  //   setIsModalOpen(true);
-  // };
-
-  // const handleReject = (order) => {
-  //   const updatedOrder = { ...order, status: "rejected" };
-  //   updateOrderStatus(updatedOrder);
-  // };
-
   const handleAccept = (order) => {
-    const updatedOrder = { ...order, status: "accepted" };
-    updateOrderStatus(updatedOrder);
-    setSelectedOrder(null);
-    setIsModalOpen(false);
+    setSelectedOrder(order);
+    setIsModalOpen(true);
   };
 
   const handleReject = (order) => {
@@ -80,10 +71,10 @@ const PendingOrders = () => {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          {pendingOrders.length === 0 ? (
+          {pendingOrders?.length === 0 ? (
             <p>No pending orders</p>
           ) : (
-            pendingOrders.map((order) => (
+            pendingOrders?.map((order) => (
               <OrderRequest
                 key={order.order_id}
                 order={order}
