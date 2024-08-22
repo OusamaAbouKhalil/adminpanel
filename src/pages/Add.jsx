@@ -28,6 +28,7 @@ function Add() {
 
   const titles = [
     "Featured on SwiftBites",
+    "Daily Recommendations!",
     "Now on SwiftBites",
     "Coming Soon",
     "In a hurry?",
