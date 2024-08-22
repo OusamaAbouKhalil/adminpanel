@@ -7,6 +7,7 @@ import { Header, Map } from "../components";
 import { restaurantGrid } from "../data/dummy";
 import CategoriesForm from "../components/Form/CategoriesForm";
 import { useGetRestaurantById } from "../lib/query/queries";
+import { uploadImage } from "../lib/firebase/api";
 
 function Edit() {
   const { id } = useParams();
