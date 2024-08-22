@@ -31,6 +31,7 @@ function Edit() {
     "In a hurry?",
     "Wallet Friendly",
     "Breakfast",
+    "Fresh & Supermarkets",
     "National Brands",
   ];
   const [imageFiles, setImageFiles] = useState({
