@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Navigate, Outlet } from 'react-router-dom';
 import { FiSettings } from 'react-icons/fi';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
@@ -10,26 +10,18 @@ import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
 import Edit from './pages/Edit';
 import PendingOrders from './components/Orders/PendingOrders';
+import { ProtectedRoute } from './contexts/ProtectedRoutes';
 
-const ProtectedRoute = ({ children }) => {
-  const { currentUser } = useAuth();
-  if (!currentUser) {
-    // Redirect to the login page if there is no current user
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
+
 
 const App = () => {
-  const { activeMenu } = useStateContext();
-
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<MainLayout />}>
-            <Route index element={<ProtectedRoute ch><Dashboard /></ProtectedRoute>} />
+            <Route index element={<ProtectedRoute ch><Restaurants /></ProtectedRoute>} />
             <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="restaurants" element={<ProtectedRoute><Restaurants /></ProtectedRoute>} />
             <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
