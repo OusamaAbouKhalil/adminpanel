@@ -660,11 +660,11 @@ export const links = [
     title: "Pages",
     links: [
       {
-        name: "Restaurants",
+        name: "restaurants",
         icon: <RiContactsLine />,
       },
       {
-        name: "Orders",
+        name: "orders",
         icon: <IoMdContacts />,
       },
     ],

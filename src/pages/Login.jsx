@@ -7,12 +7,12 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
- 
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, "admin-"+email, password);
-      navigate('/dashboard');
+      await signInWithEmailAndPassword(auth, "admin-" + email, password);
+      navigate('/restaurants');
     } catch (error) {
       alert(error.message);
     }
