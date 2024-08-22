@@ -34,6 +34,7 @@ function Add() {
     "In a hurry?",
     "Wallet Friendly",
     "Breakfast",
+    "Fresh & Supermarkets",
     "National Brands",
   ];
 
