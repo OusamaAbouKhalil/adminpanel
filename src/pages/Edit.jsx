@@ -187,8 +187,8 @@ const renderFormFields = () => (
     {restaurantGrid.map((item) => (
       <React.Fragment key={item.value}>
         {item.value === "location" && (
-          <div className="w-full p-4 bg-gray-50 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Location</h2>
+          <div className="w-full p-4 bg-gray-50 rounded-lg shadow-md mb-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Location</h2>
             <Map
               markerPosition={markerPosition}
               onMapClick={onMapClick}
@@ -200,34 +200,15 @@ const renderFormFields = () => (
                 type="text"
                 value={formData.mapLink || ""}
                 readOnly
-                className="bg-gray-100 border border-gray-300 rounded-lg p-2 w-full mt-2"
+                className="bg-gray-100 border border-gray-300 rounded-lg p-2 w-full mt-1"
               />
             </div>
           </div>
         )}
         {item.value === "title" && (
-          <div className="w-full p-4 bg-gray-50 rounded-lg shadow-md mb-8 flex flex-col">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-800">Title</h2>
-              {item.value === "status" && (
-                <div className="ml-4">
-                  <label className="block font-semibold text-gray-700">Status</label>
-                  <div className="flex items-center mt-2">
-                    <input
-                      type="checkbox"
-                      checked={formData.isClosed}
-                      onChange={handleChange}
-                      name="isClosed"
-                      className="form-checkbox h-5 w-5"
-                    />
-                    <span className="ml-2 text-gray-700">
-                      {formData.isClosed ? "Closed" : "Open"}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="mt-4 bg-gray-100 shadow-inner p-3 rounded-lg w-full">
+          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-6 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Title</h2>
+            <div className="bg-gray-100 shadow-inner p-3 rounded-lg w-full">
               <select
                 multiple
                 className="bg-white p-2 rounded-lg text-center w-full"
@@ -247,11 +228,28 @@ const renderFormFields = () => (
                 ))}
               </select>
             </div>
+            {item.value === "status" && (
+              <div className="ml-4 w-full md:w-1/2">
+                <label className="block font-semibold text-gray-700">Status</label>
+                <div className="flex items-center mt-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.isClosed}
+                    onChange={handleChange}
+                    name="isClosed"
+                    className="form-checkbox h-5 w-5"
+                  />
+                  <span className="ml-2 text-gray-700">
+                    {formData.isClosed ? "Closed" : "Open"}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         )}
         {item.value === "Category" && (
-          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Category</h2>
+          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Category</h2>
             <CategoriesForm
               categoriesForm={categoriesForm}
               setCategoriesForm={setCategoriesForm}
@@ -261,8 +259,8 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value === "sub_categories" && (
-          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Sub-Category</h2>
+          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Sub-Category</h2>
             <CategoriesForm
               categoriesForm={subCategoriesForm}
               setCategoriesForm={setSubCategoriesForm}
@@ -274,8 +272,8 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value !== "location" && item.value !== "title" && item.value !== "Category" && item.value !== "sub_categories" && (
-          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">{item.headerText}</h2>
+          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">{item.headerText}</h2>
             <div className="flex items-center mt-2">
               <input
                 ref={
