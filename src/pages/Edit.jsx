@@ -162,10 +162,6 @@ function Edit() {
       if (images.bg_image) {
         bgImageUrl = await uploadImage(images.bg_image);
       }
-
-      setFormData({ ...formData, Category: categoriesForm.map((item) => item.trim()) });
-      setFormData({ ...formData, sub_categories: subCategoriesForm.map((item) => item.trim()) });
-
       setProgress(80);
 
       const collectionRef = doc(fsdb, "restaurants", id);
@@ -174,6 +170,8 @@ function Edit() {
         ...formData,
         main_image: images.main_image ? mainImageUrl : formData.main_image,
         bg_image: images.bg_image ? bgImageUrl : formData.bg_image,
+        Category: categoriesForm.map((item) => item.trim()),
+        sub_categories: subCategoriesForm.map((item) => item.trim())
       });
 
       setProgress(100);

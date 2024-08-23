@@ -195,11 +195,15 @@ function Add() {
       menuData.sizes = subSizes;
       setProgress(40);
 
-      setFormData({ ...formData, Category: categoriesForm.map((item) => item.trim()) });
-      setFormData({ ...formData, sub_categories: subCategoriesForm.map((item) => item.trim()) });
-
       console.log(formData, menuData);
-      const restRef = await createRestaurant({ formData: formData, menuData: menuData });
+      const restRef = await createRestaurant({
+        formData: formData,
+        menuData: {
+          ...menuData,
+          Category: categoriesForm.map((item) => item.trim()),
+          sub_categories: subCategoriesForm.map((item) => item.trim())
+        }
+      });
 
       setProgress(100);
       setUserCreationComplete(true);
