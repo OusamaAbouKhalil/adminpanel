@@ -1,18 +1,13 @@
 import React from 'react';
 import { BsCurrencyDollar } from 'react-icons/bs';
 import { GoDotFill } from "react-icons/go";
-import { IoIosMore } from 'react-icons/io';
-import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 
-import { Stacked, Pie, Button, LineChart, SparkLine } from '../components';
-import { earningData, medicalproBranding, recentTransactions, weeklyStats, dropdownData, SparklineAreaData, ecomPieChartData } from '../data/dummy';
+import { Stacked, Button, SparkLine } from '../components';
+import { SparklineAreaData } from '../data/dummy';
 import { useStateContext } from '../contexts/ContextProvider';
 import { FaTaxi, FaCodePullRequest, FaAngellist } from "react-icons/fa6";
-import product9 from '../data/product9.jpg';
 
 import { MdOutlineSupervisorAccount } from 'react-icons/md';
-import { BsBoxSeam } from 'react-icons/bs';
-import { FiBarChart } from 'react-icons/fi';
 export default function Dashboard() {
   const { ridesNum, driversNum, usersNum, financials, cards } = useStateContext();
   // const {complete, pending, cancel} = reqCount;

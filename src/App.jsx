@@ -1,15 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { Navigate, Outlet } from 'react-router-dom';
-import { FiSettings } from 'react-icons/fi';
-import { TooltipComponent } from '@syncfusion/ej2-react-popups';
-import { AuthProvider, useAuth } from './contexts/AuthProvider';
-import { Navbar, Footer, Sidebar, ThemeSettings } from "./components"
+import { Outlet } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthProvider';
+import { Navbar, Sidebar } from "./components"
 import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage } from "./pages"
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
 import Edit from './pages/Edit';
-import PendingOrders from './components/Orders/PendingOrders';
 import { ProtectedRoute } from './contexts/ProtectedRoutes';
 
 

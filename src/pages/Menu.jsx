@@ -1,37 +1,31 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Header } from "../components";
 import { useStateContext } from "../contexts/ContextProvider";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useGetRestaurantMenu } from "../lib/query/queries";
 
 export default function Menu() {
   const { getRestaurantsMenu } = useStateContext();
   const { id } = useParams();
   const Navigate = useNavigate();
 
-  const [menu, setMenu] = useState([]);
+  const { data: menu, isLoading } = useGetRestaurantMenu(id);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
   const tableMenuDsiplay = ["", "Name", "Price", "Description", "Order Count"];
 
-  useEffect(() => {
-    const fetchMenu = async () => {
-      const data = await getRestaurantsMenu(id);
-      setMenu(data);
-    };
-    fetchMenu();
-  }, [id, getRestaurantsMenu]);
 
   const filteredItems = useMemo(() => {
-    return menu.filter((item) =>
+    return menu?.filter((item) =>
       item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [menu, searchTerm]);
 
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = filteredItems.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(filteredItems.length / rowsPerPage);
+  const currentRows = filteredItems?.slice(indexOfFirstRow, indexOfLastRow);
+  const totalPages = Math.ceil(filteredItems?.length / rowsPerPage);
 
   const additem = () => {
     Navigate(`/restaurants/${id}/additem`);
@@ -75,7 +69,7 @@ export default function Menu() {
             </tr>
           </thead>
           <tbody>
-            {currentRows.map((item, index) => (
+            {currentRows?.map((item, index) => (
               <tr
                 key={index}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 text-left"
@@ -85,9 +79,8 @@ export default function Menu() {
                 </td>
                 <td className="py-4 px-6">
                   <Link
-                    to={`/restaurants/${id}/${
-                      item.item_id || item.menu_item_id
-                    }`}
+                    to={`/restaurants/${id}/${item.item_id || item.menu_item_id
+                      }`}
                     className="font-medium text-gray-900 dark:text-white hover:underline"
                   >
                     {item.item_name}
@@ -104,22 +97,22 @@ export default function Menu() {
       </div>
       <div className="flex justify-center mt-4">
         <nav aria-label="Page navigation">
-          <ul className="inline-flex items-center -space-x-px">
-            {[...Array(totalPages).keys()].map((number) => (
-              <li key={number}>
-                <button
-                  onClick={() => goToPage(number + 1)}
-                  className={`py-2 px-3 leading-tight ${
-                    currentPage === number + 1
+          {(!isLoading && menu) &&
+            <ul className="inline-flex items-center -space-x-px">
+              {[...Array(totalPages).keys()].map((number) => (
+                <li key={number}>
+                  <button
+                    onClick={() => goToPage(number + 1)}
+                    className={`py-2 px-3 leading-tight ${currentPage === number + 1
                       ? "bg-blue-500 text-white"
                       : "bg-white text-gray-500"
-                  } border border-gray-300 hover:bg-blue-500 hover:text-white`}
-                >
-                  {number + 1}
-                </button>
-              </li>
-            ))}
-          </ul>
+                      } border border-gray-300 hover:bg-blue-500 hover:text-white`}
+                  >
+                    {number + 1}
+                  </button>
+                </li>
+              ))}
+            </ul>}
         </nav>
       </div>
     </div>

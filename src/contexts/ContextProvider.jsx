@@ -1,17 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  addDoc,
-  onSnapshot,
-} from "firebase/firestore";
-import { getDatabase, ref, get, onValue } from "firebase/database";
-
-import db, { fsdb, functions, httpsCallable } from "../utils/firebaseconfig";
-import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
+import React, { createContext, useContext, useState } from "react";
 
 const StateContext = createContext();
 
@@ -39,21 +26,6 @@ export const ContextProvider = ({ children }) => {
     }
   };
 
-  const getRestaurantsMenu = async (id) => {
-    try {
-      const querySnapshot = await getDocs(
-        collection(fsdb, `restaurants/${id}/menu_items`)
-      );
-      const menuList = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-      }));
-      return menuList;
-    } catch (error) {
-      console.error("Error fetching Menu: ", error);
-    }
-  };
-
-
   return (
     <StateContext.Provider
       value={{
@@ -67,7 +39,6 @@ export const ContextProvider = ({ children }) => {
         financials,
         cards,
         scheduleDates,
-        getRestaurantsMenu,
         setDrivers,
         drivers
       }}

@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import React, { useState, useCallback, useRef } from "react";
+import { useJsApiLoader } from "@react-google-maps/api";
 import { GeoPoint } from "firebase/firestore";
 import { Header, SizesForm, Map } from "../components";
 import { restaurantGrid, menuGrid } from "../data/dummy";
