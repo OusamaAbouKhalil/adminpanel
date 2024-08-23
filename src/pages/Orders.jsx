@@ -80,7 +80,7 @@ const Orders = () => {
             className="relative bg-gradient-to-r from-red-500 to-red-700 hover:opacity-80 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
             onClick={handleCanceledOrdersClick}
           >
-            <span className="text-lg">Canceled Orders</span>
+            <span className="text-lg">Cancelled Orders</span>
             {canceledOrdersCount > 0 && (
               <span className="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg">
                 {canceledOrdersCount}
