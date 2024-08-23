@@ -127,6 +127,20 @@ export const getOrders = async () => {
         console.error("Error fetching orders: ", error);
     }
 };
+const getOrderStatusMessage = (status) => {
+    switch (status) {
+        case 'completed':
+            return 'Your order has been completed!';
+        case 'preparing':
+            return 'Your order is being prepared.';
+        case 'accepted':
+            return 'Your order has been accepted.';
+        case 'on the way':
+            return 'Your order is on the way!';
+        default:
+            return `Your order status is: ${status}`;
+    }
+};
 export const updateOrderStatus = async (order) => {
     console.log("Updating order:", order);
     const orderRef = doc(fsdb, "orders", order.order_id);
@@ -147,7 +161,7 @@ export const updateOrderStatus = async (order) => {
                 await sendNotification(
                     userData.firebaseMessagingToken,
                     "SwiftBites Order Status",
-                    "Your order is " + order.status
+                    getOrderStatusMessage(order.status)
                 );
             }
         } else {
@@ -157,6 +171,7 @@ export const updateOrderStatus = async (order) => {
         console.error("Error updating order: ", error);
     }
 };
+
 const sendNotification = async (token, title, body) => {
     const sendNotificationFunction = httpsCallable(
         functions,
