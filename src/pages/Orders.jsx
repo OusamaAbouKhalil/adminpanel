@@ -49,7 +49,7 @@ const Orders = () => {
   ).length;
 
   const canceledOrdersCount = ordersList.filter(
-    (order) => order.status === "canceled"
+    (order) => order.status === "cancelled"
   ).length;
 
   const handlePendingOrdersClick = () => {
