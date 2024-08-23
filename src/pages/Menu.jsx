@@ -74,9 +74,13 @@ export default function Menu() {
                 key={index}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 text-left"
               >
-                <td className="py-4 px-6">
-                  <img src={item.item_image} className="min-w-20 w-32" alt="" />
-                </td>
+                <td className="py-4 px-6 text-center">
+                <img
+                  src={item.item_image}
+                  className="w-24 sm:w-32 lg:w-40 h-auto max-w-full rounded-lg shadow-md"
+                  alt={item.item_name || 'Item Image'}
+                />
+              </td>
                 <td className="py-4 px-6">
                   <Link
                     to={`/restaurants/${id}/${item.item_id}`} // Solved By Ousama
