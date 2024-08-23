@@ -1,19 +1,16 @@
 import React, { useState } from "react";
-import { collection, addDoc, setDoc } from "firebase/firestore";
-import {
-  getStorage,
-  uploadBytes,
-  getDownloadURL,
-  ref as storageRef,
-} from "firebase/storage";
-import { fsdb } from "../utils/firebaseconfig";
 import { menuGrid } from "../data/dummy";
 import { useNavigate, useParams } from "react-router-dom";
 import { Header, SizesForm } from "../components";
+import { useCreateItem } from "../lib/query/queries";
+import { uploadImage } from "../lib/firebase/api";
+
 function AddItem() {
   const { id } = useParams();
+  const { mutate: createItem } = useCreateItem();
   const Navigate = useNavigate();
   const [sizesForm, setSizesForm] = useState([]);
+
   const [menuData, setMenuData] = useState({
     item_category: "",
     available: true,
@@ -51,22 +48,6 @@ function AddItem() {
     setSizesForm(newSizes);
   };
 
-  const uploadImage = async (file) => {
-    const storage = getStorage();
-    const storageReference = storageRef(storage, `images/${file.name}`);
-    try {
-      console.log("Uploading to:", storageReference.fullPath);
-      const snapshot = await uploadBytes(storageReference, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      console.log("File available at:", downloadURL);
-      return downloadURL;
-    } catch (error) {
-      console.error("Error during file upload:", error);
-      throw error;
-    }
-  };
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -80,17 +61,11 @@ function AddItem() {
         item_image: itemImageUrl,
       };
 
-      const menuRef = collection(fsdb, `restaurants/${id}/menu_items`);
-      const menuItemRef = await addDoc(menuRef, menuDataWithImage);
-      await setDoc(
-        menuItemRef,
-        { item_id: menuItemRef.id },
-        { merge: true }
-      );
-      console.log("Menu item added with ID: ", menuItemRef.id);
+      const itemId = createItem({ rest_id: id, itemData: menuDataWithImage });
+
+      console.log("Menu item added with ID: ", itemId);
       Navigate(`/restaurants/${id}`);
-      //restaurants/:id/:item_id
-      // Navigate(`/restaurants/${id}/${menuItemRef.id}`);
+
     } catch (error) {
       console.error("Error adding menu item: ", error);
     }

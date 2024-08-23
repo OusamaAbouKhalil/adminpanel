@@ -89,7 +89,7 @@ export const uploadImage = async (file) => {
         throw error;
     }
 };
-export const getRestaurantsMenu = async (id) => {
+export const getRestaurantMenu = async (id) => {
     try {
         const querySnapshot = await getDocs(
             collection(fsdb, `restaurants/${id}/menu_items`)
@@ -197,3 +197,19 @@ export const createRestaurant = async (formData, menuData) => {
         return null;  // Explicitly return null in case of error
     }
 };
+export const createItem = async (id, formData) => {
+    try {
+
+        const menuRef = collection(fsdb, `restaurants/${id}/menu_items`);
+        const menuItemRef = await addDoc(menuRef, formData);
+
+        await setDoc(
+            menuItemRef,
+            { item_id: menuItemRef.id },
+            { merge: true }
+        );
+        return menuItemRef.id;
+    } catch (error) {
+        console.error("Error adding menu item: ", error);
+    }
+}
