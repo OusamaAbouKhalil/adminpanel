@@ -70,8 +70,9 @@ const Test = () => {
       <span className="bg-white rounded-lg m-0.5 px-4">&#x2190;</span>
     </button>
     {item && (
-      <div className="space-y-4">
-        <div className="flex flex-col gap-4">
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Form Inputs Section */}
+        <div className="flex-1">
           <label className="block text-gray-700 text-sm font-bold">Item Name:</label>
           <input
             type="text"
@@ -81,8 +82,8 @@ const Test = () => {
             placeholder="Item Name"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
-          
-          <label className="block text-gray-700 text-sm font-bold">Item Price:</label>
+
+          <label className="block text-gray-700 text-sm font-bold mt-4">Item Price:</label>
           <input
             type="text"
             name="item_price"
@@ -91,8 +92,8 @@ const Test = () => {
             placeholder="Item Price"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
-          
-          <label className="block text-gray-700 text-sm font-bold">Item Discount:</label>
+
+          <label className="block text-gray-700 text-sm font-bold mt-4">Item Discount:</label>
           <input
             type="text"
             name="item_discount"
@@ -101,8 +102,8 @@ const Test = () => {
             placeholder="Item Discount"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
-          
-          <label className="block text-gray-700 text-sm font-bold">Item Description:</label>
+
+          <label className="block text-gray-700 text-sm font-bold mt-4">Item Description:</label>
           <textarea
             name="item_description"
             value={item.item_description}
@@ -111,7 +112,7 @@ const Test = () => {
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
 
-          <label className="block text-gray-700 text-sm font-bold">Availability:</label>
+          <label className="block text-gray-700 text-sm font-bold mt-4">Availability:</label>
           <select
             name="available"
             onChange={handleInputChange}
@@ -122,23 +123,7 @@ const Test = () => {
             <option value={false}>Not Available</option>
           </select>
 
-          <label className="block text-gray-700 text-sm font-bold">Item Image:</label>
-          <div className="relative">
-            <input
-              type="file"
-              onChange={handleFileInputChange}
-              className="mb-4"
-            />
-            {item.item_image && (
-              <img
-                className="object-cover w-full max-h-48 mt-4 transition-transform transform hover:scale-105 cursor-pointer"
-                src={item.item_image}
-                alt="Preview"
-              />
-            )}
-          </div>
-
-          <label className="block text-gray-700 text-sm font-bold">Item Category:</label>
+          <label className="block text-gray-700 text-sm font-bold mt-4">Item Category:</label>
           <input
             type="text"
             name="item_category"
@@ -149,39 +134,65 @@ const Test = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-4 mt-4">
-          <button onClick={handleSaveChanges} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Save Changes
-          </button>
-          <button onClick={() => setShowAddonsForm(!showAddonsForm)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Add Addon
-          </button>
-        </div>
+        {/* Image and Addons Section */}
+        <div className="relative w-full md:w-1/3 flex flex-col items-center">
+          {/* Image Section */}
+          <div className="flex flex-col items-center mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Item Image:</label>
+            <input
+              type="file"
+              onChange={handleFileInputChange}
+              className="mb-4"
+            />
+            {item.item_image && (
+              <img
+                className="object-cover w-32 h-32 transition-transform transform hover:scale-105 cursor-pointer"
+                src={item.item_image}
+                alt="Preview"
+              />
+            )}
+          </div>
 
-        {showAddonsForm && (
-          <div className="mt-4 flex flex-col gap-4">
-            <input
-              type="text"
-              value={addonName}
-              onChange={(e) => setAddonName(e.target.value)}
-              placeholder="Addon Name"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-            <input
-              type="number"
-              value={addonPrice}
-              onChange={(e) => setAddonPrice(e.target.value)}
-              placeholder="Addon Price"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-            <button onClick={handleAddAddon} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          {/* Addons Section */}
+          <div>
+            <button onClick={() => setShowAddonsForm(!showAddonsForm)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
               Add Addon
             </button>
+            {showAddonsForm && (
+              <div className="flex flex-col gap-4">
+                <input
+                  type="text"
+                  value={addonName}
+                  onChange={(e) => setAddonName(e.target.value)}
+                  placeholder="Addon Name"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+                <input
+                  type="number"
+                  value={addonPrice}
+                  onChange={(e) => setAddonPrice(e.target.value)}
+                  placeholder="Addon Price"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+                <button onClick={handleAddAddon} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  Add Addon
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     )}
+
+    {/* Buttons */}
+    <div className="flex flex-col md:flex-row gap-4 mt-4">
+      <button onClick={handleSaveChanges} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Save Changes
+      </button>
+    </div>
   </div>
+);
+
 );
 
 };
