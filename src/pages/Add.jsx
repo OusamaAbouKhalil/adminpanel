@@ -215,7 +215,7 @@ function Add() {
     setSizesForm(newSizes);
   };
 
-  const handleCategoryChange = (index, field, value, isSubCategory = false) => {
+  const handleCategoryChange = (index, value, isSubCategory = false) => {
     const newCategories = isSubCategory
       ? [...subCategoriesForm]
       : [...categoriesForm];

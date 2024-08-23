@@ -2,16 +2,13 @@ import React, { useState, useMemo } from "react";
 import OrderRequest from "./OrderRequest";
 import { useStateContext } from "../../contexts/ContextProvider";
 import Modal from "./Modal";
-import { useNavigate } from "react-router-dom";
-import { useGetOrders, useUpdateOrderStatus } from "../../lib/query/queries";
+import { useUpdateOrderStatus } from "../../lib/query/queries";
 
-const PendingOrders = () => {
+const PendingOrders = ({ orders, handlePendingOrdersClick }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const { drivers } = useStateContext();
-  const { data: orders } = useGetOrders();
   const { mutate: updateOrderStatus } = useUpdateOrderStatus();
-  const navigate = useNavigate();
 
   const pendingOrders = useMemo(
     () => orders?.filter((order) => order.status === "pending"),
@@ -45,24 +42,15 @@ const PendingOrders = () => {
     updateOrderStatus(updatedOrder);
     setIsModalOpen(false);
   };
-  const handleClosePage = () => {
-    navigate("/orders");
-  };
-  const handleOutsideClick = (e) => {
-    if (e.target === e.currentTarget) {
-      handleClosePage();
-    }
-  };
 
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-      onClick={handleOutsideClick}
     >
       <div className="bg-white p-4 rounded shadow-lg relative max-w-6xl w-full h-5/6 overflow-y-auto">
         <button
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded absolute top-2 right-2"
-          onClick={handleClosePage}
+          onClick={handlePendingOrdersClick}
         >
           X
         </button>

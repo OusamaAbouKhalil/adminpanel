@@ -24,9 +24,9 @@ const CategoriesForm = ({
           <input
             type="text"
             placeholder="Category Name"
-            value={category.name}
+            value={category}
             onChange={(e) =>
-              handleCategoryChange(index, "name", e.target.value)
+              handleCategoryChange(index, e.target.value)
             }
             className="bg-gray-200 rounded-lg p-1"
           />

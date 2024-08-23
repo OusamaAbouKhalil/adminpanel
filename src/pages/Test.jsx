@@ -1,34 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStateContext } from '../contexts/ContextProvider';
+import { uploadImage } from '../lib/firebase/api';
+import { useAddAddonToMenuItem, useGetMenuItem, useSetMenuItem } from '../lib/query/queries';
 
 const Test = () => {
-  const { getMenuItem, setMenuItem, addAddonToMenuItem, uploadImage } = useStateContext();
+  const { mutate: setMenuItem } = useSetMenuItem();
   const { id, item_id } = useParams();
-  const [item, setItem] = useState(null);
+  const { data: itemData, isPending } = useGetMenuItem({ rest_id: id, item_id: item_id });
+  const { mutate: addAddonToMenuItem } = useAddAddonToMenuItem();
   const [ItemImage, setItemImage] = useState(null);
   const [addonName, setAddonName] = useState('');
   const [addonPrice, setAddonPrice] = useState('');
   const [showAddonsForm, setShowAddonsForm] = useState(false);
+  const [item, setItem] = useState(itemData ? itemData : null);
   const Navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchItem = async () => {
-      const item_data = await getMenuItem(id, item_id);
-      setItem(item_data);
-    };
-    fetchItem();
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // if (value == "true") {
-    //   console.log('true')
-    //   value = true
-    // }
     setItem(prevItem => ({
       ...prevItem,
-      [name]: name === ("item_price" || name === "item_discount") ? parseFloat(value) : name === "available" ? value == "true" : value
+      [name]: (name === "item_price" || name === "item_discount") && value ? parseFloat(value) : name === "available" ? value == "true" : value
     }));
   };
 
@@ -50,7 +43,7 @@ const Test = () => {
       }))
     }
     if (item) {
-      await setMenuItem(id, item_id, item);
+      setMenuItem({ rest_id: id, item_id: item_id, itemData: item });
       Navigate(`/restaurants/${id}`);
     }
   };
@@ -60,7 +53,7 @@ const Test = () => {
       name: addonName,
       price: parseFloat(addonPrice),
     };
-    addAddonToMenuItem(id, item_id, addonData);
+    addAddonToMenuItem({ rest_id: id, item_id: item_id, addonData: addonData });
     setAddonName('');
     setAddonPrice('');
   };
@@ -69,6 +62,9 @@ const Test = () => {
     Navigate(`/restaurants/${id}`);
   }
 
+  if (isPending) {
+    return <div>Loading...</div>
+  }
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl shadow-lg">
       <button onClick={back} className='mb-2 bg-gray-500 rounded-lg'><span className='bg-white rounded-lg m-0.5 px-4'>&#x2190;</span></button>
@@ -144,7 +140,7 @@ const Test = () => {
               <input
                 type="text"
                 name="item_category"
-                value={item.item_category} 
+                value={item.item_category}
                 onChange={handleInputChange}
                 placeholder="Item Category"
                 className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'

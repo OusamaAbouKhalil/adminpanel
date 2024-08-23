@@ -42,7 +42,7 @@ function AddItem() {
     const { name, value } = e.target;
     setMenuData((prevState) => ({
       ...prevState,
-      [name]: name === "item_price" ? parseFloat(value) : value,
+      [name]: name === "item_price" && value ? parseFloat(value) : value,
     }));
   };
   const handleSizeChange = (index, field, value) => {
@@ -66,26 +66,7 @@ function AddItem() {
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //     e.preventDefault();
-  //     try {
-  //         if (itemImage) {
-  //             const itemImageUrl = await uploadImage(itemImage);
-  //             setMenuData(prevState => ({
-  //                 ...prevState,
-  //                 item_image: itemImageUrl
-  //             }));
-  //         }
 
-  //         const menuRef = collection(fsdb, `restaurants/${id}/menu_items`);
-  //         const menuItemRef = await addDoc(menuRef, menuData);
-  //         await setDoc(menuItemRef, { menu_item_id: menuItemRef.id }, { merge: true });
-  //         console.log("Menu item added with ID: ", menuItemRef.id);
-  //         Navigate(`/restaurants/${id}`)
-  //     } catch (error) {
-  //         console.error("Error adding menu item: ", error);
-  //     }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -103,7 +84,7 @@ function AddItem() {
       const menuItemRef = await addDoc(menuRef, menuDataWithImage);
       await setDoc(
         menuItemRef,
-        { menu_item_id: menuItemRef.id },
+        { item_id: menuItemRef.id },
         { merge: true }
       );
       console.log("Menu item added with ID: ", menuItemRef.id);

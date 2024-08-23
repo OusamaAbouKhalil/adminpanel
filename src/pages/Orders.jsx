@@ -4,10 +4,12 @@ import { OrdersTable, SpecialOrderCard } from "../components";
 import { useUpdateOrderStatus } from "../lib/query/queries";
 import { onSnapshot, collection, doc, updateDoc } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
+import PendingOrders from "../components/Orders/PendingOrders";
 
 const Orders = () => {
   const [specialOrders, setSpecialOrders] = useState([]);
   const [ordersList, setOrdersList] = useState([]);
+  const [openPendingOrders, setOpenPendingOrders] = useState(false);
   const { mutate: updateOrderStatus } = useUpdateOrderStatus();
   const navigate = useNavigate();
 
@@ -39,6 +41,7 @@ const Orders = () => {
 
   const handleStatusChange = (order, newStatus) => {
     const updatedOrder = { ...order, status: newStatus };
+    console.log(updatedOrder);
     updateOrderStatus(updatedOrder);
   };
 
@@ -47,7 +50,7 @@ const Orders = () => {
   ).length;
 
   const handlePendingOrdersClick = () => {
-    navigate("/orders/pendingOrders");
+    setOpenPendingOrders(!openPendingOrders);
   };
 
   return (
@@ -64,16 +67,21 @@ const Orders = () => {
             </span>
           )}
         </button>
+        {openPendingOrders
+          ? <PendingOrders orders={ordersList} handlePendingOrdersClick={handlePendingOrdersClick} />
+          :
+          <>
+            {specialOrders.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {specialOrders.map((order) => (
+                  <SpecialOrderCard key={order.id} order={order} />
+                ))}
+              </div>
+            )}
 
-        {specialOrders.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {specialOrders.map((order) => (
-              <SpecialOrderCard key={order.id} order={order} />
-            ))}
-          </div>
-        )}
+            <OrdersTable orders={ordersList} onStatusChange={handleStatusChange} />
+          </>}
 
-        <OrdersTable orders={ordersList} onStatusChange={handleStatusChange} />
       </div>
     </>
   );

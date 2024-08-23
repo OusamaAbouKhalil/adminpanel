@@ -72,8 +72,8 @@ function Edit() {
         mapLink: restaurant.mapLink,
       });
       setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
-      setCategoriesForm(restaurant.Category.map((category) => ({ name: category })) || []);
-      setSubCategoriesForm(restaurant.sub_categories.map((category) => ({ name: category })) || []);
+      setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
+      setSubCategoriesForm(restaurant.sub_categories.map((category) => (category)) || []);
       setImageFiles({
         main_image: restaurant.main_image,
         bg_image: restaurant.bg_image,
@@ -132,7 +132,7 @@ function Edit() {
     }));
   };
 
-  const handleCategoryChange = (index, field, value, isSubCategory = false) => {
+  const handleCategoryChange = (index, value, isSubCategory = false) => {
     if (value === '') {
       (isSubCategory ? setSubCategoriesForm : setCategoriesForm)(prev => {
         const newCategories = [...prev];
@@ -142,7 +142,7 @@ function Edit() {
     } else {
       (isSubCategory ? setSubCategoriesForm : setCategoriesForm)(prev => {
         const newCategories = [...prev];
-        newCategories[index] = value;
+        newCategories[index] = value.trim();
         return newCategories;
       });
     }

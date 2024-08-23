@@ -38,53 +38,7 @@ export const ContextProvider = ({ children }) => {
       setIsClicked({ ...initialState });
     }
   };
-  const getMenuItem = async (restaurantId, itemId) => {
-    try {
-      const itemRef = doc(
-        fsdb,
-        `restaurants/${restaurantId}/menu_items`,
-        itemId
-      );
-      const itemSnapshot = await getDoc(itemRef);
-      if (itemSnapshot.exists()) {
-        console.log(itemSnapshot.data());
-        return itemSnapshot.data();
-      } else {
-        console.log("No such document!");
-      }
-    } catch (error) {
-      console.error("Error fetching menu item: ", error);
-    }
-  };
-  const setMenuItem = async (restaurantId, itemId, itemData) => {
-    try {
-      const itemRef = doc(
-        fsdb,
-        `restaurants/${restaurantId}/menu_items`,
-        itemId
-      );
-      await updateDoc(itemRef, itemData);
-      console.log("Document successfully updated!");
-    } catch (error) {
-      console.error("Error updating document: ", error);
-    }
-  };
 
-  const uploadImage = async (file) => {
-    const storage = getStorage();
-    const filename = Date.now() + "." + file.name.split('.').pop();
-    const storageReference = storageRef(storage, `images/${filename}`);
-    try {
-      console.log("Uploading to:", storageReference.fullPath);
-      const snapshot = await uploadBytes(storageReference, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      console.log("File available at:", downloadURL);
-      return downloadURL;
-    } catch (error) {
-      console.error("Error during file upload:", error);
-      throw error;
-    }
-  };
   const getRestaurantsMenu = async (id) => {
     try {
       const querySnapshot = await getDocs(
@@ -98,18 +52,7 @@ export const ContextProvider = ({ children }) => {
       console.error("Error fetching Menu: ", error);
     }
   };
-  const addAddonToMenuItem = async (restaurantId, menuItemId, addonData) => {
-    try {
-      const addonRef = collection(
-        fsdb,
-        `restaurants/${restaurantId}/menu_items/${menuItemId}/addons`
-      );
-      await addDoc(addonRef, addonData);
-      console.log("Addon added successfully!");
-    } catch (error) {
-      console.error("Error adding addon: ", error);
-    }
-  };
+
 
   return (
     <StateContext.Provider
@@ -125,10 +68,6 @@ export const ContextProvider = ({ children }) => {
         cards,
         scheduleDates,
         getRestaurantsMenu,
-        getMenuItem,
-        setMenuItem,
-        addAddonToMenuItem,
-        uploadImage,
         setDrivers,
         drivers
       }}

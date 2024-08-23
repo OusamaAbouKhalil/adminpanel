@@ -141,11 +141,12 @@ export const updateOrderStatus = async (order) => {
         const userSnapshot = await get(userRef);
         if (userSnapshot.exists()) {
             const userData = userSnapshot.val();
+            console.log("User found:", userData);
             if (userData.firebaseMessagingToken) {
                 // console.log("Sending notification to user");
                 await sendNotification(
                     userData.firebaseMessagingToken,
-                    "Order " + order.status[0, 1].toUpperCase() + order.status[1, order.status.length - 1],
+                    "Order ",
                     "Your order is " + order.status
                 );
             }
@@ -185,10 +186,6 @@ export const createRestaurant = async (formData, menuData) => {
 
         await setDoc(menuItemRef, { item_id: menuItemRef.id }, { merge: true });
         console.log("Menu item added with ID: ", menuItemRef.id);
-
-        const reviewsRef = collection(fsdb, `restaurants/${docRef.id}/reviews`);
-
-        await addDoc(reviewsRef, { initial: true });
 
         await setDoc(
             docRef,
