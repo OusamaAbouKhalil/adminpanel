@@ -49,8 +49,8 @@ const Test = () => {
 
   const handleAddAddon = () => {
     const addonData = {
-      name: addonName,
-      price: parseFloat(addonPrice),
+      addon_name: addonName,
+      addon_price: parseFloat(addonPrice),
     };
     addAddonToMenuItem({ rest_id: id, item_id: item_id, addonData: addonData });
     setAddonName('');
