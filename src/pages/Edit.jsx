@@ -181,59 +181,31 @@ function Edit() {
       setProgress(0);
     }
   };
-
 const renderFormFields = () => (
   <>
     {restaurantGrid.map((item) => (
       <React.Fragment key={item.value}>
-        {item.value === "title" && (
-          <div className="w-full p-4">
-            <label className="block text-gray-700 font-semibold mb-2">Title</label>
-            <select
-              multiple
-              className="bg-white border border-gray-300 rounded-lg p-3 w-full"
-              onChange={handleSelectChange}
-            >
-              {titles.map((option) => (
-                <option
-                  key={option}
-                  value={option}
-                  className={`p-2 ${formData.title.includes(option)
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100"
-                    } rounded-md`}
-                >
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
         {item.value === "location" && (
-          <div className="w-full p-4">
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1 bg-white border border-gray-200 rounded-lg shadow-md">
-                <Map
-                  markerPosition={markerPosition}
-                  onMapClick={onMapClick}
-                  isLoaded={isLoaded}
-                />
-              </div>
-              <div className="flex-1 bg-white border border-gray-200 rounded-lg shadow-md mt-4 lg:mt-0">
-                <label className="block text-gray-700 font-semibold mb-2">Location Link</label>
-                <input
-                  type="text"
-                  value={formData.mapLink || ""}
-                  readOnly
-                  className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full"
-                />
-              </div>
+          <div className="w-full p-2">
+            <Map
+              markerPosition={markerPosition}
+              onMapClick={onMapClick}
+              isLoaded={isLoaded}
+            />
+            <div className="w-full mt-2">
+              <label className="block text-gray-700 font-semibold">Location Link</label>
+              <input
+                type="text"
+                value={formData.mapLink || ""}
+                readOnly
+                className="bg-gray-200 rounded-lg p-2 w-full"
+              />
             </div>
           </div>
         )}
         {item.value === "Category" && (
-          <div className="w-full md:w-1/2 p-4">
-            <label className="block text-gray-700 font-semibold mb-2">Category</label>
+          <div className="w-full md:w-1/2 p-2">
+            <label className="block text-gray-700 font-semibold">Category</label>
             <CategoriesForm
               categoriesForm={categoriesForm}
               setCategoriesForm={setCategoriesForm}
@@ -243,8 +215,8 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value === "sub_categories" && (
-          <div className="w-full md:w-1/2 p-4">
-            <label className="block text-gray-700 font-semibold mb-2">Sub-Category</label>
+          <div className="w-full md:w-1/2 p-2">
+            <label className="block text-gray-700 font-semibold">Sub-Category</label>
             <CategoriesForm
               categoriesForm={subCategoriesForm}
               setCategoriesForm={setSubCategoriesForm}
@@ -255,57 +227,13 @@ const renderFormFields = () => (
             />
           </div>
         )}
-        {(item.value === "main_image" || item.value === "bg_image") && (
-          <div className="w-full p-4">
-            <label className="block text-gray-700 font-semibold mb-2">
-              {item.value === "main_image" ? "Main Image" : "Background Image"}
-            </label>
-            <div className="flex flex-col lg:flex-row gap-4 items-center">
-              <div className="flex-shrink-0 w-full lg:w-1/2 h-40 relative">
-                <img
-                  src={imageFiles[item.value]}
-                  alt={item.headerText}
-                  className="rounded-lg border border-gray-300 object-cover w-full h-full"
-                />
-                <div
-                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-xs font-bold opacity-0 hover:opacity-100 transition-opacity"
-                  onClick={() => {
-                    if (item.value === "main_image") {
-                      mainImageRef.current.click();
-                    } else if (item.value === "bg_image") {
-                      bgImageRef.current.click();
-                    }
-                  }}
-                >
-                  Change Image
-                </div>
-              </div>
-              <input
-                ref={item.value === "main_image" ? mainImageRef : item.value === "bg_image" ? bgImageRef : null}
-                className={`bg-gray-100 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
-                  ? "hidden"
-                  : ""
-                  } ${item.inputType === "checkbox" ? "form-checkbox h-5 w-5" : "w-full"}`}
-                type={item.inputType}
-                name={item.value}
-                value={item.inputType === "file" ? undefined : formData[item.value]}
-                checked={item.inputType === "checkbox" ? formData.isClosed : undefined}
-                onChange={item.inputType === "file" ? handleFileInputChange : handleChange}
-                placeholder={item.placeholder || ""}
-              />
-            </div>
-          </div>
-        )}
-        {item.value !== "location" && item.value !== "title" && item.value !== "Category" && item.value !== "sub_categories" && item.value !== "main_image" && item.value !== "bg_image" && (
-          <div key={item.value} className="w-full md:w-1/2 p-4">
-            <label className="block text-gray-700 font-semibold mb-2">{item.headerText}</label>
+        {(item.value !== "location" && item.value !== "Category" && item.value !== "sub_categories" && item.value !== "main_image" && item.value !== "bg_image") && (
+          <div className="w-full md:w-1/2 p-2">
+            <label className="block text-gray-700 font-semibold">{item.headerText}</label>
             <div className="flex items-center">
               <input
                 ref={item.value === "main_image" ? mainImageRef : item.value === "bg_image" ? bgImageRef : null}
-                className={`bg-gray-100 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
-                  ? "hidden"
-                  : ""
-                  } ${item.inputType === "checkbox" ? "form-checkbox h-5 w-5" : "w-full"}`}
+                className={`bg-gray-100 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value] ? "hidden" : ""}`}
                 type={item.inputType}
                 name={item.value}
                 value={item.inputType === "file" ? undefined : formData[item.value]}
@@ -333,8 +261,36 @@ return (
           <p className="text-gray-600">Loading...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {renderFormFields()}
+        <div className="flex flex-col gap-4">
+          {/* Map */}
+          <div className="w-full">
+            <Map
+              markerPosition={markerPosition}
+              onMapClick={onMapClick}
+              isLoaded={isLoaded}
+            />
+            <div className="w-full mt-2">
+              <label className="block text-gray-700 font-semibold">Location Link</label>
+              <input
+                type="text"
+                value={formData.mapLink || ""}
+                readOnly
+                className="bg-gray-200 rounded-lg p-2 w-full"
+              />
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex flex-wrap gap-4">
+            <div className="w-full md:w-3/4">
+              {renderFormFields().filter(item => item.key !== "main_image" && item.key !== "bg_image")}
+            </div>
+
+            {/* Images */}
+            <div className="w-full md:w-1/4">
+              {renderFormFields().filter(item => item.key === "main_image" || item.key === "bg_image")}
+            </div>
+          </div>
         </div>
       )}
       <div className="flex justify-end mt-6">
