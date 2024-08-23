@@ -2,12 +2,10 @@ import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "../components";
 import { useNavigate } from "react-router-dom";
-import { useStateContext } from "../contexts/ContextProvider";
 import { FaEdit } from "react-icons/fa";
 import { useGetRestaurants } from "../lib/query/queries";
 
 export default function Drivers() {
-  // const { restaurants } = useStateContext();
   const { data: restaurants, isPending: isLoading, isError } = useGetRestaurants();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
