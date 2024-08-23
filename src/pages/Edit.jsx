@@ -182,57 +182,55 @@ function Edit() {
     }
   };
 
- 
+
 const renderFormFields = () => (
   <>
     {restaurantGrid.map((item) => (
       <React.Fragment key={item.value}>
         {item.value === "location" && (
-          <div className="w-full p-4 bg-gray-50 rounded-lg shadow-sm">
+          <div className="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-md mb-4">
             <Map
               markerPosition={markerPosition}
               onMapClick={onMapClick}
               isLoaded={isLoaded}
             />
             <div className="mt-4">
-              <label className="block text-gray-700 font-medium">Location Link</label>
+              <label className="block text-gray-700 font-semibold mb-2">Location Link</label>
               <input
                 type="text"
                 value={formData.mapLink || ""}
                 readOnly
-                className="bg-gray-200 border border-gray-300 rounded-lg p-3 w-full mt-2"
+                className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full"
               />
             </div>
           </div>
         )}
         {item.value === "title" && (
-          <div className="w-full md:w-1/2 p-4">
-            <label className="block text-gray-700 font-medium">Title</label>
-            <div className="bg-gray-50 border border-gray-300 shadow-sm rounded-lg p-3 mt-2">
-              <select
-                multiple
-                className="bg-white p-2 rounded-lg text-center w-full border border-gray-300"
-                onChange={handleSelectChange}
-              >
-                {titles.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
-                    className={`p-2 ${formData.title.includes(option)
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200"
-                      } rounded-md`}
-                  >
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="w-full md:w-1/2 p-4 bg-white border border-gray-200 rounded-lg shadow-md mb-4">
+            <label className="block text-gray-700 font-semibold mb-2">Title</label>
+            <select
+              multiple
+              className="bg-white border border-gray-300 rounded-lg p-3 w-full"
+              onChange={handleSelectChange}
+            >
+              {titles.map((option) => (
+                <option
+                  key={option}
+                  value={option}
+                  className={`p-2 ${formData.title.includes(option)
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100"
+                    } rounded-md`}
+                >
+                  {option}
+                </option>
+              ))}
+            </select>
           </div>
         )}
         {item.value === "Category" && (
-          <div className="w-full md:w-1/2 p-4">
-            <label className="block text-gray-700 font-medium">Category</label>
+          <div className="w-full md:w-1/2 p-4 bg-white border border-gray-200 rounded-lg shadow-md mb-4">
+            <label className="block text-gray-700 font-semibold mb-2">Category</label>
             <CategoriesForm
               categoriesForm={categoriesForm}
               setCategoriesForm={setCategoriesForm}
@@ -242,8 +240,8 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value === "sub_categories" && (
-          <div className="w-full md:w-1/2 p-4">
-            <label className="block text-gray-700 font-medium">Sub-Category</label>
+          <div className="w-full md:w-1/2 p-4 bg-white border border-gray-200 rounded-lg shadow-md mb-4">
+            <label className="block text-gray-700 font-semibold mb-2">Sub-Category</label>
             <CategoriesForm
               categoriesForm={subCategoriesForm}
               setCategoriesForm={setSubCategoriesForm}
@@ -255,9 +253,9 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value !== "location" && item.value !== "title" && item.value !== "Category" && item.value !== "sub_categories" && (
-          <div key={item.value} className="w-full md:w-1/2 p-4">
-            <label className="block text-gray-700 font-medium">{item.headerText}</label>
-            <div className="flex items-center mt-2">
+          <div key={item.value} className="w-full md:w-1/2 p-4 bg-white border border-gray-200 rounded-lg shadow-md mb-4">
+            <label className="block text-gray-700 font-semibold mb-2">{item.headerText}</label>
+            <div className="flex items-center">
               <input
                 ref={
                   item.value === "main_image"
@@ -266,7 +264,7 @@ const renderFormFields = () => (
                       ? bgImageRef
                       : null
                 }
-                className={`bg-gray-200 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
+                className={`bg-gray-100 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
                   ? "hidden"
                   : ""
                   } ${item.inputType === "checkbox"
@@ -310,13 +308,8 @@ const renderFormFields = () => (
                   <img
                     src={imageFiles[item.value]}
                     alt={item.headerText}
-                    className="rounded-md w-16 h-16 border border-gray-300 object-cover"
-                    style={{
-                      objectFit: "cover",
-                      width: "100%",
-                      height: "100%",
-                      maxHeight: "200px",
-                    }}
+                    className="rounded-lg w-32 h-32 border border-gray-300 object-cover"
+                    style={{ objectFit: "cover" }}
                   />
                 </div>
               )}
@@ -334,7 +327,7 @@ const renderFormFields = () => (
 );
 
 return (
-  <div className="m-4 md:m-10 mt-12 p-4 md:p-8 bg-white rounded-xl shadow-md">
+  <div className="m-4 md:m-8 mt-8 p-4 md:p-8 bg-white rounded-lg shadow-lg">
     <Header title="Edit Restaurant" />
     <form onSubmit={handleSubmit}>
       {isLoading ? (
@@ -349,7 +342,7 @@ return (
       <div className="flex justify-end mt-6">
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition duration-300"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300"
         >
           Update
         </button>
@@ -362,7 +355,7 @@ return (
           ></div>
         </div>
         {userUpdatingComplete && (
-          <p className="text-green-500 mt-2 text-center">
+          <p className="text-green-500 mt-2 text-center font-semibold">
             This Restaurant has been successfully updated!
           </p>
         )}
