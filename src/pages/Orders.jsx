@@ -48,7 +48,6 @@ const Orders = () => {
     (order) => order.status === "pending"
   ).length;
 
-  const canceledOrdersCount = ordersList.filter(
 
   const handlePendingOrdersClick = () => {
     setOpenPendingOrders(!openPendingOrders);
