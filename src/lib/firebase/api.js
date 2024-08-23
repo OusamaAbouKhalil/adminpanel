@@ -127,20 +127,50 @@ export const getOrders = async () => {
         console.error("Error fetching orders: ", error);
     }
 };
+
+// Function to get a random message based on order status
 const getOrderStatusMessage = (status) => {
-    switch (status) {
-        case 'completed':
-            return 'Your order has been completed!';
-        case 'preparing':
-            return 'Your order is being prepared.';
-        case 'accepted':
-            return 'Your order has been accepted.';
-        case 'on the way':
-            return 'Your order is on the way!';
-        default:
-            return `Your order status is: ${status}`;
-    }
+    const messages = {
+        completed: [
+            '🎉 Your order is completed! Time to dig in and enjoy! 🍽️',
+            '👏 It’s here! Enjoy your delicious meal! 😋',
+            '🎊 Your order’s complete – feast time! 🍴',
+            '🏆 Your meal is ready for the ultimate taste test! 🍕'
+        ],
+        preparing: [
+            '👨‍🍳 Your order is being prepared with love and care! 🍲',
+            '🔪 Our chef is working their magic on your meal! 🪄',
+            '🥄 Your dish is being cooked to perfection! 🍛',
+            '🍳 Cooking up something special just for you! 🌟'
+        ],
+        accepted: [
+            '🤝 We’ve accepted your order – it’s officially in the queue! 🚦',
+            '✔️ Your order is in the lineup! We’re getting it ready! 🎬',
+            '📋 Your order is in the system and ready to roll! 🎉',
+            '🚀 Your order’s been accepted and is on its way! 🌟'
+        ],
+        'on the way': [
+            '🛵 Your order is en route and coming your way! 🛣️',
+            '📦 Your meal is on its way – get ready for a feast! 🎉',
+            '🛵 Your order is speeding toward you! Hold on tight! 🎈',
+            '🌟 Your order’s journey has begun – it’s almost there! 🚀'
+        ],
+        default: [
+            `🔍 We’re not sure what's up with your order right now: ${status}. Stay tuned! 👀`,
+            `🤔 It looks like your order status is a bit of a mystery: ${status}. We’ll keep you posted! 📡`,
+            `🕵️‍♂️ Order status unknown: ${status}. We’re on it! 🔍`
+        ]
+    };
+
+    const getRandomMessage = (messagesArray) => {
+        const randomIndex = Math.floor(Math.random() * messagesArray.length);
+        return messagesArray[randomIndex];
+    };
+
+    return getRandomMessage(messages[status] || messages.default);
 };
+
+
 export const updateOrderStatus = async (order) => {
     console.log("Updating order:", order);
     const orderRef = doc(fsdb, "orders", order.order_id);
