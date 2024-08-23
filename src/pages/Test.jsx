@@ -72,9 +72,23 @@ const Test = () => {
     
     {item && (
       <div className="space-y-6">
-        <div className='bg-gray-100 p-4 rounded-lg shadow-md'>
+        <div className='bg-gray-100 p-6 rounded-lg shadow-md'>
           <div className='space-y-4'>
-            <div className='mt-4'>
+            <div>
+              <label className="block text-gray-800 text-sm font-semibold mb-2">Item Image:</label>
+              <input
+                type="file"
+                onChange={handleFileInputChange}
+                className='mb-4'
+              />
+              {item.item_image && (
+                <div>
+                  <img className="object-cover h-48 w-full mt-4 rounded-lg shadow-md" src={item.item_image} alt="Preview" />
+                </div>
+              )}
+            </div>
+
+            <div>
               <label className="block text-gray-800 text-sm font-semibold mb-2">Item Name:</label>
               <input
                 type="text"
@@ -82,6 +96,18 @@ const Test = () => {
                 value={item.item_name}
                 onChange={handleInputChange}
                 placeholder="Item Name"
+                className='shadow-md appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-800 text-sm font-semibold mb-2">Item Category:</label>
+              <input
+                type="text"
+                name="item_category"
+                value={item.item_category}
+                onChange={handleInputChange}
+                placeholder="Item Category"
                 className='shadow-md appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
               />
             </div>
@@ -132,32 +158,6 @@ const Test = () => {
                 <option value={true}>Available</option>
                 <option value={false}>Not Available</option>
               </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-800 text-sm font-semibold mb-2">Item Image:</label>
-              <input
-                type="file"
-                onChange={handleFileInputChange}
-                className='mb-4'
-              />
-              {item.item_image && (
-                <div>
-                  <img className="object-cover h-48 w-full mt-4 rounded-lg shadow-md" src={item.item_image} alt="Preview" />
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-gray-800 text-sm font-semibold mb-2">Item Category:</label>
-              <input
-                type="text"
-                name="item_category"
-                value={item.item_category}
-                onChange={handleInputChange}
-                placeholder="Item Category"
-                className='shadow-md appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-              />
             </div>
           </div>
 
