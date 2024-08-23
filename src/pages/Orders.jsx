@@ -49,8 +49,6 @@ const Orders = () => {
   ).length;
 
   const canceledOrdersCount = ordersList.filter(
-    (order) => order.status === "cancelled"
-  ).length;
 
   const handlePendingOrdersClick = () => {
     setOpenPendingOrders(!openPendingOrders);
@@ -76,17 +74,6 @@ const Orders = () => {
             )}
           </button>
 
-          <button
-            className="relative bg-gradient-to-r from-red-500 to-red-700 hover:opacity-80 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
-            onClick={handleCanceledOrdersClick}
-          >
-            <span className="text-lg">Canceled Orders</span>
-            {canceledOrdersCount > 0 && (
-              <span className="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg">
-                {canceledOrdersCount}
-              </span>
-            )}
-          </button>
         </div>
 
         {openPendingOrders && (
@@ -96,12 +83,29 @@ const Orders = () => {
           />
         )}
 
-        <OrdersTable
-          orders={showCanceledOrders
-            ? ordersList.filter(order => order.status === "canceled")
-            : ordersList}
-          onStatusChange={handleStatusChange}
-        />
+        {showCanceledOrders && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ordersList
+              .filter(order => order.status === "canceled")
+              .map(order => (
+                <SpecialOrderCard key={order.id} order={order} />
+              ))}
+          </div>
+        )}
+
+        {!openPendingOrders && !showCanceledOrders && (
+          <>
+            {specialOrders.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {specialOrders.map((order) => (
+                  <SpecialOrderCard key={order.id} order={order} />
+                ))}
+              </div>
+            )}
+
+            <OrdersTable orders={ordersList} onStatusChange={handleStatusChange} />
+          </>
+        )}
       </div>
     </>
   );
