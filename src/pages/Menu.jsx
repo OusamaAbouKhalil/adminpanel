@@ -39,85 +39,85 @@ export default function Menu() {
   const goToPage = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-  return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
-      <Header category="restaurant" title={" "} />
-      <div className="flex justify-between mb-4">
-        <button
-          onClick={additem}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Add
-        </button>
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
-        />
-      </div>
-      <div className="overflow-x-auto relative">
-        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              {tableMenuDsiplay.map((item, index) => (
-                <th key={index} scope="col" className="py-3 px-6">
-                  {item}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {currentRows?.map((item, index) => (
-              <tr
-                key={index}
-                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 text-left"
-              >
-                <td className="py-4 px-6 text-center">
+return (
+  <div className="m-4 md:m-8 lg:m-12 mt-16 p-4 md:p-8 lg:p-12 bg-gray-50 rounded-lg shadow-lg">
+    <Header category="restaurant" title={" "} />
+    <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+      <button
+        onClick={additem}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
+      >
+        Add
+      </button>
+      <input
+        type="text"
+        placeholder="Search by name..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        className="border-2 border-gray-300 bg-white h-12 px-4 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+    <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+      <table className="w-full text-sm text-left text-gray-600">
+        <thead className="text-xs text-gray-800 bg-gray-200">
+          <tr>
+            {tableMenuDsiplay.map((item, index) => (
+              <th key={index} className="py-3 px-4">
+                {item}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {currentRows?.map((item, index) => (
+            <tr
+              key={index}
+              className="border-b bg-white hover:bg-gray-50"
+            >
+              <td className="py-4 px-4 text-center">
                 <img
                   src={item.item_image}
                   className="w-24 sm:w-32 lg:w-40 h-auto max-w-full rounded-lg shadow-md"
                   alt={item.item_name || 'Item Image'}
                 />
               </td>
-                <td className="py-4 px-6">
-                  <Link
-                    to={`/restaurants/${id}/${item.item_id}`} // Solved By Ousama
-                    className="font-medium text-gray-900 dark:text-white hover:underline"
-                  >
-                    {item.item_name}
-                  </Link>
-                </td>
-                <td className="py-4 px-6">{item.item_price}</td>
-                <td className="py-4 px-6">{item.item_description}</td>
-
-                <td className="py-4 px-6">{item.orders_count}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex justify-center mt-4">
-        <nav aria-label="Page navigation">
-          {(!isLoading && menu) &&
-            <ul className="inline-flex items-center -space-x-px">
-              {[...Array(totalPages).keys()].map((number) => (
-                <li key={number}>
-                  <button
-                    onClick={() => goToPage(number + 1)}
-                    className={`py-2 px-3 leading-tight ${currentPage === number + 1
-                      ? "bg-blue-500 text-white"
-                      : "bg-white text-gray-500"
-                      } border border-gray-300 hover:bg-blue-500 hover:text-white`}
-                  >
-                    {number + 1}
-                  </button>
-                </li>
-              ))}
-            </ul>}
-        </nav>
-      </div>
+              <td className="py-4 px-4">
+                <Link
+                  to={`/restaurants/${id}/${item.item_id}`}
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  {item.item_name}
+                </Link>
+              </td>
+              <td className="py-4 px-4">{item.item_price}</td>
+              <td className="py-4 px-4">{item.item_description}</td>
+              <td className="py-4 px-4">{item.orders_count}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
-  );
+    <div className="flex justify-center mt-6">
+      <nav aria-label="Page navigation">
+        {(!isLoading && menu) && (
+          <ul className="inline-flex items-center space-x-1">
+            {[...Array(totalPages).keys()].map((number) => (
+              <li key={number}>
+                <button
+                  onClick={() => goToPage(number + 1)}
+                  className={`py-2 px-3 text-sm font-semibold rounded-md border ${currentPage === number + 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-600 border-gray-300 hover:bg-blue-500 hover:text-white"
+                    } transition duration-200`}
+                >
+                  {number + 1}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </nav>
+    </div>
+  </div>
+);
 }
