@@ -143,7 +143,7 @@ function Edit() {
     } else {
       (isSubCategory ? setSubCategoriesForm : setCategoriesForm)(prev => {
         const newCategories = [...prev];
-        newCategories[index] = value.trim();
+        newCategories[index] = value;
         return newCategories;
       });
     }
@@ -153,26 +153,27 @@ function Edit() {
     e.preventDefault();
     try {
       setProgress(20);
-
+      let mainImageUrl;
+      let bgImageUrl
       if (images.main_image) {
-        const mainImageUrl = await uploadImage(images.main_image);
-        setFormData(prev => ({ ...prev, main_image: mainImageUrl }));
+        mainImageUrl = await uploadImage(images.main_image);
       }
-
       setProgress(60);
-
       if (images.bg_image) {
-        const bgImageUrl = await uploadImage(images.bg_image);
-        setFormData(prev => ({ ...prev, bg_image: bgImageUrl }));
+        bgImageUrl = await uploadImage(images.bg_image);
       }
+
+      setFormData({ ...formData, Category: categoriesForm.map((item) => item.trim()) });
+      setFormData({ ...formData, sub_categories: subCategoriesForm.map((item) => item.trim()) });
 
       setProgress(80);
 
       const collectionRef = doc(fsdb, "restaurants", id);
+      console.log(formData);
       await updateDoc(collectionRef, {
         ...formData,
-        Category: categoriesForm.map(item => item.name ?? item),
-        sub_categories: subCategoriesForm,
+        main_image: images.main_image ? mainImageUrl : formData.main_image,
+        bg_image: images.bg_image ? bgImageUrl : formData.bg_image,
       });
 
       setProgress(100);
@@ -247,8 +248,8 @@ function Edit() {
               <CategoriesForm
                 categoriesForm={subCategoriesForm}
                 setCategoriesForm={setSubCategoriesForm}
-                handleCategoryChange={(index, field, value) =>
-                  handleCategoryChange(index, field, value, true)
+                handleCategoryChange={(index, value) =>
+                  handleCategoryChange(index, value, true)
                 }
                 title={"Add a Sub-category"}
               />

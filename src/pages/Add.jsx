@@ -195,6 +195,9 @@ function Add() {
       menuData.sizes = subSizes;
       setProgress(40);
 
+      setFormData({ ...formData, Category: categoriesForm.map((item) => item.trim()) });
+      setFormData({ ...formData, sub_categories: subCategoriesForm.map((item) => item.trim()) });
+
       console.log(formData, menuData);
       const restRef = await createRestaurant({ formData: formData, menuData: menuData });
 
@@ -220,7 +223,7 @@ function Add() {
     const newCategories = isSubCategory
       ? [...subCategoriesForm]
       : [...categoriesForm];
-    newCategories[index] = value.trim();
+    newCategories[index] = value;
     isSubCategory
       ? setSubCategoriesForm(newCategories)
       : setCategoriesForm(newCategories);
@@ -288,8 +291,8 @@ function Add() {
                   <CategoriesForm
                     categoriesForm={subCategoriesForm}
                     setCategoriesForm={setSubCategoriesForm}
-                    handleCategoryChange={(index, field, value) =>
-                      handleCategoryChange(index, field, value, true)
+                    handleCategoryChange={(index, value) =>
+                      handleCategoryChange(index, value, true)
                     }
                     title={"Add a Sub-category"}
                   />
