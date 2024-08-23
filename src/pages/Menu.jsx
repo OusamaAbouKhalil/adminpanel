@@ -13,7 +13,7 @@ export default function Menu() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
-  const tableMenuDsiplay = ["", "Name", "Price", "Description", "Order Count"];
+  const tableMenuDsiplay = ["Item Image", "Name", "Price", "Description", "Order Count"];
 
 
   const filteredItems = useMemo(() => {
