@@ -79,7 +79,7 @@ export default function Menu() {
                 </td>
                 <td className="py-4 px-6">
                   <Link
-                    to={`/restaurants/${id}/${item.item_id}`}
+                    to={`/restaurants/${id}/${item.item_id}`} // Solved By Ousama
                     className="font-medium text-gray-900 dark:text-white hover:underline"
                   >
                     {item.item_name}
