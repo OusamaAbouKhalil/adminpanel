@@ -146,7 +146,7 @@ export const updateOrderStatus = async (order) => {
                 // console.log("Sending notification to user");
                 await sendNotification(
                     userData.firebaseMessagingToken,
-                    "Order ",
+                    "SwiftBites Order Status",
                     "Your order is " + order.status
                 );
             }
