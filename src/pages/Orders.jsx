@@ -51,9 +51,10 @@ const Orders = () => {
     setOpenPendingOrders(!openPendingOrders);
   };
 
-  return (
-    <>
-      <div className="container mx-auto p-4">
+ return (
+  <>
+    <div className="container mx-auto p-4 space-y-6">
+      <div className="flex justify-between items-center">
         <button
           className="relative bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={handlePendingOrdersClick}
@@ -65,24 +66,30 @@ const Orders = () => {
             </span>
           )}
         </button>
-        {openPendingOrders
-          ? <PendingOrders orders={ordersList} handlePendingOrdersClick={handlePendingOrdersClick} />
-          :
-          <>
-            {specialOrders.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {specialOrders.map((order) => (
-                  <SpecialOrderCard key={order.id} order={order} />
-                ))}
-              </div>
-            )}
-
-            <OrdersTable orders={ordersList} onStatusChange={handleStatusChange} />
-          </>}
-
       </div>
-    </>
-  );
+
+      {openPendingOrders ? (
+        <PendingOrders
+          orders={ordersList}
+          handlePendingOrdersClick={handlePendingOrdersClick}
+        />
+      ) : (
+        <>
+          {specialOrders.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {specialOrders.map((order) => (
+                <SpecialOrderCard key={order.id} order={order} />
+              ))}
+            </div>
+          )}
+
+          <OrdersTable orders={ordersList} onStatusChange={handleStatusChange} />
+        </>
+      )}
+    </div>
+  </>
+);
+
 };
 
 export default Orders;
