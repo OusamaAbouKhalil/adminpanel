@@ -194,7 +194,7 @@ const renderFormFields = () => (
               onMapClick={onMapClick}
               isLoaded={isLoaded}
             />
-            <div className="mt-4">
+            <div className="w-full mt-4">
               <label className="block text-gray-700 font-semibold mb-2">Location Link</label>
               <input
                 type="text"
@@ -253,70 +253,63 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value !== "location" && item.value !== "title" && item.value !== "Category" && item.value !== "sub_categories" && (
-          <div key={item.value} className="w-full md:w-1/2 p-4 bg-white border border-gray-200 rounded-lg shadow-md mb-4">
+          <div key={item.value} className="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-md mb-4">
             <label className="block text-gray-700 font-semibold mb-2">{item.headerText}</label>
-            <div className="flex items-center">
-              <input
-                ref={
-                  item.value === "main_image"
-                    ? mainImageRef
-                    : item.value === "bg_image"
-                      ? bgImageRef
-                      : null
-                }
-                className={`bg-gray-100 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
-                  ? "hidden"
-                  : ""
-                  } ${item.inputType === "checkbox"
-                    ? "form-checkbox h-5 w-5"
-                    : "w-full"
-                  }`}
-                type={item.inputType}
-                name={item.value}
-                value={
-                  item.inputType === "file"
-                    ? undefined
-                    : formData[item.value]
-                }
-                checked={
-                  item.inputType === "checkbox"
-                    ? formData.isClosed
-                    : undefined
-                }
-                onChange={
-                  item.inputType === "file"
-                    ? handleFileInputChange
-                    : handleChange
-                }
-                placeholder={item.placeholder || ""}
-              />
-              {imageFiles[item.value] && (
-                <div className="relative mt-2">
-                  <div
-                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-xs font-bold opacity-0 hover:opacity-100 transition-opacity"
-                    style={{ zIndex: 10 }}
-                    onClick={() => {
-                      if (item.value === "main_image") {
-                        mainImageRef.current.click();
-                      } else if (item.value === "bg_image") {
-                        bgImageRef.current.click();
-                      }
-                    }}
-                  >
-                    Change Image
+            <div className="flex flex-wrap items-center gap-4">
+              {item.value === "main_image" || item.value === "bg_image" ? (
+                <div className="w-full flex items-center gap-4">
+                  <div className="flex-shrink-0 w-32 h-32 relative">
+                    <img
+                      src={imageFiles[item.value]}
+                      alt={item.headerText}
+                      className="rounded-lg border border-gray-300 object-cover w-full h-full"
+                    />
+                    <div
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-xs font-bold opacity-0 hover:opacity-100 transition-opacity"
+                      onClick={() => {
+                        if (item.value === "main_image") {
+                          mainImageRef.current.click();
+                        } else if (item.value === "bg_image") {
+                          bgImageRef.current.click();
+                        }
+                      }}
+                    >
+                      Change Image
+                    </div>
                   </div>
-                  <img
-                    src={imageFiles[item.value]}
-                    alt={item.headerText}
-                    className="rounded-lg w-32 h-32 border border-gray-300 object-cover"
-                    style={{ objectFit: "cover" }}
+                  <input
+                    ref={item.value === "main_image" ? mainImageRef : item.value === "bg_image" ? bgImageRef : null}
+                    className={`bg-gray-100 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
+                      ? "hidden"
+                      : ""
+                      } ${item.inputType === "checkbox" ? "form-checkbox h-5 w-5" : "w-full"}`}
+                    type={item.inputType}
+                    name={item.value}
+                    value={item.inputType === "file" ? undefined : formData[item.value]}
+                    checked={item.inputType === "checkbox" ? formData.isClosed : undefined}
+                    onChange={item.inputType === "file" ? handleFileInputChange : handleChange}
+                    placeholder={item.placeholder || ""}
                   />
                 </div>
-              )}
-              {item.inputType === "checkbox" && (
-                <span className="ml-2 text-gray-700">
-                  {formData.isClosed ? "Closed" : "Open"}
-                </span>
+              ) : (
+                <div className="flex items-center">
+                  <input
+                    ref={item.value === "main_image" ? mainImageRef : item.value === "bg_image" ? bgImageRef : null}
+                    className={`bg-gray-100 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
+                      ? "hidden"
+                      : ""
+                      } ${item.inputType === "checkbox" ? "form-checkbox h-5 w-5" : "w-full"}`}
+                    type={item.inputType}
+                    name={item.value}
+                    value={item.inputType === "file" ? undefined : formData[item.value]}
+                    checked={item.inputType === "checkbox" ? formData.isClosed : undefined}
+                    onChange={item.inputType === "file" ? handleFileInputChange : handleChange}
+                    placeholder={item.placeholder || ""}
+                  />
+                  {item.inputType === "checkbox" && (
+                    <span className="ml-2 text-gray-700">{formData.isClosed ? "Closed" : "Open"}</span>
+                  )}
+                </div>
               )}
             </div>
           </div>
