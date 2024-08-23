@@ -187,7 +187,8 @@ const renderFormFields = () => (
     {restaurantGrid.map((item) => (
       <React.Fragment key={item.value}>
         {item.value === "location" && (
-          <div className="w-full p-4">
+          <div className="w-full p-4 bg-gray-50 rounded-lg shadow-md mb-4">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Location</h2>
             <Map
               markerPosition={markerPosition}
               onMapClick={onMapClick}
@@ -205,9 +206,9 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value === "title" && (
-          <div className="w-full md:w-1/2 p-4">
-            <label className="block font-semibold text-gray-700">Title</label>
-            <div className="bg-gray-100 shadow-md p-3 rounded-lg mt-2">
+          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-4">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Title</h2>
+            <div className="bg-gray-100 shadow-inner p-3 rounded-lg">
               <select
                 multiple
                 className="bg-white p-2 rounded-lg text-center w-full"
@@ -230,8 +231,8 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value === "Category" && (
-          <div className="w-full md:w-1/2 p-4">
-            <label className="block font-semibold text-gray-700">Category</label>
+          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-4">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Category</h2>
             <CategoriesForm
               categoriesForm={categoriesForm}
               setCategoriesForm={setCategoriesForm}
@@ -241,8 +242,8 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value === "sub_categories" && (
-          <div className="w-full md:w-1/2 p-4">
-            <label className="block font-semibold text-gray-700">Sub-Category</label>
+          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-4">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Sub-Category</h2>
             <CategoriesForm
               categoriesForm={subCategoriesForm}
               setCategoriesForm={setSubCategoriesForm}
@@ -254,8 +255,8 @@ const renderFormFields = () => (
           </div>
         )}
         {item.value !== "location" && item.value !== "title" && item.value !== "Category" && item.value !== "sub_categories" && (
-          <div className="w-full md:w-1/2 p-4">
-            <label className="block font-semibold text-gray-700">{item.headerText}</label>
+          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-4">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">{item.headerText}</h2>
             <div className="flex items-center mt-2">
               <input
                 ref={
