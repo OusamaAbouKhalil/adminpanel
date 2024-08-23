@@ -148,6 +148,23 @@ const getOrderStatusMessage = (status) => {
             '🍕 Your order is complete and ready to enjoy! 🍽️',
             '🍕 Your order is done! Indulge in your delicious meal! 🍝'
         ],
+        rejected: [
+        '🚫 Unfortunately, your order has been rejected. Please contact support if you need assistance. 🙁',
+        '❌ We’re sorry, but your order could not be processed. Please try again later. 😔',
+        '🔴 Your order has been rejected. We apologize for the inconvenience. Please reach out to us for more information. 📞',
+        '🚷 Your order has been canceled due to an issue. Contact us for help with your next order. 📩',
+        '❗ We’re sorry, but something went wrong with your order. Please contact customer service for assistance. 🙇',
+        '⚠️ Your order has been rejected. Please check with us for more details. 🚨',
+        '🚪 Unfortunately, we had to reject your order. Please get in touch with us for support. 🏥',
+        '🛑 Your order could not be completed. Reach out to us if you have questions or need help. 📧',
+        '🚫 Your order has been rejected. We apologize for the inconvenience. Please contact us for a resolution. 🔧',
+        '⚠️ We regret to inform you that your order has been rejected. Please contact us for further assistance. 📞',
+        '💔 Your order was not accepted. We apologize and are here to assist you with any issues. 📬',
+        '😞 Your order has been rejected. Please reach out to us for any queries or support. 💬',
+        '🚷 Your order could not be processed. We’re sorry for the inconvenience and are here to help. 🙋',
+        '🛑 Order rejection notice: We’re sorry, but there was a problem with your order. Contact us for more information. 📞',
+        '🚫 Your order has been rejected. We apologize for any trouble this may have caused. Please contact us for assistance. 📨'
+    ],
         preparing: [
             '👨‍🍳 Your order is being prepared with love and care! 🍲',
             '🔪 Our chef is working their magic on your meal! 🪄',
