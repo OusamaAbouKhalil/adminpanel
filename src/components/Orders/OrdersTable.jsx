@@ -43,27 +43,25 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
     .sort((a, b) => b.time.seconds - a.time.seconds);
 
-
   // Function to get the status color
   const getStatusColor = (status) => {
     switch (status) {
       case "accepted":
-        return "bg-purble-200 text-green-800";
+        return "bg-green-400 text-green-900";
       case "preparing":
-        return "bg-yellow-200 text-yellow-800";
+        return "bg-yellow-400 text-yellow-900";
       case "on the way":
-        return "bg-blue-200 text-blue-800";
+        return "bg-blue-400 text-blue-900";
       case "completed":
-        return "bg-green-200 text-gray-800";
+        return "bg-gray-300 text-gray-900";
       case "rejected":
-        return "bg-red-400 text-red-800";
+        return "bg-red-400 text-red-900";
       case "cancelled":
-        return "bg-red-300 text-gray-700";
+        return "bg-gray-400 text-gray-900";
       default:
-        return "bg-grey-200 text-black";
+        return "bg-white text-gray-800";
     }
   };
-
 
   return (
     <div className="my-10">
