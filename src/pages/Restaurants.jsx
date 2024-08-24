@@ -12,7 +12,7 @@ export default function Drivers() {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
   const tableDisplay = [
-    "Main Image",
+    "Logo",
     "Restuarnt Name",
     "Location",
     "Category",
