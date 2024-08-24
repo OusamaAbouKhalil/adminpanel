@@ -47,28 +47,6 @@ return (
           <td className="px-4 py-2 border">{order.recipient_name}</td>
         </tr>
 
-        {order.items &&
-          order.items.map((item, index) => (
-            <React.Fragment key={index}>
-              <tr>
-                <td className="px-4 py-2 border font-semibold">Item Name:</td>
-                <td className="px-4 py-2 border">{item.item_name}</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border font-semibold">Quantity:</td>
-                <td className="px-4 py-2 border">{item.quantity}</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border font-semibold">Size:</td>
-                <td className="px-4 py-2 border">{item.size}</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border font-semibold">Price:</td>
-                <td className="px-4 py-2 border">${item.total}</td>
-              </tr>
-            </React.Fragment>
-          ))}
-
         <tr>
           <td className="px-4 py-2 border font-semibold">Total:</td>
           <td className="px-4 py-2 border">${order.total + order.delivery_fee}</td>
@@ -113,6 +91,27 @@ return (
       </tbody>
     </table>
 
+          {order.items &&
+        order.items.map((item, index) => (
+          <div key={index} className="my-2 p-2 border rounded">
+            <p>
+              <strong>Item Name:</strong> {item.item_name}
+            </p>
+            <p>
+              <strong>Quantity:</strong> {item.quantity}
+            </p>
+            {/* <p>
+              <strong>Combo:</strong> {item.combo.join(", ")}
+            </p> */}
+            <p>
+              <strong>Size:</strong> {item.size}
+            </p>
+            <p>
+              <strong>Price:</strong> ${item.total}
+            </p>
+          </div>
+        ))}
+
     <div className="my-4">
       {isLoaded ? (
         <GoogleMap
@@ -131,7 +130,7 @@ return (
     <div className="flex space-x-4 mt-4">
       <button
         onClick={onAccept}
-        className="bg-lightgreen text-white rounded-lg px-4 py-2"
+        className="bg-green-500 text-white rounded-lg px-4 py-2"
       >
         Accept
       </button>
