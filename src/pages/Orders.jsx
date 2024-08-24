@@ -4,6 +4,7 @@ import { useUpdateOrderStatus } from "../lib/query/queries";
 import { onSnapshot, collection } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
 import PendingOrders from "../components/Orders/PendingOrders";
+import sound from '../public/success.mp3';
 
 const Orders = () => {
   const [specialOrders, setSpecialOrders] = useState([]);
@@ -15,7 +16,7 @@ const Orders = () => {
 
  
   useEffect(() => {
-    const sound = new Audio("../public/success.mp3");
+    const audio = new Audio(sound);
 
     const unsubscribe = onSnapshot(
       collection(fsdb, "orders"),
