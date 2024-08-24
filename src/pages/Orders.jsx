@@ -16,45 +16,44 @@ const Orders = () => {
 
  
   
-  useEffect(() => {
+ useEffect(() => {
+  const unsubscribe = onSnapshot(
+    collection(fsdb, "orders"),
+    (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const orderData = { ...change.doc.data() };
 
-    const unsubscribe = onSnapshot(
-      collection(fsdb, "orders"),
-      (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          const orderData = { ...change.doc.data() };
+        setOrdersList((prevOrdersList) => {
+          const existingOrderIndex = prevOrdersList.findIndex(
+            (order) => order.order_id === orderData.order_id
+          );
 
-          setOrdersList((prevOrdersList) => {
-            const existingOrderIndex = prevOrdersList.findIndex(
-              (order) => order.order_id === orderData.order_id
-            );
-
-            if (existingOrderIndex !== -1) {
-              const updatedOrdersList = [...prevOrdersList];
-              updatedOrdersList[existingOrderIndex] = orderData;
-              return updatedOrdersList;
-            } else {
-                  // New order, play sound if it's pending and user has interacted
-              if (orderData.status === "pending" && userHasInteracted) {
-                setTimeout(() => {
-                  const audio = new Audio(sound);
-                  audio.play().catch((error) => {
-                    console.error("Sound play error:", error);
-                  });
-                }, 100); // Delay of 100ms
-              }
-              return [...prevOrdersList, orderData];
+          if (existingOrderIndex !== -1) {
+            const updatedOrdersList = [...prevOrdersList];
+            updatedOrdersList[existingOrderIndex] = orderData;
+            return updatedOrdersList;
+          } else {
+            // New order, play sound if it's pending and user has interacted
+            if (orderData.status === "pending" && userHasInteracted) {
+              setTimeout(() => {
+                const audio = new Audio(sound);
+                audio.play().catch((error) => {
+                  console.error("Sound play error:", error);
+                });
+              }, 100); // Delay of 100ms
             }
-          });
+            return [...prevOrdersList, orderData];
+          }
         });
-      },
-      (error) => {
-        console.error("Snapshot error:", error);
-      }
-    );
+      });
+    },
+    (error) => {
+      console.error("Snapshot error:", error);
+    }
+  );
 
-    return () => unsubscribe();
-  }, [userHasInteracted]);
+  return () => unsubscribe();
+}, [userHasInteracted]);
 
   
   // Set userHasInteracted to true on first interaction
