@@ -274,6 +274,15 @@ export const links = [
     ],
   },
   {
+    title: "Notification center",
+    links: [
+      {
+        name: "notification", // Route name for the new page
+        icon: <FaDollarSign />, // Money icon
+      },
+    ],
+  },
+  {
     title: "Apps",
     links: [
       {
