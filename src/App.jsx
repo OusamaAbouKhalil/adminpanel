@@ -8,6 +8,7 @@ import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
 import Edit from './pages/Edit';
 import { ProtectedRoute } from './contexts/ProtectedRoutes';
+import PricesPage from './pages/PricesPage'; // price path
 
 
 
