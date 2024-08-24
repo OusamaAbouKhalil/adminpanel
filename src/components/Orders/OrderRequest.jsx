@@ -31,63 +31,69 @@ return (
   <div className="p-4 border rounded shadow max-w-screen-xl w-full">
     <h1 className="text-xl font-bold mb-4">Order Request</h1>
     <table className="w-full text-left border-collapse">
+      <thead>
+        <tr>
+          <th className="px-4 py-2 border">Detail</th>
+          <th className="px-4 py-2 border">Information</th>
+        </tr>
+      </thead>
       <tbody>
         <tr>
-          <td className="font-semibold">Recipient Name:</td>
-          <td>{order.recipient_name}</td>
+          <td className="px-4 py-2 border font-semibold">Recipient Name:</td>
+          <td className="px-4 py-2 border">{order.recipient_name}</td>
         </tr>
         {order.items &&
           order.items.map((item, index) => (
             <React.Fragment key={index}>
               <tr>
-                <td className="font-semibold">Item Name:</td>
-                <td>{item.item_name}</td>
+                <td className="px-4 py-2 border font-semibold">Item Name:</td>
+                <td className="px-4 py-2 border">{item.item_name}</td>
               </tr>
               <tr>
-                <td className="font-semibold">Quantity:</td>
-                <td>{item.quantity}</td>
+                <td className="px-4 py-2 border font-semibold">Quantity:</td>
+                <td className="px-4 py-2 border">{item.quantity}</td>
               </tr>
               <tr>
-                <td className="font-semibold">Size:</td>
-                <td>{item.size}</td>
+                <td className="px-4 py-2 border font-semibold">Size:</td>
+                <td className="px-4 py-2 border">{item.size}</td>
               </tr>
               <tr>
-                <td className="font-semibold">Price:</td>
-                <td>${item.total}</td>
+                <td className="px-4 py-2 border font-semibold">Price:</td>
+                <td className="px-4 py-2 border">${item.total}</td>
               </tr>
             </React.Fragment>
           ))}
         <tr>
-          <td className="font-semibold">Total:</td>
-          <td>${order.total + order.delivery_fee}</td>
+          <td className="px-4 py-2 border font-semibold">Total:</td>
+          <td className="px-4 py-2 border">${order.total + order.delivery_fee}</td>
         </tr>
         <tr>
-          <td className="font-semibold">Cost in Credits:</td>
-          <td>{order.costInCredits}</td>
+          <td className="px-4 py-2 border font-semibold">Cost in Credits:</td>
+          <td className="px-4 py-2 border">{order.costInCredits}</td>
         </tr>
         <tr>
-          <td className="font-semibold">Delivery Fee:</td>
-          <td>${order.delivery_fee}</td>
+          <td className="px-4 py-2 border font-semibold">Delivery Fee:</td>
+          <td className="px-4 py-2 border">${order.delivery_fee}</td>
         </tr>
         <tr>
-          <td className="font-semibold">Floor Number:</td>
-          <td>{order.floor_num}</td>
+          <td className="px-4 py-2 border font-semibold">Floor Number:</td>
+          <td className="px-4 py-2 border">{order.floor_num}</td>
         </tr>
         <tr>
-          <td className="font-semibold">Payment Method:</td>
-          <td>{order.payment_method}</td>
+          <td className="px-4 py-2 border font-semibold">Payment Method:</td>
+          <td className="px-4 py-2 border">{order.payment_method}</td>
         </tr>
         <tr>
-          <td className="font-semibold">Unit Number:</td>
-          <td>{order.unit_num}</td>
+          <td className="px-4 py-2 border font-semibold">Unit Number:</td>
+          <td className="px-4 py-2 border">{order.unit_num}</td>
         </tr>
         <tr>
-          <td className="font-semibold">User Address:</td>
-          <td>{order.user_address}</td>
+          <td className="px-4 py-2 border font-semibold">User Address:</td>
+          <td className="px-4 py-2 border">{order.user_address}</td>
         </tr>
         <tr>
-          <td className="font-semibold">Map:</td>
-          <td>
+          <td className="px-4 py-2 border font-semibold">Map:</td>
+          <td className="px-4 py-2 border">
             <a
               href={mapUrl}
               target="_blank"
@@ -132,6 +138,7 @@ return (
     </div>
   </div>
 );
+
 
 };
 
