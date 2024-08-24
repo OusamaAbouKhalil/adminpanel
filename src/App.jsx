@@ -10,6 +10,7 @@ import Edit from './pages/Edit';
 import { ProtectedRoute } from './contexts/ProtectedRoutes';
 import PricesPage from './pages/PricesPage'; // price path
 import SendNotificationPage from './pages/SendNotificationPage';
+import EditNotificationPage from './pages/EditNotificationPage';
 
 
 
@@ -33,6 +34,7 @@ const App = () => {
             <Route path="calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
              <Route path="prices" element={<ProtectedRoute><PricesPage /></ProtectedRoute>} />
             <Route path="notification" element={<ProtectedRoute><SendNotificationPage/></ProtectedRoute>} />
+            <Route path="notification" element={<ProtectedRoute><EditNotificationPage/></ProtectedRoute>} />
           </Route>
         </Routes>
       </BrowserRouter>
