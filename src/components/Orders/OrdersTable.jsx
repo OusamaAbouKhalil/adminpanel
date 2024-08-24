@@ -1,39 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { getDatabase, ref, get, onValue } from "firebase/database";
-import db, { fsdb, functions, httpsCallable } from "../../utils/firebaseconfig";
-import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { getDocs, collection } from "firebase/firestore";
+import { fsdb } from "../../utils/firebaseconfig";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
-  const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
-  const [searchTerm, setSearchTerm] = useState(""); // Added searchTerm state
-  const [restaurants, setRestaurants] = useState({}); // State to store restaurant data
+  const [activeTab, setActiveTab] = useState(statuses[0]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [restaurants, setRestaurants] = useState({});
 
   useEffect(() => {
- 
-const fetchRestaurants = async () => {
-  try {
-    const restaurantsCollection = collection(fsdb, 'restaurants');
-    const restaurantsSnapshot = await getDocs(restaurantsCollection);
-    const restaurantData = {};
-    restaurantsSnapshot.forEach(doc => {
-      restaurantData[doc.id] = doc.data();
-    });
-    setRestaurants(restaurantData);
-  } catch (error) {
-    console.error("Error fetching restaurants:", error);
-  }
-};
-    
+    const fetchRestaurants = async () => {
+      try {
+        const restaurantsCollection = collection(fsdb, 'restaurants');
+        const restaurantsSnapshot = await getDocs(restaurantsCollection);
+        const restaurantData = {};
+        restaurantsSnapshot.forEach(doc => {
+          restaurantData[doc.id] = doc.data();
+        });
+        setRestaurants(restaurantData);
+      } catch (error) {
+        console.error("Error fetching restaurants:", error);
+      }
+    };
     fetchRestaurants();
   }, []);
 
-  const getStatusCount = (status) => {
-    return orders.filter((order) => order.status === status).length;
-  };
+  const getStatusCount = (status) => orders.filter((order) => order.status === status).length;
 
   const formatDateTime = (timestamp) => {
-    const date = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JS Date
+    const date = new Date(timestamp.seconds * 1000);
     const formattedDate = date.toLocaleDateString("en-US");
     const formattedTime = date.toLocaleTimeString("en-US", {
       hour: "2-digit",
@@ -47,36 +42,25 @@ const fetchRestaurants = async () => {
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
     .sort((a, b) => b.time.seconds - a.time.seconds);
 
-
-  // Function to get the status color
   const getStatusColor = (status) => {
     switch (status) {
-      case "accepted":
-        return "bg-purble-200 text-green-800";
-      case "preparing":
-        return "bg-yellow-200 text-yellow-800";
-      case "on the way":
-        return "bg-blue-200 text-blue-800";
-      case "completed":
-        return "bg-green-200 text-gray-800";
-      case "rejected":
-        return "bg-red-400 text-red-800";
-      case "cancelled":
-        return "bg-red-300 text-gray-700";
-      default:
-        return "bg-white text-black";
+      case "accepted": return "bg-green-200 text-green-800";
+      case "preparing": return "bg-yellow-200 text-yellow-800";
+      case "on the way": return "bg-blue-200 text-blue-800";
+      case "completed": return "bg-gray-200 text-gray-800";
+      case "rejected": return "bg-red-200 text-red-800";
+      case "cancelled": return "bg-red-100 text-gray-600";
+      default: return "bg-white text-black";
     }
   };
 
-
   return (
-    <div className="my-10">
-      <div className="flex justify-center mb-6">
-        {/* Status Tabs */}
+    <div className="my-10 p-6 bg-gray-50 rounded-lg shadow-lg">
+      <div className="flex justify-center mb-6 space-x-4">
         {statuses.map((status) => (
           <button
             key={status}
-            className={`relative mx-2 px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-blue-500 text-white shadow-lg" : "bg-gray-200 text-gray-700"}`}
+            className={`relative px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700"}`}
             onClick={() => setActiveTab(status)}
           >
             {status.toUpperCase()}
@@ -93,59 +77,56 @@ const fetchRestaurants = async () => {
       </div>
 
       <div className="mb-6 flex justify-center">
-        {/* Search bar for Order ID */}
         <input
           type="text"
           placeholder="Search by Order ID..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="p-2 border border-gray-300 rounded-lg w-full max-w-md"
+          className="p-3 border border-gray-300 rounded-lg shadow-md w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
-      <div className={`shadow-lg rounded-lg overflow-hidden ${activeTab ? 'block' : 'hidden'}`}>
+      <div className="overflow-x-auto bg-white shadow-md rounded-lg">
         <h2 className="text-xl font-bold text-gray-800 bg-gray-100 py-3 px-4 border-b">
           {activeTab.toUpperCase()}
         </h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300">
-            <thead className="bg-blue-100 text-blue-600 border-b border-gray-300">
-              <tr>
-                <th className="px-6 py-3 text-left font-medium text-sm">Logo</th> {/* New column */}
-                <th className="px-6 py-3 text-left font-medium text-sm">Restaurant</th> {/* New column */}
-                <th className="px-6 py-3 text-left font-medium text-sm">Order ID</th>
-                <th className="px-6 py-3 text-left font-medium text-sm">Recipient</th>
-                <th className="px-6 py-3 text-left font-medium text-sm">Date</th>
-                <th className="px-6 py-3 text-left font-medium text-sm">Total</th>
-                <th className="px-6 py-3 text-left font-medium text-sm">Status</th>
-                <th className="px-6 py-3 text-left font-medium text-sm">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedOrders.map((order) => {
-                const restaurant = restaurants[order.restaurant_id] || {}; // Fetch restaurant details
-                return (
-                  <tr key={order.order_id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm">
-                      <img src={restaurant.main_image} alt="Restaurant" className="w-16 h-16 object-cover rounded" />
-                    </td>
-                    <td className="px-6 py-4 text-sm">{restaurant.rest_name || 'N/A'}</td>
-                    <td className="px-6 py-4 text-sm">{order.order_id}</td>
-                    <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
-                    <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
-                    <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
-                    <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
-                      <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-blue-100 text-blue-600">
+            <tr>
+              <th className="px-6 py-3 text-left text-sm font-medium">Logo</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">Restaurant</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">Order ID</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">Recipient</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">Date</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">Total</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">Status</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {sortedOrders.map((order) => {
+              const restaurant = restaurants[order.restaurant_id] || {};
+              return (
+                <tr key={order.order_id} className="hover:bg-gray-100">
+                  <td className="px-6 py-4 text-sm">
+                    <img src={restaurant.main_image} alt="Restaurant" className="w-20 h-20 object-cover rounded-lg" />
+                  </td>
+                  <td className="px-6 py-4 text-sm">{restaurant.rest_name || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm">{order.order_id}</td>
+                  <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
+                  <td className="px-6 py-4 text-sm">{formatDateTime(order.time)}</td>
+                  <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
+                  <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
+                    <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="relative">
                       <select
                         value={order.status}
-                        onChange={(e) =>
-                          onStatusChange(order, e.target.value)
-                        }
-                        className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        onChange={(e) => onStatusChange(order, e.target.value)}
+                        className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
                       >
                         {statuses.map((status) => (
                           <option
@@ -157,13 +138,16 @@ const fetchRestaurants = async () => {
                           </option>
                         ))}
                       </select>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      <svg className="absolute top-1/2 right-2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
