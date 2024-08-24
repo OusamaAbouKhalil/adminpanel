@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getDatabase, ref, get, onValue } from "firebase/database";
 import db, { fsdb, functions, httpsCallable } from "../../utils/firebaseconfig";
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
