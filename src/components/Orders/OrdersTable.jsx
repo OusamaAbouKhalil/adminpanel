@@ -28,17 +28,17 @@ const OrdersTable = ({ orders, onStatusChange }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "accepted":
-        return "bg-green-200 text-green-800";
+        return "bg-purble-200 text-green-800";
       case "preparing":
         return "bg-yellow-200 text-yellow-800";
       case "on the way":
         return "bg-blue-200 text-blue-800";
       case "completed":
-        return "bg-gray-200 text-gray-800";
+        return "bg-green-200 text-gray-800";
       case "rejected":
-        return "bg-red-200 text-red-800";
+        return "bg-red-400 text-red-800";
       case "cancelled":
-        return "bg-gray-300 text-gray-700";
+        return "bg-red-300 text-gray-700";
       default:
         return "bg-white text-black";
     }
