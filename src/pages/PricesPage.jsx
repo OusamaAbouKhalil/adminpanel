@@ -49,10 +49,15 @@ const PricesPage = () => {
     <div className="container mx-auto p-8 bg-gradient-to-r from-blue-50 to-white shadow-xl rounded-lg border border-gray-300">
       <h1 className="text-4xl font-bold mb-8 text-gray-800 text-center">Edit Prices</h1>
       <form onSubmit={handleSubmit} className="space-y-8">
-         <p className="text-gray-700 mb-4">
+         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Swift Drive Pricing</h2>
+          <p className="text-gray-700 mb-4">
             <strong>Formula:</strong> Cost = Base Fare + (Cost per min * Time in ride) + (Cost per km * Distance) + Booking Fee
           </p>
-        <p className="text-gray-700 mb-4">
+       <h2 className="text-2xl font-semibold text-gray-800 mb-4">Swift Bites Pricing</h2>
+          <p className="text-gray-700 mb-4">
+            <strong>Formula:</strong> Cost = Base Fare + (Cost per km * Distance) + Booking Fee
+          </p>
+          <p className="text-gray-700 mb-4">
             <strong>Distance Rules:</strong>
             <ul className="list-disc list-inside ml-5">
               <li>Distance less than 2.6 km: Cost Per Km * 2 will be added</li>
