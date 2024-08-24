@@ -9,32 +9,35 @@ const SendNotificationPage = () => {
   const [time, setTime] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const db = getDatabase(); // Get a reference to the Firebase Realtime Database
   const functions = getFunctions(); // Initialize Firebase Functions
 
   const sendTopicNotification = async (title, message) => {
-   const sendNotificationFunction = httpsCallable(functions, "sendTopicNotification");
-      try {
-        const result = await sendNotificationFunction({ title, message });
-        console.log(result.data);
-        if (result.data.success) {
-          console.log("Notification sent successfully");
-        } else {
-          console.log("Failed to send notification:", result.data.error);
-        }
-      } catch (error) {
-        console.error("Error sending notification:", error);
+    const sendNotificationFunction = httpsCallable(functions, "sendTopicNotification");
+    try {
+      const result = await sendNotificationFunction({ title, message });
+      console.log(result.data);
+      if (result.data.success) {
+        console.log("Notification sent successfully");
+      } else {
+        console.log("Failed to send notification:", result.data.error);
       }
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setIsSubmitting(true); // Show spinner and disable button
 
     if (!title || !message || !time || !type) {
       setError('All fields are required.');
+      setIsSubmitting(false); // Hide spinner
       return;
     }
 
@@ -55,9 +58,10 @@ const SendNotificationPage = () => {
       setTime('');
     } catch (err) {
       setError('Failed to send notification: ' + err.message);
+    } finally {
+      setIsSubmitting(false); // Hide spinner
     }
   };
-
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-white shadow-md rounded-lg border border-gray-200 max-w-2xl">
@@ -75,6 +79,7 @@ const SendNotificationPage = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            disabled={isSubmitting} // Disable input while submitting
           />
         </div>
         <div>
@@ -86,6 +91,7 @@ const SendNotificationPage = () => {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            disabled={isSubmitting} // Disable input while submitting
           ></textarea>
         </div>
         <div>
@@ -97,6 +103,7 @@ const SendNotificationPage = () => {
             value={type}
             onChange={(e) => setType(e.target.value)}
             className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            disabled={isSubmitting} // Disable select while submitting
           >
             <option value="alert">Alert</option>
             <option value="info">Info</option>
@@ -113,13 +120,21 @@ const SendNotificationPage = () => {
             value={time}
             onChange={(e) => setTime(e.target.value)}
             className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            disabled={isSubmitting} // Disable input while submitting
           />
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
+          className={`w-full py-2 rounded-lg shadow-md transition duration-300 ease-in-out ${isSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+          disabled={isSubmitting} // Disable button while submitting
         >
-          Send Notification
+          {isSubmitting ? (
+            <svg className="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+          ) : null}
+          {isSubmitting ? 'Sending...' : 'Send Notification'}
         </button>
       </form>
     </div>
