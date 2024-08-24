@@ -34,7 +34,7 @@ function Sidebar() {
   const normalLink = 'flex items-center gap-4 pl-6 py-2 rounded-lg text-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ease-in-out';
 
   return (
-    <div className='w-64 h-screen bg-white dark:bg-gray-800 shadow-lg overflow-auto'>
+    <div className='w-64 h-screen bg-white dark:bg-gray-800 shadow-lg fixed top-0 left-0 z-30 overflow-auto'>
       {activeMenu && (
         <>
           <div className='flex items-center justify-between px-4 py-3 border-b dark:border-gray-600'>
