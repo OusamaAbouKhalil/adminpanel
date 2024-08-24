@@ -170,8 +170,8 @@ const EditNotificationsPage = () => {
                     ) : (
                       <>
                         <button
-                          onClick={() => startEditing(notification.id)}
-                          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out mr-2"
+                          onClick={() => openDialog('update', notification.id)}
+                          className="bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-700 transition duration-300 ease-in-out mr-2"
                         >
                           Edit
                         </button>
@@ -190,10 +190,8 @@ const EditNotificationsPage = () => {
           </table>
         </div>
       )}
-
-      {/* Custom Dialog */}
       {dialog.open && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
             <h2 className="text-lg font-bold mb-4">
               {dialog.type === 'delete' ? 'Confirm Deletion' : 'Confirm Update'}
