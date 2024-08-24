@@ -13,19 +13,19 @@ const SendNotificationPage = () => {
   const db = getDatabase(); // Get a reference to the Firebase Realtime Database
   const functions = getFunctions(); // Initialize Firebase Functions
 
-  const sendTopicNotification = async (title, body) => {
-    const sendNotificationFunction = httpsCallable(functions, "sendTopicNotification");
-    try {
-      const result = await sendNotificationFunction({ title, body });
-      console.log(result.data);
-      if (result.data.success) {
-        console.log("Notification sent successfully");
-      } else {
-        console.log("Failed to send notification:", result.data.error);
+  const sendTopicNotification = async (title, message) => {
+   const sendNotificationFunction = httpsCallable(functions, "sendTopicNotification");
+      try {
+        const result = await sendNotificationFunction({ title, message });
+        console.log(result.data);
+        if (result.data.success) {
+          console.log("Notification sent successfully");
+        } else {
+          console.log("Failed to send notification:", result.data.error);
+        }
+      } catch (error) {
+        console.error("Error sending notification:", error);
       }
-    } catch (error) {
-      console.error("Error sending notification:", error);
-    }
   };
 
   const handleSubmit = async (e) => {
