@@ -46,17 +46,17 @@ const OrdersTable = ({ orders, onStatusChange }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "accepted":
-        return "bg-purble-200 text-green-800";
+        return "bg-green-300 text-green-800";
       case "preparing":
         return "bg-yellow-200 text-yellow-800";
       case "on the way":
         return "bg-blue-200 text-blue-800";
       case "completed":
-        return "bg-green-200 text-gray-800";
+        return "bg-green-400 text-gray-800";
       case "rejected":
-        return "bg-red-400 text-red-800";
+        return "bg-red-300 text-red-800";
       case "cancelled":
-        return "bg-red-300 text-gray-700";
+        return "bg-red-300 text-red-800";
       default:
         return "bg-white text-black";
     }
@@ -131,24 +131,25 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     </div>
                   </td>
                  <td className="px-6 py-4">
-                  <div className="relative">
-                    <select
-                      value={order.status}
-                      onChange={(e) => onStatusChange(order, e.target.value)}
-                      className="bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out py-2 px-3 w-full"
-                    >
-                      {statuses.map((status) => (
-                        <option
-                          key={status}
-                          value={status}
-                          disabled={status === order.status}
+                      <div className="relative">
+                        <select
+                          value={order.status}
+                          onChange={(e) => onStatusChange(order, e.target.value)}
+                          className="bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out py-2 px-4 w-full"
                         >
-                          {status.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </td>
+                          {statuses.map((status) => (
+                            <option
+                              key={status}
+                              value={status}
+                              disabled={status === order.status}
+                              className="text-gray-800"
+                            >
+                              {status.toUpperCase()}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                  </td>
                 </tr>
               );
             })}
