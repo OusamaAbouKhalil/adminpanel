@@ -39,6 +39,7 @@ const EditNotificationsPage = () => {
         setSuccess('Notification updated successfully!');
         setErrors([]);
         setDialog({ open: false, type: '', id: null });
+        setEditingId(null); // Exit edit mode
       } catch (err) {
         setErrors(prevErrors => [...prevErrors, `Failed to update notification: ${err.message}`]);
       }
@@ -170,7 +171,7 @@ const EditNotificationsPage = () => {
                     ) : (
                       <>
                         <button
-                          onClick={() => openDialog('update', notification.id)}
+                          onClick={() => startEditing(notification.id)}
                           className="bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-700 transition duration-300 ease-in-out mr-2"
                         >
                           Edit
