@@ -37,9 +37,8 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       minute: "2-digit",
       hour12: true,
     });
-    return `${formattedDate}, ${formattedTime}`; // Use backticks for template literals
+    return `${formattedDate}, ${formattedTime}`;
   };
-  
 
   const sortedOrders = orders
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
@@ -78,7 +77,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         {statuses.map((status) => (
           <button
             key={status}
-            className={relative px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700"}}
+            className={`relative px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700"}`}
             onClick={() => setActiveTab(status)}
           >
             {status.toUpperCase()}
@@ -141,8 +140,8 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
                   <td className="px-6 py-4 text-sm">{formatDateTime(order.time)}</td>
                   <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
-                  <td className={px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}}>
-                    <div className={p-2 rounded-lg ${getStatusColor(order.status)}}>
+                  <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
+                    <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
                       {order.status}
                     </div>
                   </td>
