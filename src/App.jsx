@@ -9,6 +9,7 @@ import { useStateContext } from './contexts/ContextProvider';
 import Edit from './pages/Edit';
 import { ProtectedRoute } from './contexts/ProtectedRoutes';
 import PricesPage from './pages/PricesPage'; // price path
+import SendNotificationPage from './pages/SendNotificationPage';
 
 
 
@@ -31,6 +32,7 @@ const App = () => {
             <Route path="kanban" element={<ProtectedRoute><Kanban /></ProtectedRoute>} />
             <Route path="calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
              <Route path="prices" element={<ProtectedRoute><PricesPage /></ProtectedRoute>} />
+            <Route path="notification" element={<ProtectedRoute><SendNotificationPage/></ProtectedRoute>} />
           </Route>
         </Routes>
       </BrowserRouter>
