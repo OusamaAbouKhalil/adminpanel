@@ -53,6 +53,11 @@ const Orders = () => {
     return () => unsubscribe();
   }, [userHasInteracted]);
 
+  const testSound = () => {
+  const audio = new Audio(sound);
+  audio.play().catch(error => console.error("Test sound play error:", error));
+  };
+  
   // Set userHasInteracted to true on first interaction
   useEffect(() => {
     const handleUserInteraction = () => {
@@ -106,6 +111,7 @@ const Orders = () => {
           </button>
 
         </div>
+          <button onClick={testSound}>Test Sound</button>
 
         {openPendingOrders && (
           <PendingOrders
