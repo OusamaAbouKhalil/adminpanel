@@ -34,6 +34,7 @@ export const ProtectedRoute = ({ children }) => {
             'orders/pendingOrders',
             'add',
             'prices',
+            'notification',
         ]
         if (!adminRoutes.includes(location.pathname.split('/')[1])) { return <Alert className="mx-4" variant="filled" severity="error">Access Denied</Alert> };
     }
