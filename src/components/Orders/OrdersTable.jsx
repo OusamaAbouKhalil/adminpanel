@@ -10,8 +10,8 @@ const OrdersTable = ({ orders, onStatusChange }) => {
 
   return (
     <div className="my-10">
-      <div className="flex justify-center mb-6">
-        {/* Center the status buttons */}
+      <div className="flex justify-center mb-4">
+        {/* Status Tabs */}
         {statuses.map((status) => (
           <div key={status} className="relative inline-block mx-2">
             <button
@@ -32,81 +32,63 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         ))}
       </div>
 
-      {statuses.map((status) => (
-        <div
-          key={status}
-          className={`shadow-lg rounded-lg p-4 bg-white mb-6 ${activeTab === status ? "block" : "hidden"}`}
-        >
-          <h2 className="text-lg font-bold text-gray-700 mb-4">
-            {status.toUpperCase()}
-          </h2>
-          <div className="overflow-x-auto">
-            {/* Add horizontal scroll for smaller screens */}
-            <table className="min-w-full table-fixed">
-              <thead className="bg-gray-200 border-b border-gray-300">
-                <tr>
-                  {status !== "accepted" && (
-                    <th className="px-4 py-2 text-left w-1/6">Actions</th>
-                  )}
-                  <th className="px-4 py-2 text-left w-1/6">Order ID</th>
-                  <th className="px-4 py-2 text-left w-1/6">Recipient</th>
-                  <th className="px-4 py-2 text-left w-1/6">Total</th>
-                  <th className="px-4 py-2 text-left w-1/6">Status</th>
-                  {status !== "completed" && (
-                    <th className="px-4 py-2 text-left w-1/6">Actions</th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {orders
-                  .filter((order) => order.status === status)
-                  .map((order) => (
-                    <tr
-                      key={order.order_id}
-                      className="border-b last:border-b-0 hover:bg-gray-100"
-                    >
-                      {status !== "accepted" && (
-                        <td className="px-4 py-2">
-                          <button
-                            onClick={() =>
-                              onStatusChange(
-                                order,
-                                statuses[statuses.indexOf(status) - 1]
-                              )
-                            }
-                            className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded"
+      <div
+        className={`shadow-lg rounded-lg p-4 bg-white ${activeTab ? 'block' : 'hidden'}`}
+      >
+        <h2 className="text-lg font-bold text-gray-700 mb-4">
+          {activeTab.toUpperCase()}
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-fixed border-collapse">
+            <thead className="bg-gray-100 sticky top-0 z-10">
+              <tr>
+                <th className="px-4 py-2 text-left">Order ID</th>
+                <th className="px-4 py-2 text-left">Recipient</th>
+                <th className="px-4 py-2 text-left">Total</th>
+                <th className="px-4 py-2 text-left">Status</th>
+                <th className="px-4 py-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders
+                .filter((order) => order.status === activeTab)
+                .map((order) => (
+                  <tr
+                    key={order.order_id}
+                    className="border-b last:border-b-0 hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-2 text-sm">{order.order_id}</td>
+                    <td className="px-4 py-2 text-sm">{order.recipient_name}</td>
+                    <td className="px-4 py-2 text-sm">${order.total + order.delivery_fee}</td>
+                    <td className="px-4 py-2 text-sm">{order.status}</td>
+                    <td className="px-4 py-2">
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          onStatusChange(
+                            order,
+                            e.target.value
+                          )
+                        }
+                        className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                      >
+                        {statuses.map((status) => (
+                          <option
+                            key={status}
+                            value={status}
+                            disabled={status === order.status}
                           >
-                            Move to {statuses[statuses.indexOf(status) - 1]}
-                          </button>
-                        </td>
-                      )}
-                      <td className="px-4 py-2 text-sm">{order.order_id}</td>
-                      <td className="px-4 py-2 text-sm">{order.recipient_name}</td>
-                      <td className="px-4 py-2 text-sm">${order.total + order.delivery_fee}</td>
-                      <td className="px-4 py-2 text-sm">{order.status}</td>
-
-                      {status !== "completed" && (
-                        <td className="px-4 py-2">
-                          <button
-                            onClick={() =>
-                              onStatusChange(
-                                order,
-                                statuses[statuses.indexOf(status) + 1]
-                              )
-                            }
-                            className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded"
-                          >
-                            Move to {statuses[statuses.indexOf(status) + 1]}
-                          </button>
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+                            Move to {status.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
         </div>
-      ))}
+      </div>
     </div>
   );
 };
