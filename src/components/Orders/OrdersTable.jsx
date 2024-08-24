@@ -5,17 +5,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
   const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
   const [searchTerm, setSearchTerm] = useState(""); // For filtering by Order ID
 
-  // Function to format the date and time
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    const formattedDate = date.toLocaleDateString("en-US");
-    const formattedTime = date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-    return `${formattedDate}, ${formattedTime}`;
-  };
+ 
 
   // Sort orders by date and time
   const sortedOrders = orders
@@ -81,7 +71,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Order ID</th>
                   <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Recipient</th>
                   <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Total</th>
-                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Date & Time</th> {/* New column */}
+                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Date & Time</th>
                   <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Status</th>
                   {status !== "completed" && (
                     <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Actions</th>
@@ -112,7 +102,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     <td className="border px-4 py-2 text-sm">{order.order_id}</td>
                     <td className="border px-4 py-2 text-sm">{order.recipient_name}</td>
                     <td className="border px-4 py-2 text-sm">${order.total + order.delivery_fee}</td>
-                    <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> 
+                    <td className="border px-4 py-2 text-sm">{order.time}</td> 
                     <td className="border px-4 py-2 text-sm">{order.status}</td>
 
                     {status !== "completed" && (
