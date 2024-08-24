@@ -119,7 +119,7 @@ return (
     <div className="flex space-x-4 mt-4">
       <button
         onClick={onAccept}
-        className="bg-lightgreen text-white rounded-lg px-4 py-2"
+        className="bg-green-500 text-white rounded-lg px-4 py-2"
       >
         Accept
       </button>
