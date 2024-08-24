@@ -4,7 +4,6 @@ import { SiShopware } from 'react-icons/si';
 import { MdOutlineCancel } from 'react-icons/md';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import { IoLogOutOutline } from 'react-icons/io5';
-import { AiOutlineArrowLeft, AiOutlineArrowRight } from 'react-icons/ai'; // Arrow icons
 
 import { links } from '../data/dummy';
 import { useStateContext } from '../contexts/ContextProvider';
@@ -31,15 +30,11 @@ function Sidebar() {
     setOpenSection(openSection === title ? null : title);
   };
 
-  const toggleSidebar = () => {
-    setActiveMenu(!activeMenu);
-  };
-
   const activeLink = 'flex items-center gap-4 pl-6 py-2 rounded-lg text-white text-md bg-blue-800 hover:bg-blue-900 transition-colors duration-200 ease-in-out';
   const normalLink = 'flex items-center gap-4 pl-6 py-2 rounded-lg text-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ease-in-out';
 
   return (
-    <div className={`w-64 h-screen bg-white dark:bg-gray-800 shadow-lg fixed top-0 left-0 z-30 overflow-auto ${activeMenu ? 'block' : 'hidden'}`}>
+    <div className='w-64 h-screen bg-white dark:bg-gray-800 shadow-lg fixed top-0 left-0 z-30 overflow-auto'>
       {activeMenu && (
         <>
           <div className='flex items-center justify-between px-4 py-3 border-b dark:border-gray-600'>
@@ -47,12 +42,11 @@ function Sidebar() {
               <SiShopware size={24} /><span>Swift Drive</span>
             </Link>
             <TooltipComponent content="Menu" position='BottomCenter'>
-              <button type="button" onClick={toggleSidebar} className='text-xl rounded-full p-2 hover:bg-gray-200 dark:hover:bg-gray-700'>
-                {activeMenu ? <MdOutlineCancel /> : <AiOutlineArrowRight />}
+              <button type="button" onClick={() => setActiveMenu(prev => !prev)} className='text-xl rounded-full p-2 hover:bg-gray-200 dark:hover:bg-gray-700 md:hidden'>
+                <MdOutlineCancel />
               </button>
             </TooltipComponent>
           </div>
-          <hr className='border-gray-300 dark:border-gray-600 my-2' />
           <div className="mt-6 px-4">
             {links.map((item) => (
               <div key={item.title} className='mb-6'>
@@ -77,7 +71,6 @@ function Sidebar() {
                     </NavLink>
                   ))}
                 </div>
-                <hr className='border-gray-300 dark:border-gray-600 my-2' />
               </div>
             ))}
           </div>
