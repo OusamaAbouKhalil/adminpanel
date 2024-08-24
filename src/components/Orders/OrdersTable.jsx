@@ -3,12 +3,13 @@ import React, { useState } from "react";
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
   const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
+  const [searchTerm, setSearchTerm] = useState(""); // Added searchTerm state
 
   const getStatusCount = (status) => {
     return orders.filter((order) => order.status === status).length;
   };
 
-    const formatDateTime = (timestamp) => {
+  const formatDateTime = (timestamp) => {
     const date = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JS Date
     const formattedDate = date.toLocaleDateString("en-US");
     const formattedTime = date.toLocaleTimeString("en-US", {
@@ -19,12 +20,9 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     return `${formattedDate}, ${formattedTime}`;
   };
 
-  // Sorting orders by Firestore timestamp
   const sortedOrders = orders
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
-    .sort((a, b) => {
-      return b.time.seconds - a.time.seconds;
-    });
+    .sort((a, b) => b.time.seconds - a.time.seconds);
 
   // Function to get the status color
   const getStatusColor = (status) => {
@@ -69,6 +67,17 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         ))}
       </div>
 
+      <div className="mb-6 flex justify-center">
+        {/* Search bar for Order ID */}
+        <input
+          type="text"
+          placeholder="Search by Order ID..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="p-2 border border-gray-300 rounded-lg w-full max-w-md"
+        />
+      </div>
+
       <div className={`shadow-lg rounded-lg overflow-hidden ${activeTab ? 'block' : 'hidden'}`}>
         <h2 className="text-xl font-bold text-gray-800 bg-gray-100 py-3 px-4 border-b">
           {activeTab.toUpperCase()}
@@ -86,46 +95,44 @@ const OrdersTable = ({ orders, onStatusChange }) => {
               </tr>
             </thead>
             <tbody>
-              {orders
-                .filter((order) => order.status === activeTab)
-                .map((order) => (
-                  <tr
-                    key={order.order_id}
-                    className="border-b hover:bg-gray-50"
-                  >
-                    <td className="px-6 py-4 text-sm">{order.order_id}</td>
-                    <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
-                    <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
-                    <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
-                    <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
-                      <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <select
-                        value={order.status}
-                        onChange={(e) =>
-                          onStatusChange(
-                            order,
-                            e.target.value
-                          )
-                        }
-                        className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                      >
-                        {statuses.map((status) => (
-                          <option
-                            key={status}
-                            value={status}
-                            disabled={status === order.status}
-                          >
-                            Move to {status.toUpperCase()}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))}
+              {sortedOrders.map((order) => (
+                <tr
+                  key={order.order_id}
+                  className="border-b hover:bg-gray-50"
+                >
+                  <td className="px-6 py-4 text-sm">{order.order_id}</td>
+                  <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
+                  <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
+                  <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
+                  <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
+                    <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        onStatusChange(
+                          order,
+                          e.target.value
+                        )
+                      }
+                      className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    >
+                      {statuses.map((status) => (
+                        <option
+                          key={status}
+                          value={status}
+                          disabled={status === order.status}
+                        >
+                          Move to {status.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
