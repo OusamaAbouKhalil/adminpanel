@@ -5,7 +5,8 @@ const EditNotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(null);
-  const [editingId, setEditingId] = useState(null); // Track which notification is being edited
+  const [editingId, setEditingId] = useState(null);
+  const [dialog, setDialog] = useState({ open: false, type: '', id: null }); // State for dialog
   const db = getDatabase();
 
   useEffect(() => {
@@ -28,7 +29,8 @@ const EditNotificationsPage = () => {
     ));
   };
 
-  const handleUpdate = async (id) => {
+  const handleUpdate = async () => {
+    const { id } = dialog;
     const updatedNotification = notifications.find(notification => notification.id === id);
     if (updatedNotification) {
       const notificationRef = ref(db, `Notifications/${id}`);
@@ -36,18 +38,21 @@ const EditNotificationsPage = () => {
         await update(notificationRef, updatedNotification);
         setSuccess('Notification updated successfully!');
         setErrors([]);
+        setDialog({ open: false, type: '', id: null });
       } catch (err) {
         setErrors(prevErrors => [...prevErrors, `Failed to update notification: ${err.message}`]);
       }
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
+    const { id } = dialog;
     const notificationRef = ref(db, `Notifications/${id}`);
     try {
       await remove(notificationRef);
       setSuccess('Notification deleted successfully!');
       setErrors([]);
+      setDialog({ open: false, type: '', id: null });
     } catch (err) {
       setErrors(prevErrors => [...prevErrors, `Failed to delete notification: ${err.message}`]);
     }
@@ -58,6 +63,14 @@ const EditNotificationsPage = () => {
   };
 
   const isEditing = (id) => editingId === id;
+
+  const openDialog = (type, id) => {
+    setDialog({ open: true, type, id });
+  };
+
+  const closeDialog = () => {
+    setDialog({ open: false, type: '', id: null });
+  };
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-white shadow-lg rounded-lg border border-gray-200 max-w-6xl">
@@ -74,106 +87,138 @@ const EditNotificationsPage = () => {
           </svg>
         </div>
       ) : (
-        <table className="min-w-full bg-white divide-y divide-gray-200 border border-gray-300 rounded-lg shadow-md">
-          <thead className="bg-gray-100 text-gray-500 uppercase text-xs leading-normal">
-            <tr>
-              <th className="px-6 py-3 text-left">Title</th>
-              <th className="px-6 py-3 text-left">Message</th>
-              <th className="px-6 py-3 text-left">Type</th>
-              <th className="px-6 py-3 text-left">Time</th>
-              <th className="px-6 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {notifications.map(notification => (
-              <tr key={notification.id} className={isEditing(notification.id) ? 'bg-blue-50' : ''}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {isEditing(notification.id) ? (
-                    <input
-                      type="text"
-                      value={notification.title}
-                      onChange={(e) => handleChange(notification.id, 'title', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-                    />
-                  ) : (
-                    notification.title
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {isEditing(notification.id) ? (
-                    <textarea
-                      value={notification.message}
-                      onChange={(e) => handleChange(notification.id, 'message', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-                    ></textarea>
-                  ) : (
-                    notification.message
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {isEditing(notification.id) ? (
-                    <select
-                      value={notification.type}
-                      onChange={(e) => handleChange(notification.id, 'type', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-                    >
-                      <option value="alert">Alert</option>
-                      <option value="info">Info</option>
-                      <option value="warning">Warning</option>
-                    </select>
-                  ) : (
-                    notification.type
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {isEditing(notification.id) ? (
-                    <input
-                      type="datetime-local"
-                      value={notification.time}
-                      onChange={(e) => handleChange(notification.id, 'time', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-                    />
-                  ) : (
-                    new Date(notification.time).toLocaleString()
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  {isEditing(notification.id) ? (
-                    <>
-                      <button
-                        onClick={() => handleUpdate(notification.id)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out mr-2"
-                      >
-                        Update
-                      </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700 transition duration-300 ease-in-out"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => startEditing(notification.id)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out mr-2"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(notification.id)}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out"
-                      >
-                        Delete
-                      </button>
-                    </>
-                  )}
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white divide-y divide-gray-200 border border-gray-300 rounded-lg shadow-md">
+            <thead className="bg-gray-100 text-gray-500 uppercase text-xs leading-normal">
+              <tr>
+                <th className="px-4 py-3 text-left">Title</th>
+                <th className="px-4 py-3 text-left">Message</th>
+                <th className="px-4 py-3 text-left">Type</th>
+                <th className="px-4 py-3 text-left">Time</th>
+                <th className="px-4 py-3 text-left">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {notifications.map(notification => (
+                <tr key={notification.id} className={isEditing(notification.id) ? 'bg-blue-50' : ''}>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {isEditing(notification.id) ? (
+                      <input
+                        type="text"
+                        value={notification.title}
+                        onChange={(e) => handleChange(notification.id, 'title', e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                      />
+                    ) : (
+                      notification.title
+                    )}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {isEditing(notification.id) ? (
+                      <textarea
+                        value={notification.message}
+                        onChange={(e) => handleChange(notification.id, 'message', e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                      ></textarea>
+                    ) : (
+                      notification.message
+                    )}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {isEditing(notification.id) ? (
+                      <select
+                        value={notification.type}
+                        onChange={(e) => handleChange(notification.id, 'type', e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                      >
+                        <option value="alert">Alert</option>
+                        <option value="info">Info</option>
+                        <option value="warning">Warning</option>
+                      </select>
+                    ) : (
+                      notification.type
+                    )}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {isEditing(notification.id) ? (
+                      <input
+                        type="datetime-local"
+                        value={notification.time}
+                        onChange={(e) => handleChange(notification.id, 'time', e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                      />
+                    ) : (
+                      new Date(notification.time).toLocaleString()
+                    )}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    {isEditing(notification.id) ? (
+                      <>
+                        <button
+                          onClick={handleUpdate}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out mr-2"
+                        >
+                          Update
+                        </button>
+                        <button
+                          onClick={() => setEditingId(null)}
+                          className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700 transition duration-300 ease-in-out"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => startEditing(notification.id)}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out mr-2"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => openDialog('delete', notification.id)}
+                          className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out"
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Custom Dialog */}
+      {dialog.open && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
+            <h2 className="text-lg font-bold mb-4">
+              {dialog.type === 'delete' ? 'Confirm Deletion' : 'Confirm Update'}
+            </h2>
+            <p className="mb-4">
+              {dialog.type === 'delete' 
+                ? 'Are you sure you want to delete this notification?' 
+                : 'Are you sure you want to update this notification?'}
+            </p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={dialog.type === 'delete' ? handleDelete : handleUpdate}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={closeDialog}
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700 transition duration-300 ease-in-out"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
