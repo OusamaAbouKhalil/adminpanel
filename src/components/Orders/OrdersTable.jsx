@@ -1,18 +1,11 @@
 import React, { useState } from "react";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
-  const statuses = ["accepted", "preparing", "on the way", "completed", "cancelled", "rejected"];
+  const statuses = ["accepted", "preparing", "on the way", "completed","cancelled","rejected"];
   const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
   const [searchTerm, setSearchTerm] = useState(""); // For filtering by Order ID
 
-  const getStatusCount = (status) => {
-    return orders.filter((order) => order.status === status).length;
-  };
-
-  const filteredOrders = orders.filter((order) => 
-    order.status === activeTab && order.order_id.includes(searchTerm)
-  );
-
+  // Function to format the date and time from a timestamp
   const formatDateTime = (timestamp) => {
     const date = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JS Date
     const formattedDate = date.toLocaleDateString("en-US");
@@ -24,10 +17,10 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     return `${formattedDate}, ${formattedTime}`;
   };
 
-  // Sorting orders by Firestore timestamp
   const sortedOrders = orders
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
     .sort((a, b) => b.time.seconds - a.time.seconds);
+
 
   return (
     <div className="my-10 p-4">
@@ -37,7 +30,9 @@ const OrdersTable = ({ orders, onStatusChange }) => {
           <div key={status} className="relative inline-block mr-4">
             <button
               key={status}
-              className={`rounded-t-lg p-3 mr-2 lg:text-lg text-sm font-bold text-gray-700 ${activeTab === status ? "bg-gray-200" : "bg-white"} transition-colors duration-300`}
+              className={`rounded-t-lg p-3 mr-2 lg:text-lg text-sm font-bold text-gray-700 ${
+                activeTab === status ? "bg-gray-200" : "bg-white"
+              } transition-colors duration-300`}
               onClick={() => setActiveTab(status)}
             >
               {status.toUpperCase()}
@@ -68,7 +63,9 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       {statuses.map((status) => (
         <div
           key={status}
-          className={`${activeTab === status ? "block" : "hidden"} shadow-lg rounded-lg p-6 bg-white`}
+          className={`${
+            activeTab === status ? "block" : "hidden"
+          } shadow-lg rounded-lg p-6 bg-white`}
         >
           <h2 className="text-lg font-bold text-gray-800 mb-6">
             {status.toUpperCase()}
@@ -78,26 +75,40 @@ const OrdersTable = ({ orders, onStatusChange }) => {
             <table className="min-w-full table-fixed border-separate border-spacing-0">
               <thead className="bg-gray-200 text-gray-700">
                 <tr>
-                  {status !== "rejected" && status !== "cancelled" && (
-                    <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Actions</th>
+                  {status !== "accepted" && (
+                    <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">
+                      Actions
+                    </th>
                   )}
-                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Order ID</th>
-                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Recipient</th>
-                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Total</th>
-                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Date</th> {/* New column */}
-                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Status</th>
-                  {status !== "completed" && status !== "rejected" && status !== "cancelled" && (
-                    <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Actions</th>
+                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">
+                    Order ID
+                  </th>
+                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">
+                    Recipient
+                  </th>
+                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">
+                    Total
+                  </th>
+                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">
+                    Date & Time
+                  </th>
+                  <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">
+                    Status
+                  </th>
+                  {status !== "completed" && (
+                    <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">
+                      Actions
+                    </th>
                   )}
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map((order) => (
+                {sortedOrders.map((order) => (
                   <tr
                     key={order.order_id}
                     className="border-b last:border-b-0 hover:bg-gray-100 transition-colors duration-300"
                   >
-                    {status !== "rejected" && status !== "cancelled" && (
+                    {status !== "accepted" || status !== "rejected" || status !== "cancelled"  && (
                       <td className="border px-4 py-2 text-sm">
                         <button
                           onClick={() =>
@@ -114,11 +125,15 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     )}
                     <td className="border px-4 py-2 text-sm">{order.order_id}</td>
                     <td className="border px-4 py-2 text-sm">{order.recipient_name}</td>
-                    <td className="border px-4 py-2 text-sm">${order.total + order.delivery_fee}</td>
-                     <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
-                     <td className="border px-4 py-2 text-sm">{order.status}</td>
+                    <td className="border px-4 py-2 text-sm">
+                      ${order.total + order.delivery_fee}
+                    </td>
+                    <td className="border px-4 py-2 text-sm">
+                      {formatDateTime(order.time)} {/* Display formatted date & time */}
+                    </td>
+                    <td className="border px-4 py-2 text-sm">{order.status}</td>
 
-                    {status !== "completed" && status !== "rejected" && status !== "cancelled" && (
+                    {status !== "completed" || status !== "rejected" || status !== "cancelled" && (
                       <td className="border px-4 py-2 text-sm">
                         <button
                           onClick={() =>
