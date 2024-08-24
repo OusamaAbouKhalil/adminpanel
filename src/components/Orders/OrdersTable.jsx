@@ -4,9 +4,10 @@ const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed"];
   const [selectedStatus, setSelectedStatus] = useState("accepted");
 
-  const handleStatusChange = (orderId, newStatus) => {
+  // Update status when dropdown changes
+  const handleDropdownChange = (orderId, newStatus) => {
     onStatusChange(orderId, newStatus);
-    setSelectedStatus(newStatus);
+    setSelectedStatus(newStatus); // Ensure status filter updates
   };
 
   return (
@@ -71,9 +72,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <select
                       value={order.status}
-                      onChange={(e) =>
-                        handleStatusChange(order.order_id, e.target.value)
-                      }
+                      onChange={(e) => handleDropdownChange(order.order_id, e.target.value)}
                       className="p-1 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
                     >
                       {statuses.map((status) => (
