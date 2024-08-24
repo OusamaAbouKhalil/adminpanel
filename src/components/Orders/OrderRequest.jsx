@@ -27,6 +27,10 @@ const OrderRequest = ({ order, onAccept, onReject }) => {
   return <div className="text-center p-4">No pending requests currently</div>;
 }
 
+if (!order) {
+  return <div className="text-center p-4">No pending requests currently</div>;
+}
+
 return (
   <div className="p-4 border rounded shadow max-w-screen-xl w-full">
     <h1 className="text-xl font-bold mb-4">Order Request</h1>
@@ -42,6 +46,7 @@ return (
           <td className="px-4 py-2 border font-semibold">Recipient Name:</td>
           <td className="px-4 py-2 border">{order.recipient_name}</td>
         </tr>
+
         {order.items &&
           order.items.map((item, index) => (
             <React.Fragment key={index}>
@@ -63,13 +68,14 @@ return (
               </tr>
             </React.Fragment>
           ))}
+
         <tr>
           <td className="px-4 py-2 border font-semibold">Total:</td>
           <td className="px-4 py-2 border">${order.total + order.delivery_fee}</td>
         </tr>
         <tr>
           <td className="px-4 py-2 border font-semibold">Cost in Credits:</td>
-          <td className="px-4 py-2 border">{order.costInCredits.toFixed(2)}</td>
+          <td className="px-4 py-2 border">{order.costInCredits}</td>
         </tr>
         <tr>
           <td className="px-4 py-2 border font-semibold">Delivery Fee:</td>
@@ -125,7 +131,7 @@ return (
     <div className="flex space-x-4 mt-4">
       <button
         onClick={onAccept}
-        className="bg-green-500 text-white rounded-lg px-4 py-2"
+        className="bg-lightgreen text-white rounded-lg px-4 py-2"
       >
         Accept
       </button>
@@ -138,7 +144,6 @@ return (
     </div>
   </div>
 );
-
 
 };
 
