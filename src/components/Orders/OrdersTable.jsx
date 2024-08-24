@@ -111,8 +111,8 @@ const fetchRestaurants = async () => {
           <table className="min-w-full bg-white border border-gray-300">
             <thead className="bg-blue-100 text-blue-600 border-b border-gray-300">
               <tr>
-                <th className="px-6 py-3 text-left font-medium text-sm">Main Image</th> {/* New column */}
-                <th className="px-6 py-3 text-left font-medium text-sm">Restaurant Name</th> {/* New column */}
+                <th className="px-6 py-3 text-left font-medium text-sm">Logo</th> {/* New column */}
+                <th className="px-6 py-3 text-left font-medium text-sm">Restaurant</th> {/* New column */}
                 <th className="px-6 py-3 text-left font-medium text-sm">Order ID</th>
                 <th className="px-6 py-3 text-left font-medium text-sm">Recipient</th>
                 <th className="px-6 py-3 text-left font-medium text-sm">Date</th>
