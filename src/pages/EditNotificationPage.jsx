@@ -6,7 +6,7 @@ const EditNotificationsPage = () => {
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [dialog, setDialog] = useState({ open: false, type: '', id: null }); // State for dialog
+  const [dialog, setDialog] = useState({ open: false, type: '', id: null });
   const db = getDatabase();
 
   useEffect(() => {
@@ -30,19 +30,25 @@ const EditNotificationsPage = () => {
   };
 
   const handleUpdate = async () => {
+    console.log('Update button clicked'); // Debugging line
     const { id } = dialog;
     const updatedNotification = notifications.find(notification => notification.id === id);
+    
     if (updatedNotification) {
+      console.log('Updating notification:', updatedNotification); // Debugging line
       const notificationRef = ref(db, `Notifications/${id}`);
       try {
         await update(notificationRef, updatedNotification);
         setSuccess('Notification updated successfully!');
         setErrors([]);
         setDialog({ open: false, type: '', id: null });
-        setEditingId(null); // Exit edit mode
+        setEditingId(null);
       } catch (err) {
         setErrors(prevErrors => [...prevErrors, `Failed to update notification: ${err.message}`]);
+        console.error('Update error:', err); // Debugging line
       }
+    } else {
+      console.error('No notification found for ID:', id); // Debugging line
     }
   };
 
@@ -172,7 +178,7 @@ const EditNotificationsPage = () => {
                       <>
                         <button
                           onClick={() => startEditing(notification.id)}
-                          className="bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-700 transition duration-300 ease-in-out mr-2"
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out mr-2"
                         >
                           Edit
                         </button>
