@@ -10,43 +10,40 @@ const OrdersTable = ({ orders, onStatusChange }) => {
 
   return (
     <div className="my-10">
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-6">
         {/* Status Tabs */}
         {statuses.map((status) => (
-          <div key={status} className="relative inline-block mx-2">
-            <button
-              className={`rounded-t-lg px-4 py-2 text-sm font-bold text-gray-700 transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-gray-200" : "bg-white"}`}
-              onClick={() => setActiveTab(status)}
-            >
-              {status.toUpperCase()}
-            </button>
+          <button
+            key={status}
+            className={`relative mx-2 px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-blue-500 text-white shadow-lg" : "bg-gray-200 text-gray-700"}`}
+            onClick={() => setActiveTab(status)}
+          >
+            {status.toUpperCase()}
             {getStatusCount(status) > 0 && (
               <span
-                className="absolute top-0 right-2 rounded-full bg-red-600 text-white text-xs font-bold px-2 py-1"
+                className="absolute top-0 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full"
                 style={{ transform: "translate(50%, -50%)" }}
               >
                 {getStatusCount(status)}
               </span>
             )}
-          </div>
+          </button>
         ))}
       </div>
 
-      <div
-        className={`shadow-lg rounded-lg p-4 bg-white ${activeTab ? 'block' : 'hidden'}`}
-      >
-        <h2 className="text-lg font-bold text-gray-700 mb-4">
+      <div className={`shadow-lg rounded-lg overflow-hidden ${activeTab ? 'block' : 'hidden'}`}>
+        <h2 className="text-xl font-bold text-gray-800 bg-gray-100 py-3 px-4 border-b">
           {activeTab.toUpperCase()}
         </h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full table-fixed border-collapse">
-            <thead className="bg-gray-100 sticky top-0 z-10">
+          <table className="min-w-full bg-white border border-gray-300">
+            <thead className="bg-blue-100 text-blue-600 border-b border-gray-300">
               <tr>
-                <th className="px-4 py-2 text-left">Order ID</th>
-                <th className="px-4 py-2 text-left">Recipient</th>
-                <th className="px-4 py-2 text-left">Total</th>
-                <th className="px-4 py-2 text-left">Status</th>
-                <th className="px-4 py-2 text-left">Actions</th>
+                <th className="px-6 py-3 text-left font-medium text-sm">Order ID</th>
+                <th className="px-6 py-3 text-left font-medium text-sm">Recipient</th>
+                <th className="px-6 py-3 text-left font-medium text-sm">Total</th>
+                <th className="px-6 py-3 text-left font-medium text-sm">Status</th>
+                <th className="px-6 py-3 text-left font-medium text-sm">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -55,13 +52,13 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                 .map((order) => (
                   <tr
                     key={order.order_id}
-                    className="border-b last:border-b-0 hover:bg-gray-50"
+                    className="border-b hover:bg-gray-50"
                   >
-                    <td className="px-4 py-2 text-sm">{order.order_id}</td>
-                    <td className="px-4 py-2 text-sm">{order.recipient_name}</td>
-                    <td className="px-4 py-2 text-sm">${order.total + order.delivery_fee}</td>
-                    <td className="px-4 py-2 text-sm">{order.status}</td>
-                    <td className="px-4 py-2">
+                    <td className="px-6 py-4 text-sm">{order.order_id}</td>
+                    <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
+                    <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
+                    <td className="px-6 py-4 text-sm capitalize">{order.status}</td>
+                    <td className="px-6 py-4">
                       <select
                         value={order.status}
                         onChange={(e) =>
