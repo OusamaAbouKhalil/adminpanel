@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, query, orderByChild, limitToLast, onValue, update } from 'firebase/database';
+import { getDatabase, ref, query, orderByChild, limitToLast, onValue, update, remove } from 'firebase/database';
 
 const EditNotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(null);
+  const [editingId, setEditingId] = useState(null); // Track which notification is being edited
   const db = getDatabase();
 
   useEffect(() => {
@@ -41,6 +42,23 @@ const EditNotificationsPage = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    const notificationRef = ref(db, `Notifications/${id}`);
+    try {
+      await remove(notificationRef);
+      setSuccess('Notification deleted successfully!');
+      setErrors([]);
+    } catch (err) {
+      setErrors(prevErrors => [...prevErrors, `Failed to delete notification: ${err.message}`]);
+    }
+  };
+
+  const startEditing = (id) => {
+    setEditingId(id);
+  };
+
+  const isEditing = (id) => editingId === id;
+
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-white shadow-lg rounded-lg border border-gray-200 max-w-3xl">
       <h1 className="text-4xl font-extrabold mb-8 text-gray-900 text-center">Edit Notifications</h1>
@@ -57,58 +75,83 @@ const EditNotificationsPage = () => {
         </div>
       ) : (
         notifications.map(notification => (
-          <form key={notification.id} onSubmit={(e) => { e.preventDefault(); handleUpdate(notification.id); }} className="bg-gray-50 p-6 rounded-lg shadow-sm mb-8">
-            <div className="mb-4">
-              <label htmlFor={`title-${notification.id}`} className="block text-gray-700 text-lg font-semibold mb-2">Title</label>
-              <input
-                type="text"
-                id={`title-${notification.id}`}
-                value={notification.title}
-                onChange={(e) => handleChange(notification.id, 'title', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-                placeholder="Enter title here"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor={`message-${notification.id}`} className="block text-gray-700 text-lg font-semibold mb-2">Message</label>
-              <textarea
-                id={`message-${notification.id}`}
-                value={notification.message}
-                onChange={(e) => handleChange(notification.id, 'message', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-                placeholder="Enter message here"
-              ></textarea>
-            </div>
-            <div className="mb-4">
-              <label htmlFor={`type-${notification.id}`} className="block text-gray-700 text-lg font-semibold mb-2">Type</label>
-              <select
-                id={`type-${notification.id}`}
-                value={notification.type}
-                onChange={(e) => handleChange(notification.id, 'type', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-              >
-                <option value="alert">Alert</option>
-                <option value="info">Info</option>
-                <option value="warning">Warning</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label htmlFor={`time-${notification.id}`} className="block text-gray-700 text-lg font-semibold mb-2">Time</label>
-              <input
-                type="datetime-local"
-                id={`time-${notification.id}`}
-                value={notification.time}
-                onChange={(e) => handleChange(notification.id, 'time', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
-            >
-              Update Notification
-            </button>
-          </form>
+          <div key={notification.id} className="bg-gray-50 p-6 rounded-lg shadow-sm mb-8">
+            {isEditing(notification.id) ? (
+              <form onSubmit={(e) => { e.preventDefault(); handleUpdate(notification.id); }} className="space-y-6">
+                <div className="mb-4">
+                  <label htmlFor={`title-${notification.id}`} className="block text-gray-700 text-lg font-semibold mb-2">Title</label>
+                  <input
+                    type="text"
+                    id={`title-${notification.id}`}
+                    value={notification.title}
+                    onChange={(e) => handleChange(notification.id, 'title', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                    placeholder="Enter title here"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label htmlFor={`message-${notification.id}`} className="block text-gray-700 text-lg font-semibold mb-2">Message</label>
+                  <textarea
+                    id={`message-${notification.id}`}
+                    value={notification.message}
+                    onChange={(e) => handleChange(notification.id, 'message', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                    placeholder="Enter message here"
+                  ></textarea>
+                </div>
+                <div className="mb-4">
+                  <label htmlFor={`type-${notification.id}`} className="block text-gray-700 text-lg font-semibold mb-2">Type</label>
+                  <select
+                    id={`type-${notification.id}`}
+                    value={notification.type}
+                    onChange={(e) => handleChange(notification.id, 'type', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                  >
+                    <option value="alert">Alert</option>
+                    <option value="info">Info</option>
+                    <option value="warning">Warning</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label htmlFor={`time-${notification.id}`} className="block text-gray-700 text-lg font-semibold mb-2">Time</label>
+                  <input
+                    type="datetime-local"
+                    id={`time-${notification.id}`}
+                    value={notification.time}
+                    onChange={(e) => handleChange(notification.id, 'time', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
+                >
+                  Update Notification
+                </button>
+              </form>
+            ) : (
+              <div className="flex flex-col space-y-4">
+                <h2 className="text-2xl font-semibold text-gray-800">{notification.title}</h2>
+                <p className="text-gray-700">{notification.message}</p>
+                <p className="text-gray-600">Type: {notification.type}</p>
+                <p className="text-gray-600">Time: {new Date(notification.time).toLocaleString()}</p>
+                <div className="flex space-x-4">
+                  <button
+                    onClick={() => startEditing(notification.id)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(notification.id)}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         ))
       )}
     </div>
