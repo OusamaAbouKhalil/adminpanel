@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getDatabase, ref, push } from 'firebase/database';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const SendNotificationPage = () => {
   const [title, setTitle] = useState('');
@@ -10,24 +11,22 @@ const SendNotificationPage = () => {
   const [success, setSuccess] = useState(null);
 
   const db = getDatabase(); // Get a reference to the Firebase Realtime Database
+  const functions = getFunctions(); // Initialize Firebase Functions
 
-  const sendNotification = async (title, body) => {
-    const sendNotificationFunction = httpsCallable(
-        functions,
-        "	sendTopicNotification"
-    );
+  const sendTopicNotification = async (title, body) => {
+    const sendNotificationFunction = httpsCallable(functions, "sendTopicNotification");
     try {
-        const result = await sendNotificationFunction({title, body });
-        console.log(result.data);
-        if (result.data.success) {
-            console.log("Notification sent successfully");
-        } else {
-            console.log("Failed to send notification:", result.data.error);
-        }
+      const result = await sendNotificationFunction({ title, body });
+      console.log(result.data);
+      if (result.data.success) {
+        console.log("Notification sent successfully");
+      } else {
+        console.log("Failed to send notification:", result.data.error);
+      }
     } catch (error) {
-        console.error("Error sending notification:", error);
+      console.error("Error sending notification:", error);
     }
-};
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,10 +46,7 @@ const SendNotificationPage = () => {
         type,
         time,
       });
-      await sendNotification(
-                    title,
-                    message
-                );
+      await sendTopicNotification(title, message);
 
       setSuccess('Notification sent successfully!');
       setTitle('');
@@ -61,6 +57,7 @@ const SendNotificationPage = () => {
       setError('Failed to send notification: ' + err.message);
     }
   };
+
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-white shadow-md rounded-lg border border-gray-200 max-w-2xl">
