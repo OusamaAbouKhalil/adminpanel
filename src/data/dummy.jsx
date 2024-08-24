@@ -251,7 +251,7 @@ export const links = [
   },
 
   {
-    title: "Pages",
+    title: "Restaurants Pages",
     links: [
       {
         name: "restaurants",
@@ -260,6 +260,15 @@ export const links = [
       {
         name: "orders",
         icon: <IoMdContacts />,
+      },
+    ],
+  },
+{
+    title: "Pricing",
+    links: [
+      {
+        name: "prices", // Route name for the new page
+        icon: <FaDollarSign />, // Money icon
       },
     ],
   },
