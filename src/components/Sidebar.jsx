@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { SiShopware } from 'react-icons/si';
 import { MdOutlineCancel } from 'react-icons/md';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
-import { IoLogOutOutline } from 'react-icons/io5'; // Logout icon
+import { IoLogOutOutline } from 'react-icons/io5';
 
-import { links } from '../data/dummy'; // Import your links data
+import { links } from '../data/dummy';
 import { useStateContext } from '../contexts/ContextProvider';
-import { useAuth } from '../contexts/AuthProvider'; // Assuming you have a useAuth hook
+import { useAuth } from '../contexts/AuthProvider';
 
 function Sidebar() {
   const { activeMenu, setActiveMenu, screenSize } = useStateContext();
-  const { logOut } = useAuth(); // Corrected to match the function name in AuthProvider
+  const { logOut } = useAuth();
+
+  const [openSection, setOpenSection] = useState(null);
 
   const handleCloseSideBar = () => {
     if (activeMenu && screenSize <= 900) {
@@ -20,52 +22,65 @@ function Sidebar() {
   };
 
   const handleLogout = () => {
-    logOut(); // Corrected to match the function name in AuthProvider
-    handleCloseSideBar(); // Optionally close the sidebar
+    logOut();
+    handleCloseSideBar();
   };
 
-  const activeLink = 'flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-white text-md m-2 bg-blue-900';
-  const normalLink = 'flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md text-gray-700 dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2';
+  const handleSectionToggle = (title) => {
+    setOpenSection(openSection === title ? null : title);
+  };
+
+  const activeLink = 'flex items-center gap-4 pl-6 py-2 rounded-lg text-white text-md bg-blue-800 hover:bg-blue-900 transition-colors duration-200 ease-in-out';
+  const normalLink = 'flex items-center gap-4 pl-6 py-2 rounded-lg text-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ease-in-out';
 
   return (
-    <div className='ml-3 h-screen overflow-auto md:hover:overflow-auto pb-10'>
+    <div className='w-64 h-screen bg-white dark:bg-gray-800 shadow-lg overflow-auto'>
       {activeMenu && (
         <>
-          <div className='flex justify-between items-center'>
-            <Link to="/" onClick={handleCloseSideBar} className='items-center gap-3 ml-3 mt-4 flex text-xl tracking-tight dark:text-white text-slate-900'>
-              <SiShopware /><span>Swift Drive</span>
+          <div className='flex items-center justify-between px-4 py-3 border-b dark:border-gray-600'>
+            <Link to="/" onClick={handleCloseSideBar} className='flex items-center gap-2 text-xl font-semibold text-gray-900 dark:text-white'>
+              <SiShopware size={24} /><span>Swift Drive</span>
             </Link>
             <TooltipComponent content="Menu" position='BottomCenter'>
-              <button type="button" onClick={() => setActiveMenu((preActiveMenu) => !preActiveMenu)} className='text-xl rounded-full p-3 block hover:bg-light-gray md:hidden'>
+              <button type="button" onClick={() => setActiveMenu(prev => !prev)} className='text-xl rounded-full p-2 hover:bg-gray-200 dark:hover:bg-gray-700 md:hidden'>
                 <MdOutlineCancel />
               </button>
             </TooltipComponent>
           </div>
-          <div className="mt-10">
+          <div className="mt-6 px-4">
             {links.map((item) => (
-              <div key={item.title}>
-                <p className="text-gray-500 mt-4 m-3">{item.title}</p>
-                {item.links.map((link) => (
-                  <NavLink
-                    to={`/${link.name}`}
-                    key={link.name}
-                    onClick={handleCloseSideBar}
-                    className={({ isActive }) => isActive ? activeLink : normalLink}
-                  >
-                    {link.icon}
-                    <span className='capitalize'>{link.name}</span>
-                  </NavLink>
-                ))}
+              <div key={item.title} className='mb-6'>
+                <p 
+                  className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 cursor-pointer"
+                  onClick={() => handleSectionToggle(item.title)}
+                >
+                  {item.title}
+                </p>
+                <div 
+                  className={`overflow-hidden transition-all duration-300 ${openSection === item.title ? 'max-h-screen' : 'max-h-0'}`}
+                >
+                  {item.links.map((link) => (
+                    <NavLink
+                      to={`/${link.name}`}
+                      key={link.name}
+                      onClick={handleCloseSideBar}
+                      className={({ isActive }) => isActive ? activeLink : normalLink}
+                    >
+                      {link.icon}
+                      <span className='capitalize'>{link.name}</span>
+                    </NavLink>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
-          <div className="absolute bottom-0 w-[95%]">
+          <div className="absolute bottom-0 w-full px-4 py-3 bg-gray-100 dark:bg-gray-700">
             <button
-              className="flex items-center justify-center w-full p-3 hover:bg-red-600/30 text-gray-500 rounded-md"
-              onClick={handleLogout} // Removed the immediate invocation
+              className="flex items-center justify-center w-full p-2 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-700 transition-colors duration-200 ease-in-out"
+              onClick={handleLogout}
             >
-              <IoLogOutOutline className="text-xl" />
-              <span className="ml-2">Logout</span>
+              <IoLogOutOutline className="text-lg" />
+              <span className="ml-2 text-sm font-medium">Logout</span>
             </button>
           </div>
         </>
