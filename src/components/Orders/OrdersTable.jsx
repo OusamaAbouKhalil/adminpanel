@@ -1,9 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { firestore } from './firebase'; // Adjust this import based on your Firebase setup
 
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
   const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
   const [searchTerm, setSearchTerm] = useState(""); // Added searchTerm state
+  const [restaurants, setRestaurants] = useState({}); // State to store restaurant data
+
+  useEffect(() => {
+    // Fetch restaurant data from Firestore
+    const fetchRestaurants = async () => {
+      try {
+        const restaurantsSnapshot = await firestore.collection('restaurants').get();
+        const restaurantData = {};
+        restaurantsSnapshot.forEach(doc => {
+          restaurantData[doc.id] = doc.data();
+        });
+        setRestaurants(restaurantData);
+      } catch (error) {
+        console.error("Error fetching restaurants:", error);
+      }
+    };
+    fetchRestaurants();
+  }, []);
 
   const getStatusCount = (status) => {
     return orders.filter((order) => order.status === status).length;
@@ -24,6 +43,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
     .sort((a, b) => b.time.seconds - a.time.seconds);
 
+
   // Function to get the status color
   const getStatusColor = (status) => {
     switch (status) {
@@ -40,9 +60,10 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       case "cancelled":
         return "bg-red-300 text-gray-700";
       default:
-        return "bg-white text-black";
+        return "bg-grey-200 text-black";
     }
   };
+
 
   return (
     <div className="my-10">
@@ -86,6 +107,8 @@ const OrdersTable = ({ orders, onStatusChange }) => {
           <table className="min-w-full bg-white border border-gray-300">
             <thead className="bg-blue-100 text-blue-600 border-b border-gray-300">
               <tr>
+                <th className="px-6 py-3 text-left font-medium text-sm">Main Image</th> {/* New column */}
+                <th className="px-6 py-3 text-left font-medium text-sm">Restaurant Name</th> {/* New column */}
                 <th className="px-6 py-3 text-left font-medium text-sm">Order ID</th>
                 <th className="px-6 py-3 text-left font-medium text-sm">Recipient</th>
                 <th className="px-6 py-3 text-left font-medium text-sm">Date</th>
@@ -95,44 +118,45 @@ const OrdersTable = ({ orders, onStatusChange }) => {
               </tr>
             </thead>
             <tbody>
-              {sortedOrders.map((order) => (
-                <tr
-                  key={order.order_id}
-                  className="border-b hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4 text-sm">{order.order_id}</td>
-                  <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
-                  <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
-                  <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
-                  <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
-                    <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <select
-                      value={order.status}
-                      onChange={(e) =>
-                        onStatusChange(
-                          order,
-                          e.target.value
-                        )
-                      }
-                      className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    >
-                      {statuses.map((status) => (
-                        <option
-                          key={status}
-                          value={status}
-                          disabled={status === order.status}
-                        >
-                          {status.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                </tr>
-              ))}
+              {sortedOrders.map((order) => {
+                const restaurant = restaurants[order.restaurant_id] || {}; // Fetch restaurant details
+                return (
+                  <tr key={order.order_id} className="border-b hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm">
+                      <img src={restaurant.main_image} alt="Restaurant" className="w-16 h-16 object-cover rounded" />
+                    </td>
+                    <td className="px-6 py-4 text-sm">{restaurant.rest_name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm">{order.order_id}</td>
+                    <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
+                    <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
+                    <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
+                    <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
+                      <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
+                        {order.status}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          onStatusChange(order, e.target.value)
+                        }
+                        className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                      >
+                        {statuses.map((status) => (
+                          <option
+                            key={status}
+                            value={status}
+                            disabled={status === order.status}
+                          >
+                            {status.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
