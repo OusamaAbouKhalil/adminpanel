@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getDatabase, ref, get, onValue } from "firebase/database";
 import db, { fsdb, functions, httpsCallable } from "../../utils/firebaseconfig";
-const firestore = getFirestore();
-
 
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
@@ -14,7 +12,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
  
 const fetchRestaurants = async () => {
   try {
-    const restaurantsCollection = collection(firestore, 'restaurants');
+    const restaurantsCollection = collection(fsdb, 'restaurants');
     const restaurantsSnapshot = await getDocs(restaurantsCollection);
     const restaurantData = {};
     restaurantsSnapshot.forEach(doc => {
