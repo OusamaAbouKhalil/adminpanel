@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
-  const statuses = ["accepted", "preparing", "on the way", "completed"];
+  const statuses = ["accepted", "preparing", "on the way", "completed","cancelled","rejected"];
   const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
   const [searchTerm, setSearchTerm] = useState(""); // For filtering by Order ID
 
