@@ -126,7 +126,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                           value={status}
                           disabled={status === order.status}
                         >
-                          status.toUpperCase()
+                          {status.toUpperCase()}
                         </option>
                       ))}
                     </select>
