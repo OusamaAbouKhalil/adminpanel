@@ -23,110 +23,116 @@ const OrderRequest = ({ order, onAccept, onReject }) => {
 
   const mapUrl = `https://www.google.com/maps?q=${center.lat},${center.lng}`;
 
-  if (!order) {
-    return <div className="text-center p-4">No pending requests currently</div>;
-  }
+ if (!order) {
+  return <div className="text-center p-4">No pending requests currently</div>;
+}
 
-  return (
-    <div className="p-4 border rounded shadow max-w-screen-xl w-full">
-      <h1 className="text-xl font-bold">Order Request:</h1>
-      <p>
-        <strong>Recipient Name:</strong> {order.recipient_name}
-      </p>
-      {/* {console.log("hmmm",order.items)} */}
-      {order.items &&
-        order.items.map((item, index) => (
-          <div key={index} className="my-2 p-2 border rounded">
-            <p>
-              <strong>Item Name:</strong> {item.item_name}
-            </p>
-            <p>
-              <strong>Quantity:</strong> {item.quantity}
-            </p>
-            {/* <p>
-              <strong>Combo:</strong> {item.combo.join(", ")}
-            </p> */}
-            <p>
-              <strong>Size:</strong> {item.size}
-            </p>
-            <p>
-              <strong>Price:</strong> ${item.total}
-            </p>
-          </div>
-        ))}
-      <p>
-        {/* total = total + delivery fee */}
-        <strong>Total:</strong> ${order.total + order.delivery_fee}
-      </p>
-      <p>
-        <strong>Cost in Credits:</strong> {order.costInCredits}
-      </p>
-      <p>
-        <strong>Delivery Fee:</strong> ${order.delivery_fee}
-      </p>
-      <p>
-        <strong>Floor Number:</strong> {order.floor_num}
-      </p>
-      <p>
-        <strong>Payment Method:</strong> {order.payment_method}
-      </p>
-      <p>
-        <strong>Unit Number:</strong> {order.unit_num}
-      </p>
-      <p>
-        <strong>User Address:</strong> {order.user_address}
-      </p>
-      <p>
-        <a
-          href={mapUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500 hover:text-blue-700 font-semibold"
+return (
+  <div className="p-4 border rounded shadow max-w-screen-xl w-full">
+    <h1 className="text-xl font-bold mb-4">Order Request</h1>
+    <table className="w-full text-left border-collapse">
+      <tbody>
+        <tr>
+          <td className="font-semibold">Recipient Name:</td>
+          <td>{order.recipient_name}</td>
+        </tr>
+        {order.items &&
+          order.items.map((item, index) => (
+            <React.Fragment key={index}>
+              <tr>
+                <td className="font-semibold">Item Name:</td>
+                <td>{item.item_name}</td>
+              </tr>
+              <tr>
+                <td className="font-semibold">Quantity:</td>
+                <td>{item.quantity}</td>
+              </tr>
+              <tr>
+                <td className="font-semibold">Size:</td>
+                <td>{item.size}</td>
+              </tr>
+              <tr>
+                <td className="font-semibold">Price:</td>
+                <td>${item.total}</td>
+              </tr>
+            </React.Fragment>
+          ))}
+        <tr>
+          <td className="font-semibold">Total:</td>
+          <td>${order.total + order.delivery_fee}</td>
+        </tr>
+        <tr>
+          <td className="font-semibold">Cost in Credits:</td>
+          <td>{order.costInCredits}</td>
+        </tr>
+        <tr>
+          <td className="font-semibold">Delivery Fee:</td>
+          <td>${order.delivery_fee}</td>
+        </tr>
+        <tr>
+          <td className="font-semibold">Floor Number:</td>
+          <td>{order.floor_num}</td>
+        </tr>
+        <tr>
+          <td className="font-semibold">Payment Method:</td>
+          <td>{order.payment_method}</td>
+        </tr>
+        <tr>
+          <td className="font-semibold">Unit Number:</td>
+          <td>{order.unit_num}</td>
+        </tr>
+        <tr>
+          <td className="font-semibold">User Address:</td>
+          <td>{order.user_address}</td>
+        </tr>
+        <tr>
+          <td className="font-semibold">Map:</td>
+          <td>
+            <a
+              href={mapUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-700 font-semibold"
+            >
+              View on Google Maps
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div className="my-4">
+      {isLoaded ? (
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
+          zoom={6}
+          onLoad={onLoad}
         >
-          View on Google Maps
-        </a>
-      </p>
-      <div style={containerStyle}>
-        {isLoaded ? (
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
-            zoom={6}
-            onLoad={onLoad}
-          >
-            <Marker position={center} />
-          </GoogleMap>
-        ) : (
-          <div>Loading...</div>
-        )}
-      </div>
+          <Marker position={center} />
+        </GoogleMap>
+      ) : (
+        <div>Loading...</div>
+      )}
+    </div>
+
+    <div className="flex space-x-4 mt-4">
       <button
         onClick={onAccept}
-        style={{
-          backgroundColor: "lightgreen",
-          color: "white",
-          borderRadius: "12%",
-          padding: "8px",
-          marginTop: "3px",
-          marginRight: "10px",
-        }}
+        className="bg-lightgreen text-white rounded-lg px-4 py-2"
       >
         Accept
       </button>
       <button
         onClick={onReject}
-        style={{
-          backgroundColor: "red",
-          color: "white",
-          borderRadius: "12%",
-          padding: "8px",
-          marginTop: "3px",
-        }}
+        className="bg-red-500 text-white rounded-lg px-4 py-2"
       >
         Reject
       </button>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default OrderRequest;
