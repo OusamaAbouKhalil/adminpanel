@@ -2,90 +2,101 @@ import React, { useState } from "react";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed"];
-  const [selectedStatus, setSelectedStatus] = useState("accepted");
+  const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
 
-  // Update status when dropdown changes
-  const handleDropdownChange = (orderId, newStatus) => {
-    onStatusChange(orderId, newStatus);
-    setSelectedStatus(newStatus); // Ensure status filter updates
+  const getStatusCount = (status) => {
+    return orders.filter((order) => order.status === status).length;
   };
 
   return (
-    <div className="my-10 px-4 sm:px-6 lg:px-8">
-      {/* Status Filter */}
-      <div className="flex justify-center mb-6">
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
-        >
-          {statuses.map((status) => (
-            <option key={status} value={status}>
+    <div className="my-10">
+      <div className="flex justify-center mb-4">
+        {/* Status Tabs */}
+        {statuses.map((status) => (
+          <div key={status} className="relative inline-block mr-4">
+            <button
+              className={`rounded-t-lg p-2 mr-2 lg:text-lg text-sm font-bold text-gray-700 ${activeTab === status ? "bg-gray-200" : "bg-white"
+                }`}
+              onClick={() => setActiveTab(status)}
+            >
               {status.toUpperCase()}
-            </option>
-          ))}
-        </select>
+            </button>
+            {getStatusCount(status) > 0 && (
+              <span
+                className="absolute top-0 right-2 rounded-full bg-red-600 text-white text-xs font-bold px-2 py-1"
+                style={{ transform: "translate(50%, -50%)" }}
+              >
+                {getStatusCount(status)}
+              </span>
+            )}
+          </div>
+        ))}
       </div>
 
-      {/* Orders Table */}
-      <div className="overflow-x-auto shadow-lg rounded-lg bg-white">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Order ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Recipient
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Total
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {orders
-              .filter((order) => order.status === selectedStatus)
-              .map((order) => (
-                <tr
-                  key={order.order_id}
-                  className="hover:bg-gray-100 transition-colors duration-200"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {order.order_id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {order.recipient_name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${order.total + order.delivery_fee}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {order.status}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <select
-                      value={order.status}
-                      onChange={(e) => handleDropdownChange(order.order_id, e.target.value)}
-                      className="p-1 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
-                    >
-                      {statuses.map((status) => (
-                        <option key={status} value={status}>
-                          Move to {status.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+      <div
+        className={`shadow-lg rounded-lg p-4 bg-white ${activeTab === 'accepted' ? 'block' : 'hidden'}`}
+      >
+        <h2 className="text-lg font-bold text-gray-700 mb-4">
+          {activeTab.toUpperCase()}
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-fixed">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-2 w-1/4">Order ID</th>
+                <th className="px-4 py-2 w-1/4">Recipient</th>
+                <th className="px-4 py-2 w-1/4">Total</th>
+                <th className="px-4 py-2 w-1/4">Status</th>
+                <th className="px-4 py-2 w-1/4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders
+                .filter((order) => order.status === activeTab)
+                .map((order) => (
+                  <tr
+                    key={order.order_id}
+                    className="border-b last:border-b-0"
+                  >
+                    <td className="border px-4 py-2 sm:text-base text-xs">
+                      {order.order_id}
+                    </td>
+                    <td className="border px-4 py-2 sm:text-base text-xs">
+                      {order.recipient_name}
+                    </td>
+                    <td className="border px-4 py-2 sm:text-base text-xs">
+                      ${order.total + order.delivery_fee}
+                    </td>
+                    <td className="border px-4 py-2 sm:text-base text-xs">
+                      {order.status}
+                    </td>
+                    <td className="border px-4 py-2">
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          onStatusChange(
+                            order,
+                            e.target.value
+                          )
+                        }
+                        className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                      >
+                        {statuses.map((status) => (
+                          <option
+                            key={status}
+                            value={status}
+                            disabled={status === order.status}
+                          >
+                            Move to {status.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
