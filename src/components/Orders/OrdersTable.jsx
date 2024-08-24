@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { getDocs, collection } from "firebase/firestore";
 import { fsdb } from "../../utils/firebaseconfig";
+import OrderDetailsPopup from "./OrderDetailsPopup";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
   const [activeTab, setActiveTab] = useState(statuses[0]);
   const [searchTerm, setSearchTerm] = useState("");
   const [restaurants, setRestaurants] = useState({});
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -62,9 +64,15 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     }
   };
 
-
   return (
     <div className="my-10 p-6 bg-gray-50 rounded-lg shadow-lg">
+      {selectedOrder && (
+        <OrderDetailsPopup
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
+      )}
+
       <div className="flex justify-center mb-6 space-x-4">
         {statuses.map((status) => (
           <button
@@ -121,7 +129,14 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     <img src={restaurant.main_image} alt="Restaurant" className="w-20 h-20 object-cover rounded-lg" />
                   </td>
                   <td className="px-6 py-4 text-sm">{restaurant.rest_name || 'N/A'}</td>
-                  <td className="px-6 py-4 text-sm">{order.order_id}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <button
+                      onClick={() => setSelectedOrder(order)}
+                      className="text-blue-500 underline"
+                    >
+                      {order.order_id}
+                    </button>
+                  </td>
                   <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
                   <td className="px-6 py-4 text-sm">{formatDateTime(order.time)}</td>
                   <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
@@ -130,25 +145,25 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                       {order.status}
                     </div>
                   </td>
-                 <td className="px-6 py-4">
-                      <div className="relative">
-                        <select
-                          value={order.status}
-                          onChange={(e) => onStatusChange(order, e.target.value)}
-                          className="bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out py-2 px-4 w-full"
-                        >
-                          {statuses.map((status) => (
-                            <option
-                              key={status}
-                              value={status}
-                              disabled={status === order.status}
-                              className="text-gray-800"
-                            >
-                              {status.toUpperCase()}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                  <td className="px-6 py-4">
+                    <div className="relative">
+                      <select
+                        value={order.status}
+                        onChange={(e) => onStatusChange(order, e.target.value)}
+                        className="bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out py-2 px-4 w-full"
+                      >
+                        {statuses.map((status) => (
+                          <option
+                            key={status}
+                            value={status}
+                            disabled={status === order.status}
+                            className="text-gray-800"
+                          >
+                            {status.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </td>
                 </tr>
               );
