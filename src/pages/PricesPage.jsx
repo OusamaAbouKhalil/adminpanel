@@ -46,23 +46,23 @@ const PricesPage = () => {
   if (error) return <div className="text-center text-red-600 text-lg">Error: {error}</div>;
 
   return (
-    <div className="container mx-auto p-8 bg-gradient-to-r from-blue-50 to-white shadow-lg rounded-lg border border-gray-200">
-      <h1 className="text-5xl font-extrabold mb-8 text-gray-900 text-center">Edit Prices</h1>
-      <form onSubmit={handleSubmit} className="space-y-10">
-        <div className="space-y-6">
-          <h2 className="text-3xl font-semibold text-gray-800">Swift Drive Pricing</h2>
-          <p className="text-gray-600">
+    <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-blue-50 to-white shadow-md rounded-lg border border-gray-200 max-w-3xl">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Edit Prices</h1>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-gray-800">Swift Drive Pricing</h2>
+          <p className="text-gray-600 text-sm">
             <strong className="font-medium">Formula:</strong> Cost = Base Fare + (Cost per min * Time in ride) + (Cost per km * Distance) + Booking Fee
           </p>
         </div>
-        <div className="space-y-6">
-          <h2 className="text-3xl font-semibold text-gray-800">Swift Bites Pricing</h2>
-          <p className="text-gray-600">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-gray-800">Swift Bites Pricing</h2>
+          <p className="text-gray-600 text-sm">
             <strong className="font-medium">Formula:</strong> Cost = Base Fare + (Cost per km * Distance) + Booking Fee
           </p>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm">
             <strong className="font-medium">Distance Rules:</strong>
-            <ul className="list-disc list-inside ml-6 mt-2">
+            <ul className="list-disc list-inside ml-4 mt-2 text-sm">
               <li>Distance less than 2.6 km: Cost Per Km * 2 will be added</li>
               <li>Distance between 2.6 km and 4 km: Cost Per Km is added to the total cost</li>
               <li>Distance greater than 4 km: Cost Per Km * Distance</li>
@@ -70,9 +70,9 @@ const PricesPage = () => {
           </p>
         </div>
         {Object.keys(prices).map((key) => (
-          <div key={key} className="flex items-center justify-between border-b border-gray-300 py-4">
+          <div key={key} className="flex items-center justify-between border-b border-gray-300 py-3">
             <label
-              className="block text-gray-800 font-medium text-lg w-1/3"
+              className="block text-gray-800 font-medium text-base w-1/3"
               htmlFor={key}
             >
               {key.replace(/_/g, ' ')}:
@@ -84,13 +84,13 @@ const PricesPage = () => {
               id={key}
               value={prices[key]}
               onChange={handleChange}
-              className="border border-gray-300 rounded-lg p-4 w-2/3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+              className="border border-gray-300 rounded-lg p-2 w-2/3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
             />
           </div>
         ))}
         <button
           type="submit"
-          className="w-full bg-blue-700 text-white py-4 rounded-lg shadow-md hover:bg-blue-800 transition duration-300 ease-in-out"
+          className="w-full bg-blue-600 text-white py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
         >
           Save Changes
         </button>
