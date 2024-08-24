@@ -8,23 +8,41 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     return orders.filter((order) => order.status === status).length;
   };
 
-  // Function to determine the container background color based on status
-  const getStatusContainerStyle = (status) => {
+    const formatDateTime = (timestamp) => {
+    const date = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JS Date
+    const formattedDate = date.toLocaleDateString("en-US");
+    const formattedTime = date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+    return `${formattedDate}, ${formattedTime}`;
+  };
+
+  // Sorting orders by Firestore timestamp
+  const sortedOrders = orders
+    .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
+    .sort((a, b) => {
+      return b.time.seconds - a.time.seconds;
+    });
+
+  // Function to get the status color
+  const getStatusColor = (status) => {
     switch (status) {
       case "accepted":
-        return "bg-green-100 border-green-300";
+        return "bg-green-200 text-green-800";
       case "preparing":
-        return "bg-yellow-100 border-yellow-300";
+        return "bg-yellow-200 text-yellow-800";
       case "on the way":
-        return "bg-blue-100 border-blue-300";
+        return "bg-blue-200 text-blue-800";
       case "completed":
-        return "bg-gray-100 border-gray-300";
+        return "bg-gray-200 text-gray-800";
       case "rejected":
-        return "bg-red-100 border-red-300";
+        return "bg-red-200 text-red-800";
       case "cancelled":
-        return "bg-orange-100 border-orange-300";
+        return "bg-gray-300 text-gray-700";
       default:
-        return "bg-white border-gray-300";
+        return "bg-white text-black";
     }
   };
 
@@ -51,7 +69,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         ))}
       </div>
 
-      <div className={`shadow-lg rounded-lg overflow-hidden ${activeTab ? 'block' : 'hidden'} ${getStatusContainerStyle(activeTab)}`}>
+      <div className={`shadow-lg rounded-lg overflow-hidden ${activeTab ? 'block' : 'hidden'}`}>
         <h2 className="text-xl font-bold text-gray-800 bg-gray-100 py-3 px-4 border-b">
           {activeTab.toUpperCase()}
         </h2>
@@ -61,6 +79,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
               <tr>
                 <th className="px-6 py-3 text-left font-medium text-sm">Order ID</th>
                 <th className="px-6 py-3 text-left font-medium text-sm">Recipient</th>
+                <th className="px-6 py-3 text-left font-medium text-sm">Date</th>
                 <th className="px-6 py-3 text-left font-medium text-sm">Total</th>
                 <th className="px-6 py-3 text-left font-medium text-sm">Status</th>
                 <th className="px-6 py-3 text-left font-medium text-sm">Actions</th>
@@ -76,12 +95,22 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   >
                     <td className="px-6 py-4 text-sm">{order.order_id}</td>
                     <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
+                    <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
                     <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
-                    <td className="px-6 py-4 text-sm capitalize">{order.status}</td>
+                    <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
+                      <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
+                        {order.status}
+                      </div>
+                    </td>
                     <td className="px-6 py-4">
                       <select
                         value={order.status}
-                        onChange={(e) => onStatusChange(order, e.target.value)}
+                        onChange={(e) =>
+                          onStatusChange(
+                            order,
+                            e.target.value
+                          )
+                        }
                         className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                       >
                         {statuses.map((status) => (
@@ -90,7 +119,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                             value={status}
                             disabled={status === order.status}
                           >
-                            Change Status }
+                            Move to {status.toUpperCase()}
                           </option>
                         ))}
                       </select>
