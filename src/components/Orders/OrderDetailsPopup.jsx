@@ -19,7 +19,7 @@ const handlePrint = () => {
   printWindow.document.write(`<div class="receipt-container">`);
   printWindow.document.write(`<h1>Order Receipt</h1>`);
   printWindow.document.write(`<h2>Order ID: ${order.order_id}</h2>`);
-  printWindow.document.write(`<p><strong>Restaurant:</strong> ${order.restaurant_name}</p>`);
+  printWindow.document.write(`<p><strong>Restaurant:</strong> ${restaurant.rest_name}</p>`);
   printWindow.document.write(`<p><strong>Recipient:</strong> ${order.recipient_name}</p>`);
   printWindow.document.write(`<p><strong>Date:</strong> ${new Date(order.time.seconds * 1000).toLocaleString()}</p>`);
   printWindow.document.write(`<h3>Items Ordered:</h3>`);
