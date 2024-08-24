@@ -36,7 +36,7 @@ const Orders = () => {
             } else {
                   // New order, play sound if it's pending and user has interacted
               if (orderData.status === "pending" && userHasInteracted) {
-                sound.play().catch((error) => {
+                audio.play().catch((error) => {
                   console.error("Sound play error:", error);
                 });
               }
