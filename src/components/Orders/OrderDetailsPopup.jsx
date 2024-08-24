@@ -1,40 +1,40 @@
 import React from "react";
 
-const OrderDetailsPopup = ({ order, onClose }) => {
+const OrderDetailsPopup = ({ order, items, onClose }) => {
   const handlePrint = () => {
     const printWindow = window.open("", "", "width=800,height=600");
     printWindow.document.write("<html><head><title>Order Receipt</title>");
-    printWindow.document.write("<style>
+    printWindow.document.write(`<style>
       body { font-family: Arial, sans-serif; padding: 20px; }
       h1, h2, h3 { margin: 0; padding-bottom: 10px; }
       p { margin: 0; padding: 5px 0; }
       .receipt-container { border: 1px solid #ccc; padding: 20px; }
       .total { margin-top: 20px; font-size: 18px; font-weight: bold; }
       .footer { margin-top: 40px; text-align: center; font-size: 14px; color: #555; }
-    </style>");
+    </style>`);
     printWindow.document.write("</head><body>");
-    printWindow.document.write(<div class="receipt-container">);
-    printWindow.document.write(<h1>Order Receipt</h1>);
-    printWindow.document.write(<h2>Order ID: ${order.order_id}</h2>);
-    printWindow.document.write(<p><strong>Restaurant:</strong> ${order.restaurant_name}</p>);
-    printWindow.document.write(<p><strong>Recipient:</strong> ${order.recipient_name}</p>);
-    printWindow.document.write(<p><strong>Date:</strong> ${new Date(order.time.seconds * 1000).toLocaleString()}</p>);
+    printWindow.document.write(`<div class="receipt-container">`);
+    printWindow.document.write(`<h1>Order Receipt</h1>`);
+    printWindow.document.write(`<h2>Order ID: ${order.order_id}</h2>`);
+    printWindow.document.write(`<p><strong>Restaurant:</strong> ${order.restaurant_name}</p>`);
+    printWindow.document.write(`<p><strong>Recipient:</strong> ${order.recipient_name}</p>`);
+    printWindow.document.write(`<p><strong>Date:</strong> ${new Date(order.time.seconds * 1000).toLocaleString()}</p>`);
 
     const total = order.total + order.delivery_fee;
-    
-    printWindow.document.write(<p class="total">Subtotal: $${order.total.toFixed(2)}</p>);
-    printWindow.document.write(<p class="total">Delivery Fee: $${order.delivery_fee.toFixed(2)}</p>);
-    printWindow.document.write(<p class="total">Total: $${total.toFixed(2)}</p>);
-    printWindow.document.write(<p class="total">In credits: $${order.costInCredits.toFixed(2)}</p>);
-    printWindow.document.write(<p><strong>Payment Method:</strong> ${order.payment_method}</p>);
-    printWindow.document.write(</div>);
-    
+
+    printWindow.document.write(`<p class="total">Subtotal: $${order.total.toFixed(2)}</p>`);
+    printWindow.document.write(`<p class="total">Delivery Fee: $${order.delivery_fee.toFixed(2)}</p>`);
+    printWindow.document.write(`<p class="total">Total: $${total.toFixed(2)}</p>`);
+    printWindow.document.write(`<p class="total">In credits: $${order.costInCredits.toFixed(2)}</p>`);
+    printWindow.document.write(`<p><strong>Payment Method:</strong> ${order.payment_method}</p>`);
+    printWindow.document.write(`</div>`);
+
     // Footer with Thank You message and All rights reserved
-    printWindow.document.write(<div class="footer">);
-    printWindow.document.write(<p>Thank you for your order!</p>);
-    printWindow.document.write(<p>All rights reserved © SwiftGo ${new Date().getFullYear()}</p>);
-    printWindow.document.write(</div>);
-    
+    printWindow.document.write(`<div class="footer">`);
+    printWindow.document.write(`<p>Thank you for your order!</p>`);
+    printWindow.document.write(`<p>All rights reserved © SwiftGo ${new Date().getFullYear()}</p>`);
+    printWindow.document.write(`</div>`);
+
     printWindow.document.write("</body></html>");
     printWindow.document.close();
     printWindow.focus();
@@ -57,6 +57,21 @@ const OrderDetailsPopup = ({ order, onClose }) => {
           <p className="text-lg font-medium"><strong>Date:</strong> {new Date(order.time.seconds * 1000).toLocaleString()}</p>
           <p className="text-lg font-medium"><strong>Total:</strong> ${order.total + order.delivery_fee}</p>
           <p className="text-lg font-medium"><strong>Status:</strong> {order.status}</p>
+        </div>
+        {/* Display order items */}
+        <div className="mb-4">
+          <h3 className="text-lg font-medium mb-2">Order Items:</h3>
+          <ul className="list-disc pl-5">
+            {items && items.length > 0 ? (
+              items.map((item, index) => (
+                <li key={index} className="mb-1">
+                  <p><strong>{item.name}</strong> - ${item.price.toFixed(2)} x {item.quantity}</p>
+                </li>
+              ))
+            ) : (
+              <li>No items available</li>
+            )}
+          </ul>
         </div>
         <div className="absolute top-3 right-3">
           <button
