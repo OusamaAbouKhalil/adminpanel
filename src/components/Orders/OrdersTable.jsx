@@ -23,6 +23,13 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     });
     return `${formattedDate}, ${formattedTime}`;
   };
+  
+    // Sorting orders by Firestore timestamp
+  const sortedOrders = orders
+    .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
+    .sort((a, b) => {
+      return b.time.seconds - a.time.seconds;
+    });
 
   return (
     <div className="my-10 p-4">
