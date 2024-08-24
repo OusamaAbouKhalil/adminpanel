@@ -273,15 +273,15 @@ export const links = [
       },
     ],
   },
-  {
-    title: "Notification center",
-    links: [
-      {
-        name: "notification", // Route name for the new page
-        icon: <FaDollarSign />, // Money icon
-      },
-    ],
-  },
+ {
+  title: "Notification center",
+  links: [
+    {
+      name: "notification", // Route name for the new page
+      icon: <FaBell />, // Changed to Bell icon
+    },
+  ],
+},
   {
     title: "Apps",
     links: [
