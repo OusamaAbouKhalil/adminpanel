@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
-  const statuses = ["accepted", "preparing", "on the way", "completed","cancelled","rejected"];
+  const statuses = ["accepted", "preparing", "on the way", "completed", "cancelled", "rejected"];
   const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
   const [searchTerm, setSearchTerm] = useState(""); // For filtering by Order ID
+  const [dropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
+  const [selectedOrder, setSelectedOrder] = useState(null); // State to manage the selected order
 
   const getStatusCount = (status) => {
     return orders.filter((order) => order.status === status).length;
@@ -23,13 +25,20 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     });
     return `${formattedDate}, ${formattedTime}`;
   };
-  
-    // Sorting orders by Firestore timestamp
+
+  // Sorting orders by Firestore timestamp
   const sortedOrders = orders
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
     .sort((a, b) => {
       return b.time.seconds - a.time.seconds;
     });
+
+  const handleDropdownChange = (newStatus) => {
+    if (selectedOrder) {
+      onStatusChange(selectedOrder, newStatus);
+      setDropdownOpen(false);
+    }
+  };
 
   return (
     <div className="my-10 p-4">
@@ -38,7 +47,6 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         {statuses.map((status) => (
           <div key={status} className="relative inline-block mr-4">
             <button
-              key={status}
               className={`rounded-t-lg p-3 mr-2 lg:text-lg text-sm font-bold text-gray-700 ${activeTab === status ? "bg-gray-200" : "bg-white"} transition-colors duration-300`}
               onClick={() => setActiveTab(status)}
             >
@@ -80,7 +88,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
             <table className="min-w-full table-fixed border-separate border-spacing-0">
               <thead className="bg-gray-200 text-gray-700">
                 <tr>
-                  {status !== "accepted" && (
+                  {status !== "accepted" && status !== "cancelled" && status !== "rejected" && (
                     <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Actions</th>
                   )}
                   <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Order ID</th>
@@ -88,9 +96,6 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Total</th>
                   <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Date</th> {/* New column */}
                   <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Status</th>
-                  {status !== "completed" && (
-                    <th className="px-4 py-2 border-b border-gray-300 w-1/6 text-left">Actions</th>
-                  )}
                 </tr>
               </thead>
               <tbody>
@@ -99,42 +104,42 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     key={order.order_id}
                     className="border-b last:border-b-0 hover:bg-gray-100 transition-colors duration-300"
                   >
-                    {status !== "accepted" && (
+                    {status !== "accepted" && status !== "cancelled" && status !== "rejected" && (
                       <td className="border px-4 py-2 text-sm">
-                        <button
-                          onClick={() =>
-                            onStatusChange(
-                              order,
-                              statuses[statuses.indexOf(status) - 1]
-                            )
-                          }
-                          className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
-                          Move to {statuses[statuses.indexOf(status) - 1]}
-                        </button>
+                        <div className="relative inline-block text-left">
+                          <button
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setDropdownOpen(!dropdownOpen);
+                            }}
+                            className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                          >
+                            Actions
+                          </button>
+                          {dropdownOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                              <button
+                                onClick={() => handleDropdownChange(statuses[statuses.indexOf(status) - 1])}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full text-left"
+                              >
+                                Move to {statuses[statuses.indexOf(status) - 1]}
+                              </button>
+                              <button
+                                onClick={() => handleDropdownChange(statuses[statuses.indexOf(status) + 1])}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full text-left"
+                              >
+                                Move to {statuses[statuses.indexOf(status) + 1]}
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </td>
                     )}
                     <td className="border px-4 py-2 text-sm">{order.order_id}</td>
                     <td className="border px-4 py-2 text-sm">{order.recipient_name}</td>
                     <td className="border px-4 py-2 text-sm">${order.total + order.delivery_fee}</td>
-                     <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
-                     <td className="border px-4 py-2 text-sm">{order.status}</td>
-
-                    {status !== "completed" && (
-                      <td className="border px-4 py-2 text-sm">
-                        <button
-                          onClick={() =>
-                            onStatusChange(
-                              order,
-                              statuses[statuses.indexOf(status) + 1]
-                            )
-                          }
-                          className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
-                          Move to {statuses[statuses.indexOf(status) + 1]}
-                        </button>
-                      </td>
-                    )}
+                    <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
+                    <td className="border px-4 py-2 text-sm">{order.status}</td>
                   </tr>
                 ))}
               </tbody>
