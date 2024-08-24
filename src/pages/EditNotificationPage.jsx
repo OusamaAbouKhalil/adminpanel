@@ -5,8 +5,9 @@ const EditNotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(null);
-  const [editingId, setEditingId] = useState(null);
-  const [dialog, setDialog] = useState({ open: false, type: '', id: null });
+  const [editingId, setEditingId] = useState(null); // Track which notification is being edited
+  const [deletingId, setDeletingId] = useState(null); // Track which notification is being deleted
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Control dialog visibility
   const db = getDatabase();
 
   useEffect(() => {
@@ -29,37 +30,27 @@ const EditNotificationsPage = () => {
     ));
   };
 
-  const handleUpdate = async () => {
-    console.log('Update button clicked'); // Debugging line
-    const { id } = dialog;
+  const handleUpdate = async (id) => {
     const updatedNotification = notifications.find(notification => notification.id === id);
-    
     if (updatedNotification) {
-      console.log('Updating notification:', updatedNotification); // Debugging line
       const notificationRef = ref(db, `Notifications/${id}`);
       try {
         await update(notificationRef, updatedNotification);
         setSuccess('Notification updated successfully!');
         setErrors([]);
-        setDialog({ open: false, type: '', id: null });
-        setEditingId(null);
       } catch (err) {
         setErrors(prevErrors => [...prevErrors, `Failed to update notification: ${err.message}`]);
-        console.error('Update error:', err); // Debugging line
       }
-    } else {
-      console.error('No notification found for ID:', id); // Debugging line
     }
   };
 
   const handleDelete = async () => {
-    const { id } = dialog;
-    const notificationRef = ref(db, `Notifications/${id}`);
+    const notificationRef = ref(db, `Notifications/${deletingId}`);
     try {
       await remove(notificationRef);
       setSuccess('Notification deleted successfully!');
       setErrors([]);
-      setDialog({ open: false, type: '', id: null });
+      setIsDialogOpen(false); // Close the dialog after successful delete
     } catch (err) {
       setErrors(prevErrors => [...prevErrors, `Failed to delete notification: ${err.message}`]);
     }
@@ -71,12 +62,13 @@ const EditNotificationsPage = () => {
 
   const isEditing = (id) => editingId === id;
 
-  const openDialog = (type, id) => {
-    setDialog({ open: true, type, id });
+  const openDialog = (id) => {
+    setDeletingId(id);
+    setIsDialogOpen(true);
   };
 
   const closeDialog = () => {
-    setDialog({ open: false, type: '', id: null });
+    setIsDialogOpen(false);
   };
 
   return (
@@ -108,7 +100,7 @@ const EditNotificationsPage = () => {
             <tbody className="divide-y divide-gray-200">
               {notifications.map(notification => (
                 <tr key={notification.id} className={isEditing(notification.id) ? 'bg-blue-50' : ''}>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap">
                     {isEditing(notification.id) ? (
                       <input
                         type="text"
@@ -120,7 +112,7 @@ const EditNotificationsPage = () => {
                       notification.title
                     )}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap">
                     {isEditing(notification.id) ? (
                       <textarea
                         value={notification.message}
@@ -131,7 +123,7 @@ const EditNotificationsPage = () => {
                       notification.message
                     )}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap">
                     {isEditing(notification.id) ? (
                       <select
                         value={notification.type}
@@ -146,7 +138,7 @@ const EditNotificationsPage = () => {
                       notification.type
                     )}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-2 whitespace-nowrap">
                     {isEditing(notification.id) ? (
                       <input
                         type="datetime-local"
@@ -158,11 +150,11 @@ const EditNotificationsPage = () => {
                       new Date(notification.time).toLocaleString()
                     )}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                     {isEditing(notification.id) ? (
                       <>
                         <button
-                          onClick={handleUpdate}
+                          onClick={() => handleUpdate(notification.id)}
                           className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out mr-2"
                         >
                           Update
@@ -183,7 +175,7 @@ const EditNotificationsPage = () => {
                           Edit
                         </button>
                         <button
-                          onClick={() => openDialog('delete', notification.id)}
+                          onClick={() => openDialog(notification.id)}
                           className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out"
                         >
                           Delete
@@ -197,23 +189,19 @@ const EditNotificationsPage = () => {
           </table>
         </div>
       )}
-      {dialog.open && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
-            <h2 className="text-lg font-bold mb-4">
-              {dialog.type === 'delete' ? 'Confirm Deletion' : 'Confirm Update'}
-            </h2>
-            <p className="mb-4">
-              {dialog.type === 'delete' 
-                ? 'Are you sure you want to delete this notification?' 
-                : 'Are you sure you want to update this notification?'}
-            </p>
-            <div className="flex justify-end space-x-2">
+
+      {/* Dialog for deletion confirmation */}
+      {isDialogOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
+            <p className="mb-4">Are you sure you want to delete this notification?</p>
+            <div className="flex justify-end">
               <button
-                onClick={dialog.type === 'delete' ? handleDelete : handleUpdate}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out"
+                onClick={handleDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out mr-2"
               >
-                Confirm
+                Yes, Delete
               </button>
               <button
                 onClick={closeDialog}
