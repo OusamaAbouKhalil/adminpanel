@@ -5,7 +5,7 @@ import { MdOutlineCancel } from 'react-icons/md';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import { IoLogOutOutline } from 'react-icons/io5'; // Logout icon
 
-import { links } from '../data/dummy';
+import { links } from '../data/dummy'; // Import your links data
 import { useStateContext } from '../contexts/ContextProvider';
 import { useAuth } from '../contexts/AuthProvider'; // Assuming you have a useAuth hook
 
