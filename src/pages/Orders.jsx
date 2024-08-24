@@ -14,7 +14,7 @@ const Orders = () => {
 
  
   useEffect(() => {
-    const sound = new Audio("/sound.mp3");
+    const sound = new Audio("../public/sound.mp3");
 
     const unsubscribe = onSnapshot(
       collection(fsdb, "orders"),
