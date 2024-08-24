@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getDocs, collection, doc, getDoc } from "firebase/firestore";
+import { getDocs, collection } from "firebase/firestore";
 import { fsdb } from "../../utils/firebaseconfig";
 import OrderDetailsPopup from "./OrderDetailsPopup";
 
@@ -9,7 +9,6 @@ const OrdersTable = ({ orders, onStatusChange }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [restaurants, setRestaurants] = useState({});
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [orderItems, setOrderItems] = useState({});
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -28,26 +27,6 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     fetchRestaurants();
   }, []);
 
-  const fetchOrderItems = async (orderId) => {
-    try {
-      const orderDoc = doc(fsdb, 'orders', orderId);
-      const orderSnapshot = await getDoc(orderDoc);
-      if (orderSnapshot.exists()) {
-        const orderData = orderSnapshot.data();
-        setOrderItems(orderData.items || []);
-      } else {
-        console.log('No such document!');
-      }
-    } catch (error) {
-      console.error("Error fetching order items:", error);
-    }
-  };
-
-  const handleOrderClick = (order) => {
-    setSelectedOrder(order);
-    fetchOrderItems(order.order_id); // Fetch items for the selected order
-  };
-
   const getStatusCount = (status) => orders.filter((order) => order.status === status).length;
 
   const formatDateTime = (timestamp) => {
@@ -58,13 +37,14 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       minute: "2-digit",
       hour12: true,
     });
-    return `${formattedDate}, ${formattedTime}`;
+    return ${formattedDate}, ${formattedTime};
   };
 
   const sortedOrders = orders
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
     .sort((a, b) => b.time.seconds - a.time.seconds);
 
+  // Function to get the status color
   const getStatusColor = (status) => {
     switch (status) {
       case "accepted":
@@ -89,7 +69,6 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       {selectedOrder && (
         <OrderDetailsPopup
           order={selectedOrder}
-          items={orderItems}
           onClose={() => setSelectedOrder(null)}
         />
       )}
@@ -98,7 +77,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         {statuses.map((status) => (
           <button
             key={status}
-            className={`relative px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700"}`}
+            className={relative px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700"}}
             onClick={() => setActiveTab(status)}
           >
             {status.toUpperCase()}
@@ -152,7 +131,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   <td className="px-6 py-4 text-sm">{restaurant.rest_name || 'N/A'}</td>
                   <td className="px-6 py-4 text-sm">
                     <button
-                      onClick={() => handleOrderClick(order)}
+                      onClick={() => setSelectedOrder(order)}
                       className="text-blue-500 underline"
                     >
                       {order.order_id}
@@ -161,8 +140,8 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
                   <td className="px-6 py-4 text-sm">{formatDateTime(order.time)}</td>
                   <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
-                  <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
-                    <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
+                  <td className={px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}}>
+                    <div className={p-2 rounded-lg ${getStatusColor(order.status)}}>
                       {order.status}
                     </div>
                   </td>
