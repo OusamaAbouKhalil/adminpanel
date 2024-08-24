@@ -10,6 +10,7 @@ const Orders = () => {
   const [ordersList, setOrdersList] = useState([]);
   const [openPendingOrders, setOpenPendingOrders] = useState(false);
   const [showCanceledOrders, setShowCanceledOrders] = useState(false); // State to toggle canceled orders view
+  const [userHasInteracted, setUserHasInteracted] = useState(false); // Track user interaction
   const { mutate: updateOrderStatus } = useUpdateOrderStatus();
 
  
