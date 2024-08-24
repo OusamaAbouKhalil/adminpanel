@@ -4,8 +4,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "cancelled", "rejected"];
   const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
   const [searchTerm, setSearchTerm] = useState(""); // For filtering by Order ID
-  const [dropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
-  const [selectedOrder, setSelectedOrder] = useState(null); // State to manage the selected order
+  const [openDropdownId, setOpenDropdownId] = useState(null); // Track which dropdown is open
 
   const getStatusCount = (status) => {
     return orders.filter((order) => order.status === status).length;
@@ -33,11 +32,17 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       return b.time.seconds - a.time.seconds;
     });
 
-  const handleDropdownChange = (newStatus) => {
-    if (selectedOrder) {
-      onStatusChange(selectedOrder, newStatus);
-      setDropdownOpen(false);
+  const handleDropdownToggle = (orderId) => {
+    if (openDropdownId === orderId) {
+      setOpenDropdownId(null); // Close dropdown if the same button is clicked again
+    } else {
+      setOpenDropdownId(orderId); // Open dropdown for the selected order
     }
+  };
+
+  const handleDropdownChange = (order, newStatus) => {
+    onStatusChange(order, newStatus);
+    setOpenDropdownId(null); // Close dropdown after action
   };
 
   return (
@@ -108,24 +113,21 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                       <td className="border px-4 py-2 text-sm">
                         <div className="relative inline-block text-left">
                           <button
-                            onClick={() => {
-                              setSelectedOrder(order);
-                              setDropdownOpen(!dropdownOpen);
-                            }}
+                            onClick={() => handleDropdownToggle(order.order_id)}
                             className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                           >
                             Actions
                           </button>
-                          {dropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                          {openDropdownId === order.order_id && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
                               <button
-                                onClick={() => handleDropdownChange(statuses[statuses.indexOf(status) - 1])}
+                                onClick={() => handleDropdownChange(order, statuses[statuses.indexOf(status) - 1])}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full text-left"
                               >
                                 Move to {statuses[statuses.indexOf(status) - 1]}
                               </button>
                               <button
-                                onClick={() => handleDropdownChange(statuses[statuses.indexOf(status) + 1])}
+                                onClick={() => handleDropdownChange(order, statuses[statuses.indexOf(status) + 1])}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full text-left"
                               >
                                 Move to {statuses[statuses.indexOf(status) + 1]}
