@@ -4,14 +4,14 @@ const OrderDetailsPopup = ({ order, onClose }) => {
   const handlePrint = () => {
     const printWindow = window.open("", "", "width=800,height=600");
     printWindow.document.write("<html><head><title>Order Receipt</title>");
-    printWindow.document.write(<style>
+    printWindow.document.write("<style>
       body { font-family: Arial, sans-serif; padding: 20px; }
       h1, h2, h3 { margin: 0; padding-bottom: 10px; }
       p { margin: 0; padding: 5px 0; }
       .receipt-container { border: 1px solid #ccc; padding: 20px; }
       .total { margin-top: 20px; font-size: 18px; font-weight: bold; }
       .footer { margin-top: 40px; text-align: center; font-size: 14px; color: #555; }
-    </style>);
+    </style>");
     printWindow.document.write("</head><body>");
     printWindow.document.write(<div class="receipt-container">);
     printWindow.document.write(<h1>Order Receipt</h1>);
