@@ -42,33 +42,37 @@ const PricesPage = () => {
     }
   };
 
-  if (isLoading) return <p className="text-center text-gray-500">Loading...</p>;
-  if (error) return <p className="text-center text-red-500">Error: {error}</p>;
+  if (isLoading) return <div className="text-center text-gray-500 text-lg">Loading...</div>;
+  if (error) return <div className="text-center text-red-600 text-lg">Error: {error}</div>;
 
   return (
-    <div className="container mx-auto p-8 bg-gradient-to-r from-blue-50 to-white shadow-xl rounded-lg border border-gray-300">
-      <h1 className="text-4xl font-bold mb-8 text-gray-800 text-center">Edit Prices</h1>
-      <form onSubmit={handleSubmit} className="space-y-8">
-         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Swift Drive Pricing</h2>
-          <p className="text-gray-700 mb-4">
-            <strong>Formula:</strong> Cost = Base Fare + (Cost per min * Time in ride) + (Cost per km * Distance) + Booking Fee
+    <div className="container mx-auto p-8 bg-gradient-to-r from-blue-50 to-white shadow-lg rounded-lg border border-gray-200">
+      <h1 className="text-5xl font-extrabold mb-8 text-gray-900 text-center">Edit Prices</h1>
+      <form onSubmit={handleSubmit} className="space-y-10">
+        <div className="space-y-6">
+          <h2 className="text-3xl font-semibold text-gray-800">Swift Drive Pricing</h2>
+          <p className="text-gray-600">
+            <strong className="font-medium">Formula:</strong> Cost = Base Fare + (Cost per min * Time in ride) + (Cost per km * Distance) + Booking Fee
           </p>
-       <h2 className="text-2xl font-semibold text-gray-800 mb-4">Swift Bites Pricing</h2>
-          <p className="text-gray-700 mb-4">
-            <strong>Formula:</strong> Cost = Base Fare + (Cost per km * Distance) + Booking Fee
+        </div>
+        <div className="space-y-6">
+          <h2 className="text-3xl font-semibold text-gray-800">Swift Bites Pricing</h2>
+          <p className="text-gray-600">
+            <strong className="font-medium">Formula:</strong> Cost = Base Fare + (Cost per km * Distance) + Booking Fee
           </p>
-          <p className="text-gray-700 mb-4">
-            <strong>Distance Rules:</strong>
-            <ul className="list-disc list-inside ml-5">
+          <p className="text-gray-600">
+            <strong className="font-medium">Distance Rules:</strong>
+            <ul className="list-disc list-inside ml-6 mt-2">
               <li>Distance less than 2.6 km: Cost Per Km * 2 will be added</li>
               <li>Distance between 2.6 km and 4 km: Cost Per Km is added to the total cost</li>
               <li>Distance greater than 4 km: Cost Per Km * Distance</li>
             </ul>
           </p>
+        </div>
         {Object.keys(prices).map((key) => (
-          <div key={key} className="flex items-center justify-between border-b border-gray-200 pb-6">
+          <div key={key} className="flex items-center justify-between border-b border-gray-300 py-4">
             <label
-              className="block text-gray-700 font-medium text-lg w-1/4"
+              className="block text-gray-800 font-medium text-lg w-1/3"
               htmlFor={key}
             >
               {key.replace(/_/g, ' ')}:
@@ -80,13 +84,13 @@ const PricesPage = () => {
               id={key}
               value={prices[key]}
               onChange={handleChange}
-              className="border border-gray-300 rounded-lg p-3 w-3/4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+              className="border border-gray-300 rounded-lg p-4 w-2/3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
             />
           </div>
         ))}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
+          className="w-full bg-blue-700 text-white py-4 rounded-lg shadow-md hover:bg-blue-800 transition duration-300 ease-in-out"
         >
           Save Changes
         </button>
