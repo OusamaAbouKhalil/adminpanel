@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getDatabase, ref, get, onValue } from "firebase/database";
 import db, { fsdb, functions, httpsCallable } from "../../utils/firebaseconfig";
+const firestore = getFirestore();
+
 
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
@@ -9,19 +11,21 @@ const OrdersTable = ({ orders, onStatusChange }) => {
   const [restaurants, setRestaurants] = useState({}); // State to store restaurant data
 
   useEffect(() => {
-    // Fetch restaurant data from Firestore
-    const fetchRestaurants = async () => {
-      try {
-        const restaurantsSnapshot = await firestore.collection('restaurants').get();
-        const restaurantData = {};
-        restaurantsSnapshot.forEach(doc => {
-          restaurantData[doc.id] = doc.data();
-        });
-        setRestaurants(restaurantData);
-      } catch (error) {
-        console.error("Error fetching restaurants:", error);
-      }
-    };
+ 
+const fetchRestaurants = async () => {
+  try {
+    const restaurantsCollection = collection(firestore, 'restaurants');
+    const restaurantsSnapshot = await getDocs(restaurantsCollection);
+    const restaurantData = {};
+    restaurantsSnapshot.forEach(doc => {
+      restaurantData[doc.id] = doc.data();
+    });
+    setRestaurants(restaurantData);
+  } catch (error) {
+    console.error("Error fetching restaurants:", error);
+  }
+};
+    
     fetchRestaurants();
   }, []);
 
