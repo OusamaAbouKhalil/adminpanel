@@ -13,7 +13,7 @@ const PricesPage = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const pricesRef = ref(db, 'prices'); // Reference to the 'prices' node
+        const pricesRef = ref(db, 'Prices'); // Reference to the 'prices' node
         onValue(pricesRef, (snapshot) => {
           setPrices(snapshot.val());
           setIsLoading(false);
