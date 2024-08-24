@@ -32,11 +32,11 @@ const Orders = () => {
               updatedOrdersList[existingOrderIndex] = orderData;
               return updatedOrdersList;
             } else {
-              // New order, play sound if it's pending
-              if (orderData.status === "pending") {
-                sound.play();
-                //console.log("New order:", orderData);
-                console.log("Sound played");
+                  // New order, play sound if it's pending and user has interacted
+              if (orderData.status === "pending" && userHasInteracted) {
+                sound.play().catch((error) => {
+                  console.error("Sound play error:", error);
+                });
               }
               return [...prevOrdersList, orderData];
             }
@@ -49,8 +49,24 @@ const Orders = () => {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [userHasInteracted]);
 
+  // Set userHasInteracted to true on first interaction
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      setUserHasInteracted(true);
+      window.removeEventListener("click", handleUserInteraction);
+      window.removeEventListener("keydown", handleUserInteraction);
+    };
+
+    window.addEventListener("click", handleUserInteraction);
+    window.addEventListener("keydown", handleUserInteraction);
+
+    return () => {
+      window.removeEventListener("click", handleUserInteraction);
+      window.removeEventListener("keydown", handleUserInteraction);
+    };
+  }, []);
 
   const handleStatusChange = (order, newStatus) => {
     const updatedOrder = { ...order, status: newStatus };
