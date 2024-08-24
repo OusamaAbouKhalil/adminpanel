@@ -46,13 +46,13 @@ const PricesPage = () => {
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
   return (
-    <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-      <h1 className="text-3xl font-semibold mb-6 text-gray-800">Edit Prices</h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="container mx-auto p-8 bg-gradient-to-r from-blue-50 to-white shadow-xl rounded-lg border border-gray-300">
+      <h1 className="text-4xl font-bold mb-8 text-gray-800 text-center">Edit Prices</h1>
+      <form onSubmit={handleSubmit} className="space-y-8">
         {Object.keys(prices).map((key) => (
-          <div key={key} className="flex items-center justify-between border-b border-gray-300 pb-4">
+          <div key={key} className="flex items-center justify-between border-b border-gray-200 pb-6">
             <label
-              className="block text-gray-700 font-medium w-1/4"
+              className="block text-gray-700 font-medium text-lg w-1/4"
               htmlFor={key}
             >
               {key.replace(/_/g, ' ')}:
@@ -64,13 +64,13 @@ const PricesPage = () => {
               id={key}
               value={prices[key]}
               onChange={handleChange}
-              className="border border-gray-300 rounded-lg p-2 w-3/4 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 rounded-lg p-3 w-3/4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
             />
           </div>
         ))}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
+          className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
         >
           Save Changes
         </button>
