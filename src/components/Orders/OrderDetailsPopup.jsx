@@ -1,5 +1,3 @@
-import React from "react";
-
 const OrderDetailsPopup = ({ order, onClose }) => {
   const handlePrint = () => {
     const printWindow = window.open("", "", "width=800,height=600");
@@ -20,8 +18,9 @@ const OrderDetailsPopup = ({ order, onClose }) => {
   if (!order) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Popup */}
+      <div className="relative z-20 bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">Order Details</h2>
         <div className="mb-4 border-b border-gray-200 pb-4">
           <p className="text-lg font-medium"><strong>Order ID:</strong> {order.order_id}</p>
@@ -56,8 +55,10 @@ const OrderDetailsPopup = ({ order, onClose }) => {
           </button>
         </div>
       </div>
+
+      {/* Background Overlay */}
       <div
-        className="fixed inset-0 bg-gray-900 opacity-50"
+        className="fixed inset-0 z-10 bg-gray-900 opacity-50"
         onClick={onClose}
       />
     </div>
