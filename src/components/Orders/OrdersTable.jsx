@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { firestore } from './firebase'; // Adjust this import based on your Firebase setup
+import { getDatabase, ref, get, onValue } from "firebase/database";
+import db, { fsdb, functions, httpsCallable } from "../../utils/firebaseconfig";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
@@ -43,25 +44,27 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
     .sort((a, b) => b.time.seconds - a.time.seconds);
 
+
   // Function to get the status color
   const getStatusColor = (status) => {
     switch (status) {
       case "accepted":
-        return "bg-green-400 text-green-900";
+        return "bg-purble-200 text-green-800";
       case "preparing":
-        return "bg-yellow-400 text-yellow-900";
+        return "bg-yellow-200 text-yellow-800";
       case "on the way":
-        return "bg-blue-400 text-blue-900";
+        return "bg-blue-200 text-blue-800";
       case "completed":
-        return "bg-gray-300 text-gray-900";
+        return "bg-green-200 text-gray-800";
       case "rejected":
-        return "bg-red-400 text-red-900";
+        return "bg-red-400 text-red-800";
       case "cancelled":
-        return "bg-gray-400 text-gray-900";
+        return "bg-red-300 text-gray-700";
       default:
-        return "bg-white text-gray-800";
+        return "bg-white text-black";
     }
   };
+
 
   return (
     <div className="my-10">
