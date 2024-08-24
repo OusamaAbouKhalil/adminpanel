@@ -37,8 +37,9 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       minute: "2-digit",
       hour12: true,
     });
-    return ${formattedDate}, ${formattedTime};
+    return `${formattedDate}, ${formattedTime}`; // Use backticks for template literals
   };
+  
 
   const sortedOrders = orders
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
