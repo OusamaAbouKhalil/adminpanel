@@ -42,17 +42,26 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
     .sort((a, b) => b.time.seconds - a.time.seconds);
 
+  // Function to get the status color
   const getStatusColor = (status) => {
     switch (status) {
-      case "accepted": return "bg-green-200 text-green-800";
-      case "preparing": return "bg-yellow-200 text-yellow-800";
-      case "on the way": return "bg-blue-200 text-blue-800";
-      case "completed": return "bg-gray-200 text-gray-800";
-      case "rejected": return "bg-red-200 text-red-800";
-      case "cancelled": return "bg-red-100 text-gray-600";
-      default: return "bg-white text-black";
+      case "accepted":
+        return "bg-purble-200 text-green-800";
+      case "preparing":
+        return "bg-yellow-200 text-yellow-800";
+      case "on the way":
+        return "bg-blue-200 text-blue-800";
+      case "completed":
+        return "bg-green-200 text-gray-800";
+      case "rejected":
+        return "bg-red-400 text-red-800";
+      case "cancelled":
+        return "bg-red-300 text-gray-700";
+      default:
+        return "bg-white text-black";
     }
   };
+
 
   return (
     <div className="my-10 p-6 bg-gray-50 rounded-lg shadow-lg">
@@ -121,28 +130,25 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                       {order.status}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="relative">
-                      <select
-                        value={order.status}
-                        onChange={(e) => onStatusChange(order, e.target.value)}
-                        className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-                      >
-                        {statuses.map((status) => (
-                          <option
-                            key={status}
-                            value={status}
-                            disabled={status === order.status}
-                          >
-                            {status.toUpperCase()}
-                          </option>
-                        ))}
-                      </select>
-                      <svg className="absolute top-1/2 right-2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  </td>
+                 <td className="px-6 py-4">
+                  <div className="relative">
+                    <select
+                      value={order.status}
+                      onChange={(e) => onStatusChange(order, e.target.value)}
+                      className="bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out py-2 px-3 w-full"
+                    >
+                      {statuses.map((status) => (
+                        <option
+                          key={status}
+                          value={status}
+                          disabled={status === order.status}
+                        >
+                          {status.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </td>
                 </tr>
               );
             })}
