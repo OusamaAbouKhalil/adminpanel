@@ -39,7 +39,7 @@ function Sidebar() {
         <>
           <div className='flex items-center justify-between px-4 py-3 border-b dark:border-gray-600'>
             <Link to="/" onClick={handleCloseSideBar} className='flex items-center gap-2 text-xl font-semibold text-gray-900 dark:text-white'>
-              <SiShopware size={24} /><span>Swift Drive</span>
+              <SiShopware size={24} /><span>Swift Go</span>
             </Link>
             <TooltipComponent content="Menu" position='BottomCenter'>
               <button type="button" onClick={() => setActiveMenu(prev => !prev)} className='text-xl rounded-full p-2 hover:bg-gray-200 dark:hover:bg-gray-700 md:hidden'>
