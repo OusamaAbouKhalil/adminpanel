@@ -17,7 +17,6 @@ const App = () => {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/prices" element={<PricesPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<MainLayout />}>
             <Route index element={<ProtectedRoute ch><Restaurants /></ProtectedRoute>} />
@@ -31,6 +30,7 @@ const App = () => {
             <Route path="restaurants/:id/:item_id" element={<ProtectedRoute><Test /></ProtectedRoute>} />
             <Route path="kanban" element={<ProtectedRoute><Kanban /></ProtectedRoute>} />
             <Route path="calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+             <Route path="prices" element={<ProtectedRoute><PricesPage /></ProtectedRoute>} />
           </Route>
         </Routes>
       </BrowserRouter>
