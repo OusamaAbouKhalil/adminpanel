@@ -13,9 +13,8 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     order.status === activeTab && order.order_id.includes(searchTerm)
   );
 
-    // Function to format the date and time
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
+  const formatDateTime = (timestamp) => {
+    const date = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JS Date
     const formattedDate = date.toLocaleDateString("en-US");
     const formattedTime = date.toLocaleTimeString("en-US", {
       hour: "2-digit",
