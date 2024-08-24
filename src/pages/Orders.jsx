@@ -35,6 +35,8 @@ const Orders = () => {
               // New order, play sound if it's pending
               if (orderData.status === "pending") {
                 sound.play();
+                //console.log("New order:", orderData);
+                console.log("Sound played");
               }
               return [...prevOrdersList, orderData];
             }
