@@ -9,7 +9,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     return orders.filter((order) => order.status === status).length;
   };
 
-  const filteredOrders = orders.filter((order) =>
+  const filteredOrders = orders.filter((order) => 
     order.status === activeTab && order.order_id.includes(searchTerm)
   );
 
@@ -27,9 +27,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
   // Sorting orders by Firestore timestamp
   const sortedOrders = orders
     .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
-    .sort((a, b) => {
-      return b.time.seconds - a.time.seconds;
-    });
+    .sort((a, b) => b.time.seconds - a.time.seconds);
 
   return (
     <div className="my-10 p-4">
@@ -38,6 +36,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         {statuses.map((status) => (
           <div key={status} className="relative inline-block mr-4">
             <button
+              key={status}
               className={`rounded-t-lg p-3 mr-2 lg:text-lg text-sm font-bold text-gray-700 ${activeTab === status ? "bg-gray-200" : "bg-white"} transition-colors duration-300`}
               onClick={() => setActiveTab(status)}
             >
@@ -100,38 +99,38 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   >
                     {status !== "rejected" && status !== "cancelled" && (
                       <td className="border px-4 py-2 text-sm">
-                        <span
+                        <button
                           onClick={() =>
                             onStatusChange(
                               order,
                               statuses[statuses.indexOf(status) - 1]
                             )
                           }
-                          className="cursor-pointer text-blue-500 hover:text-blue-700 text-xs font-bold"
+                          className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
-                          &larr;
-                        </span>
+                          Move to {statuses[statuses.indexOf(status) - 1]}
+                        </button>
                       </td>
                     )}
                     <td className="border px-4 py-2 text-sm">{order.order_id}</td>
                     <td className="border px-4 py-2 text-sm">{order.recipient_name}</td>
                     <td className="border px-4 py-2 text-sm">${order.total + order.delivery_fee}</td>
-                    <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
-                    <td className="border px-4 py-2 text-sm">{order.status}</td>
+                     <td className="border px-4 py-2 text-sm">{formatDateTime(order.time)}</td> {/* New column */}
+                     <td className="border px-4 py-2 text-sm">{order.status}</td>
 
                     {status !== "completed" && status !== "rejected" && status !== "cancelled" && (
                       <td className="border px-4 py-2 text-sm">
-                        <span
+                        <button
                           onClick={() =>
                             onStatusChange(
                               order,
                               statuses[statuses.indexOf(status) + 1]
                             )
                           }
-                          className="cursor-pointer text-blue-500 hover:text-blue-700 text-xs font-bold"
+                          className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
-                          &rarr;
-                        </span>
+                          Move to {statuses[statuses.indexOf(status) + 1]}
+                        </button>
                       </td>
                     )}
                   </tr>
