@@ -1,11 +1,31 @@
 import React, { useState } from "react";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
-  const statuses = ["accepted", "preparing", "on the way", "completed"];
+  const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
   const [activeTab, setActiveTab] = useState(statuses[0]); // Default to the first status
 
   const getStatusCount = (status) => {
     return orders.filter((order) => order.status === status).length;
+  };
+
+  // Function to determine the container background color based on status
+  const getStatusContainerStyle = (status) => {
+    switch (status) {
+      case "accepted":
+        return "bg-green-100 border-green-300";
+      case "preparing":
+        return "bg-yellow-100 border-yellow-300";
+      case "on the way":
+        return "bg-blue-100 border-blue-300";
+      case "completed":
+        return "bg-gray-100 border-gray-300";
+      case "rejected":
+        return "bg-red-100 border-red-300";
+      case "cancelled":
+        return "bg-orange-100 border-orange-300";
+      default:
+        return "bg-white border-gray-300";
+    }
   };
 
   return (
@@ -31,7 +51,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         ))}
       </div>
 
-      <div className={`shadow-lg rounded-lg overflow-hidden ${activeTab ? 'block' : 'hidden'}`}>
+      <div className={`shadow-lg rounded-lg overflow-hidden ${activeTab ? 'block' : 'hidden'} ${getStatusContainerStyle(activeTab)}`}>
         <h2 className="text-xl font-bold text-gray-800 bg-gray-100 py-3 px-4 border-b">
           {activeTab.toUpperCase()}
         </h2>
@@ -61,12 +81,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     <td className="px-6 py-4">
                       <select
                         value={order.status}
-                        onChange={(e) =>
-                          onStatusChange(
-                            order,
-                            e.target.value
-                          )
-                        }
+                        onChange={(e) => onStatusChange(order, e.target.value)}
                         className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                       >
                         {statuses.map((status) => (
@@ -75,7 +90,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                             value={status}
                             disabled={status === order.status}
                           >
-                            Move to {status.toUpperCase()}
+                            Change Status }
                           </option>
                         ))}
                       </select>
