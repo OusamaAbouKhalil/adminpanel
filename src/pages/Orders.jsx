@@ -4,7 +4,7 @@ import { useUpdateOrderStatus } from "../lib/query/queries";
 import { onSnapshot, collection } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
 import PendingOrders from "../components/Orders/PendingOrders";
-import sound from '../public/success.mp3';
+import sound from '/success.mp3';
 
 const Orders = () => {
   const [specialOrders, setSpecialOrders] = useState([]);
