@@ -16,7 +16,6 @@ const Orders = () => {
 
  
   useEffect(() => {
-    const audio = new Audio(sound);
 
     const unsubscribe = onSnapshot(
       collection(fsdb, "orders"),
@@ -36,9 +35,12 @@ const Orders = () => {
             } else {
                   // New order, play sound if it's pending and user has interacted
               if (orderData.status === "pending" && userHasInteracted) {
-                audio.play().catch((error) => {
-                  console.error("Sound play error:", error);
-                });
+                setTimeout(() => {
+                  const audio = new Audio(sound);
+                  audio.play().catch((error) => {
+                    console.error("Sound play error:", error);
+                  });
+                }, 100); // Delay of 100ms
               }
               return [...prevOrdersList, orderData];
             }
@@ -53,10 +55,6 @@ const Orders = () => {
     return () => unsubscribe();
   }, [userHasInteracted]);
 
-  const testSound = () => {
-  const audio = new Audio(sound);
-  audio.play().catch(error => console.error("Test sound play error:", error));
-  };
   
   // Set userHasInteracted to true on first interaction
   useEffect(() => {
@@ -111,7 +109,6 @@ const Orders = () => {
           </button>
 
         </div>
-          <button onClick={testSound}>Test Sound</button>
 
         {openPendingOrders && (
           <PendingOrders
