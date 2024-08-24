@@ -69,7 +69,7 @@ return (
         </tr>
         <tr>
           <td className="px-4 py-2 border font-semibold">Cost in Credits:</td>
-          <td className="px-4 py-2 border">{order.costInCredits}</td>
+          <td className="px-4 py-2 border">{order.costInCredits.toFixed(2)}</td>
         </tr>
         <tr>
           <td className="px-4 py-2 border font-semibold">Delivery Fee:</td>
