@@ -12,31 +12,43 @@ const Orders = () => {
   const [showCanceledOrders, setShowCanceledOrders] = useState(false); // State to toggle canceled orders view
   const { mutate: updateOrderStatus } = useUpdateOrderStatus();
 
+ 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(fsdb, "orders"), (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        const orderData = { ...change.doc.data() };
+    const sound = new Audio("/sound.mp3");
 
-        setOrdersList((prevOrdersList) => {
-          const existingOrderIndex = prevOrdersList.findIndex(order => order.order_id === orderData.order_id);
+    const unsubscribe = onSnapshot(
+      collection(fsdb, "orders"),
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const orderData = { ...change.doc.data() };
 
-          if (existingOrderIndex !== -1) {
-            // Order exists, update it
-            const updatedOrdersList = [...prevOrdersList];
-            updatedOrdersList[existingOrderIndex] = orderData;
-            return updatedOrdersList;
-          } else {
-            // New order, add it to the list
-            return [...prevOrdersList, orderData];
-          }
+          setOrdersList((prevOrdersList) => {
+            const existingOrderIndex = prevOrdersList.findIndex(
+              (order) => order.order_id === orderData.order_id
+            );
+
+            if (existingOrderIndex !== -1) {
+              const updatedOrdersList = [...prevOrdersList];
+              updatedOrdersList[existingOrderIndex] = orderData;
+              return updatedOrdersList;
+            } else {
+              // New order, play sound if it's pending
+              if (orderData.status === "pending") {
+                sound.play();
+              }
+              return [...prevOrdersList, orderData];
+            }
+          });
         });
-      });
-    }, (error) => {
-      console.error("Snapshot error:", error);
-    });
+      },
+      (error) => {
+        console.error("Snapshot error:", error);
+      }
+    );
 
     return () => unsubscribe();
   }, []);
+
 
   const handleStatusChange = (order, newStatus) => {
     const updatedOrder = { ...order, status: newStatus };
