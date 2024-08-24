@@ -17,14 +17,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
     return `${formattedDate}, ${formattedTime}`;
   };
 
-  // Sort orders by date and time
-const sortedOrders = orders
-  .filter((order) => order.status === activeTab && order.order_id.includes(searchTerm))
-  .sort((a, b) => {
-    const dateA = a.date?.seconds || 0; // Fallback to 0 if undefined
-    const dateB = b.date?.seconds || 0; // Fallback to 0 if undefined
-    return dateB - dateA; // Sort by timestamp (most recent first)
-  });
+
 
 
   return (
