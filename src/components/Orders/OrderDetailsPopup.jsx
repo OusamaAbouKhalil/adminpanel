@@ -1,3 +1,5 @@
+import React from "react";
+
 const OrderDetailsPopup = ({ order, onClose }) => {
   const handlePrint = () => {
     const printWindow = window.open("", "", "width=800,height=600");
