@@ -55,44 +55,45 @@ const PromoCodesPage = () => {
   };
 
   const handleUpdatePromoCode = async (id, field, value) => {
-    if (field !== 'promoCode' && value < 0) {
-      setMessage('Credits and uses left must be non-negative.');
-      setMessageType('error');
-      return;
-    }
+  if (field !== 'promoCode' && value < 0) {
+    setMessage('Credits and uses left must be non-negative.');
+    setMessageType('error');
+    return;
+  }
 
-    setSaving(true);
+  setSaving(true);
+  try {
+    const db = getDatabase();
+    const promoCodeRef = ref(db, `PromoCodes/${id}`); // Fixed line
+    await update(promoCodeRef, {
+      [field]: field === 'promoCode' ? value : parseInt(value),
+    });
+    setMessage('Promo code updated successfully!');
+    setMessageType('success');
+  } catch (err) {
+    setMessage('Error updating promo code.');
+    setMessageType('error');
+    console.error('Error updating promo code:', err);
+  }
+  setSaving(false);
+};
+
+const handleDeletePromoCode = async (id) => {
+  if (window.confirm('Are you sure you want to delete this promo code?')) {
     try {
       const db = getDatabase();
-      const promoCodeRef = ref(db, PromoCodes/${id});
-      await update(promoCodeRef, {
-        [field]: field === 'promoCode' ? value : parseInt(value),
-      });
-      setMessage('Promo code updated successfully!');
+      const promoCodeRef = ref(db, `PromoCodes/${id}`); // Fixed line
+      await remove(promoCodeRef);
+      setMessage('Promo code deleted successfully!');
       setMessageType('success');
     } catch (err) {
-      setMessage('Error updating promo code.');
+      setMessage('Error deleting promo code.');
       setMessageType('error');
-      console.error('Error updating promo code:', err);
+      console.error('Error deleting promo code:', err);
     }
-    setSaving(false);
-  };
+  }
+};
 
-  const handleDeletePromoCode = async (id) => {
-    if (window.confirm('Are you sure you want to delete this promo code?')) {
-      try {
-        const db = getDatabase();
-        const promoCodeRef = ref(db, PromoCodes/${id});
-        await remove(promoCodeRef);
-        setMessage('Promo code deleted successfully!');
-        setMessageType('success');
-      } catch (err) {
-        setMessage('Error deleting promo code.');
-        setMessageType('error');
-        console.error('Error deleting promo code:', err);
-      }
-    }
-  };
 
   if (loading) {
     return (
