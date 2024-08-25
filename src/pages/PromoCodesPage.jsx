@@ -200,7 +200,7 @@ const PromoCodesPage = () => {
                     <input
                       type="number"
                       value={data.usesLeft}
-                      onChange={(e) => handleUpdatePromoCode(id, 'usesLeft', e.target.value)}
+                      onChange={(e) => handleUpdatePromoCode(id, 'usesleft', e.target.value)}
                       className="w-full text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       min="0"
                     />
