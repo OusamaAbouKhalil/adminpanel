@@ -8,6 +8,7 @@ const OffersPage = () => {
   const [tempValue, setTempValue] = useState('');
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); // For error messages
 
   useEffect(() => {
     const db = getDatabase();
@@ -37,12 +38,14 @@ const OffersPage = () => {
     try {
       const db = getDatabase();
       const offerRef = ref(db, `Offers/${key}`);
-      await update(offerRef, parseInt(tempValue));
+      await update(offerRef, { value: parseInt(tempValue) }); // Pass an object with the field to update
 
       setSuccessMessage(`Offer "${key}" updated successfully!`);
       setTimeout(() => setSuccessMessage(''), 3000); // Clear success message after 3 seconds
     } catch (err) {
       console.error('Error updating offer:', err);
+      setErrorMessage('Failed to update offer. Please try again.');
+      setTimeout(() => setErrorMessage(''), 3000); // Clear error message after 3 seconds
     }
     setSaving(false);
     setEditingOffer(null); // Exit edit mode
@@ -65,6 +68,14 @@ const OffersPage = () => {
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6" role="alert">
           <strong className="font-bold">Success!</strong>
           <span className="block sm:inline"> {successMessage}</span>
+        </div>
+      )}
+
+      {/* Error message */}
+      {errorMessage && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
+          <strong className="font-bold">Error!</strong>
+          <span className="block sm:inline"> {errorMessage}</span>
         </div>
       )}
 
