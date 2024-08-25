@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getDatabase, ref, onValue, update, remove } from 'firebase/database';
+import { getDatabase, ref, onValue, update } from 'firebase/database';
 
 const OffersPage = () => {
   const [offers, setOffers] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false); // To handle spinner for saving changes
-  const [newOfferKey, setNewOfferKey] = useState('');
-  const [newOfferValue, setNewOfferValue] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // For success messages
 
   useEffect(() => {
     const db = getDatabase();
@@ -21,25 +20,6 @@ const OffersPage = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleAddOffer = async () => {
-    if (!newOfferKey || newOfferValue < 0 || newOfferValue > 100) {
-      alert('Please provide a valid key and ensure the value is between 0 and 100.');
-      return;
-    }
-
-    setSaving(true); // Start the spinner
-    try {
-      const db = getDatabase();
-      const offersRef = ref(db, `Offers/${newOfferKey}`);
-      await update(offersRef, parseInt(newOfferValue));
-      setNewOfferKey('');
-      setNewOfferValue('');
-    } catch (err) {
-      console.error('Error adding offer:', err);
-    }
-    setSaving(false); // Stop the spinner
-  };
-
   const handleUpdateOffer = async (key, value) => {
     if (value < 0 || value > 100) {
       alert('Please ensure the value is between 0 and 100.');
@@ -51,22 +31,13 @@ const OffersPage = () => {
       const db = getDatabase();
       const offerRef = ref(db, `Offers/${key}`);
       await update(offerRef, parseInt(value));
+
+      setSuccessMessage(`Offer "${key}" updated successfully!`);
+      setTimeout(() => setSuccessMessage(''), 3000); // Clear success message after 3 seconds
     } catch (err) {
       console.error('Error updating offer:', err);
     }
     setSaving(false); // Stop the spinner
-  };
-
-  const handleDeleteOffer = async (key) => {
-    if (window.confirm(`Are you sure you want to delete the offer "${key}"?`)) {
-      try {
-        const db = getDatabase();
-        const offerRef = ref(db, `Offers/${key}`);
-        await remove(offerRef);
-      } catch (err) {
-        console.error('Error deleting offer:', err);
-      }
-    }
   };
 
   if (loading) {
@@ -81,72 +52,46 @@ const OffersPage = () => {
     <div className="container mx-auto p-6 sm:p-8 lg:p-10 bg-white shadow-xl rounded-lg border border-gray-200 max-w-3xl">
       <h1 className="text-4xl font-bold mb-8 text-gray-900 text-center">Manage Offers</h1>
 
-      {/* Form to Add a New Offer */}
-      <div className="mb-10">
-        <h2 className="text-3xl font-semibold mb-6 text-gray-800">Add New Offer</h2>
-        <div className="space-y-4">
-          <input
-            type="text"
-            placeholder="Offer Key (e.g., 100offer)"
-            value={newOfferKey}
-            onChange={(e) => setNewOfferKey(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-          />
-          <input
-            type="number"
-            placeholder="Offer Value (0-100)"
-            value={newOfferValue}
-            onChange={(e) => setNewOfferValue(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-            min="0"
-            max="100"
-          />
-          <button
-            onClick={handleAddOffer}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
-            disabled={saving} // Disable button while saving
-          >
-            {saving ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-white mr-2"></div>
-                Saving...
-              </div>
-            ) : (
-              'Add Offer'
-            )}
-          </button>
+      {/* Success message */}
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <strong className="font-bold">Success!</strong>
+          <span className="block sm:inline"> {successMessage}</span>
         </div>
-      </div>
+      )}
 
-      {/* List of Current Offers with Edit/Delete Options */}
+      {/* List of Current Offers with Edit Option */}
       <h2 className="text-3xl font-semibold mb-6 text-gray-800">Current Offers</h2>
       <ul className="space-y-6">
-        {Object.entries(offers).map(([key, value]) => (
-          <li key={key} className="bg-gray-100 p-6 rounded-lg shadow-md">
-            <div className="flex justify-between items-center">
-              <input
-                type="text"
-                value={key}
-                readOnly
-                className="mr-4 text-lg font-medium text-gray-700 bg-gray-200 p-3 rounded-lg w-1/3"
-              />
-              <input
-                type="number"
-                value={value}
-                onChange={(e) => handleUpdateOffer(key, e.target.value)}
-                className="mr-4 w-20 text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                min="0"
-                max="100"
-              />
-              <button
-                onClick={() => handleDeleteOffer(key)}
-                className="bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out"
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
+        {Object.entries(offers).map(([key, value]) => {
+          const packageDescription = key === '10Offer' ? 'Basic Package' : key === '100Offer' ? 'Premium Package' : 'Custom Package';
+
+          return (
+            <li key={key} className="bg-gradient-to-r from-blue-500 to-green-500 p-6 rounded-lg shadow-md text-white">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-2xl font-bold">{packageDescription}</p>
+                  <p className="text-lg font-medium">{key}</p>
+                </div>
+                <input
+                  type="number"
+                  value={value}
+                  onChange={(e) => handleUpdateOffer(key, e.target.value)}
+                  className="mr-4 w-20 text-lg font-medium p-3 rounded-lg border border-gray-300 text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="0"
+                  max="100"
+                  disabled={saving} // Disable input while saving
+                />
+                {saving && (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-white mr-2"></div>
+                    Saving...
+                  </div>
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
