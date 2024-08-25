@@ -8,7 +8,7 @@ const OffersPage = () => {
   const [tempValue, setTempValue] = useState('');
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); // For error messages
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const db = getDatabase();
@@ -38,17 +38,17 @@ const OffersPage = () => {
     try {
       const db = getDatabase();
       const offerRef = ref(db, `Offers/${key}`);
-      await update(offerRef, { value: parseInt(tempValue) }); // Pass an object with the field to update
+      await update(offerRef, parseInt(tempValue)); // Directly update the node value
 
       setSuccessMessage(`Offer "${key}" updated successfully!`);
-      setTimeout(() => setSuccessMessage(''), 3000); // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Error updating offer:', err);
       setErrorMessage('Failed to update offer. Please try again.');
-      setTimeout(() => setErrorMessage(''), 3000); // Clear error message after 3 seconds
+      setTimeout(() => setErrorMessage(''), 3000);
     }
     setSaving(false);
-    setEditingOffer(null); // Exit edit mode
+    setEditingOffer(null);
   };
 
   if (loading) {
