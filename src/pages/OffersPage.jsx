@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDatabase, ref, onValue, update } from 'firebase/database';
+import { getDatabase, ref, onValue, update,set } from 'firebase/database';
 
 const OffersPage = () => {
   const [offers, setOffers] = useState({});
