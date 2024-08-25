@@ -4,6 +4,8 @@ import { getDatabase, ref, onValue, update } from 'firebase/database';
 const OffersPage = () => {
   const [offers, setOffers] = useState({});
   const [loading, setLoading] = useState(true);
+  const [editingOffer, setEditingOffer] = useState(null);
+  const [tempValue, setTempValue] = useState('');
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -20,8 +22,13 @@ const OffersPage = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleUpdateOffer = async (key, value) => {
-    if (value < 0 || value > 100) {
+  const handleEditClick = (key, value) => {
+    setEditingOffer(key);
+    setTempValue(value);
+  };
+
+  const handleSaveClick = async (key) => {
+    if (tempValue < 0 || tempValue > 100) {
       alert('Please ensure the value is between 0 and 100.');
       return;
     }
@@ -30,7 +37,7 @@ const OffersPage = () => {
     try {
       const db = getDatabase();
       const offerRef = ref(db, `Offers/${key}`);
-      await update(offerRef, parseInt(value));
+      await update(offerRef, parseInt(tempValue));
 
       setSuccessMessage(`Offer "${key}" updated successfully!`);
       setTimeout(() => setSuccessMessage(''), 3000); // Clear success message after 3 seconds
@@ -38,6 +45,7 @@ const OffersPage = () => {
       console.error('Error updating offer:', err);
     }
     setSaving(false);
+    setEditingOffer(null); // Exit edit mode
   };
 
   if (loading) {
@@ -74,20 +82,32 @@ const OffersPage = () => {
                   <p className="text-lg font-medium">{key}</p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <input
-                    type="number"
-                    value={value}
-                    onChange={(e) => handleUpdateOffer(key, e.target.value)}
-                    className="w-24 text-lg font-medium p-3 rounded-lg border border-gray-300 text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min="0"
-                    max="100"
-                    disabled={saving}
-                  />
-                  {saving && (
-                    <div className="flex items-center text-white">
-                      <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-white mr-2"></div>
-                      Saving...
-                    </div>
+                  {editingOffer === key ? (
+                    <>
+                      <input
+                        type="number"
+                        value={tempValue}
+                        onChange={(e) => setTempValue(e.target.value)}
+                        className="w-24 text-lg font-medium p-3 rounded-lg border border-gray-300 text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        min="0"
+                        max="100"
+                        disabled={saving}
+                      />
+                      <button
+                        onClick={() => handleSaveClick(key)}
+                        className={`px-4 py-2 text-white rounded-lg ${saving ? 'bg-gray-600' : 'bg-blue-600'} hover:bg-blue-700 focus:outline-none`}
+                        disabled={saving}
+                      >
+                        {saving ? 'Saving...' : 'Save'}
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleEditClick(key, value)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
+                    >
+                      Edit
+                    </button>
                   )}
                 </div>
               </div>
