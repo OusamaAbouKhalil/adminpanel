@@ -36,6 +36,8 @@ export const ProtectedRoute = ({ children }) => {
             'prices',
             'notification',
             'editnotification',
+            'promo',
+            'offers',
         ]
         if (!adminRoutes.includes(location.pathname.split('/')[1])) { return <Alert className="mx-4" variant="filled" severity="error">Access Denied</Alert> };
     }
