@@ -8,3 +8,8 @@ export { default as Menu } from './Menu';
 export { default as Add } from './Add';
 export { default as AddItem } from './AddItem';
 export {default as LoginPage} from './Login'
+export { default as SendNotificationPage } from './SendNotificationPage';
+export { default as EditNotificationPage } from './EditNotificationPage';
+export { default as OffersPage } from './OffersPage';
+export {default as PromoCodesPage} from './PromoCodesPage'
+
