@@ -28,29 +28,28 @@ const OffersPage = () => {
     setTempValue(value);
   };
 
-  const handleSaveClick = async (key) => {
-    if (tempValue < 0 || tempValue > 100) {
-      alert('Please ensure the value is between 0 and 100.');
-      return;
-    }
+const handleSaveClick = async (key) => {
+  if (tempValue < 0 || tempValue > 100) {
+    alert('Please ensure the value is between 0 and 100.');
+    return;
+  }
 
-    setSaving(true);
-    try {
-      const db = getDatabase();
-      const offerRef = ref(db, `Offers/${key}`);
-      await update(offerRef, parseInt(tempValue)); // Directly update the node value
+  setSaving(true);
+  try {
+    const db = getDatabase();
+    const offerRef = ref(db, `Offers/${key}`);
+    await set(offerRef, parseInt(tempValue)); // Use set to directly update the node value
 
-      setSuccessMessage(`Offer "${key}" updated successfully!`);
-      setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (err) {
-      console.error('Error updating offer:', err);
-      setErrorMessage('Failed to update offer. Please try again.');
-      setTimeout(() => setErrorMessage(''), 3000);
-    }
-    setSaving(false);
-    setEditingOffer(null);
-  };
-
+    setSuccessMessage(`Offer "${key}" updated successfully!`);
+    setTimeout(() => setSuccessMessage(''), 3000);
+  } catch (err) {
+    console.error('Error updating offer:', err);
+    setErrorMessage('Failed to update offer. Please try again.');
+    setTimeout(() => setErrorMessage(''), 3000);
+  }
+  setSaving(false);
+  setEditingOffer(null);
+};
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100">
