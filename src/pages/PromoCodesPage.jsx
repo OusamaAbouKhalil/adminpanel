@@ -55,45 +55,44 @@ const PromoCodesPage = () => {
   };
 
   const handleUpdatePromoCode = async (id, field, value) => {
-  if (field !== 'promoCode' && value < 0) {
-    setMessage('Credits and uses left must be non-negative.');
-    setMessageType('error');
-    return;
-  }
+    if (field !== 'promoCode' && value < 0) {
+      setMessage('Credits and uses left must be non-negative.');
+      setMessageType('error');
+      return;
+    }
 
-  setSaving(true);
-  try {
-    const db = getDatabase();
-    const promoCodeRef = ref(db, `PromoCodes/${id}`); // Fixed line
-    await update(promoCodeRef, {
-      [field]: field === 'promoCode' ? value : parseInt(value),
-    });
-    setMessage('Promo code updated successfully!');
-    setMessageType('success');
-  } catch (err) {
-    setMessage('Error updating promo code.');
-    setMessageType('error');
-    console.error('Error updating promo code:', err);
-  }
-  setSaving(false);
-};
-
-const handleDeletePromoCode = async (id) => {
-  if (window.confirm('Are you sure you want to delete this promo code?')) {
+    setSaving(true);
     try {
       const db = getDatabase();
-      const promoCodeRef = ref(db, `PromoCodes/${id}`); // Fixed line
-      await remove(promoCodeRef);
-      setMessage('Promo code deleted successfully!');
+      const promoCodeRef = ref(db, `PromoCodes/${id}`);
+      await update(promoCodeRef, {
+        [field]: field === 'promoCode' ? value : parseInt(value),
+      });
+      setMessage('Promo code updated successfully!');
       setMessageType('success');
     } catch (err) {
-      setMessage('Error deleting promo code.');
+      setMessage('Error updating promo code.');
       setMessageType('error');
-      console.error('Error deleting promo code:', err);
+      console.error('Error updating promo code:', err);
     }
-  }
-};
+    setSaving(false);
+  };
 
+  const handleDeletePromoCode = async (id) => {
+    if (window.confirm('Are you sure you want to delete this promo code?')) {
+      try {
+        const db = getDatabase();
+        const promoCodeRef = ref(db, `PromoCodes/${id}`);
+        await remove(promoCodeRef);
+        setMessage('Promo code deleted successfully!');
+        setMessageType('success');
+      } catch (err) {
+        setMessage('Error deleting promo code.');
+        setMessageType('error');
+        console.error('Error deleting promo code:', err);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -112,13 +111,13 @@ const handleDeletePromoCode = async (id) => {
         <div className="flex mb-8 border-b border-gray-300">
           <button
             onClick={() => setActiveTab('add')}
-            className={py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}}
+            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
           >
             Add Promo Code
           </button>
           <button
             onClick={() => setActiveTab('edit')}
-            className={py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'edit' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}}
+            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'edit' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
           >
             Edit Promo Code
           </button>
@@ -126,7 +125,7 @@ const handleDeletePromoCode = async (id) => {
 
         {/* Message */}
         {message && (
-          <div className={mb-6 p-4 rounded-lg ${messageType === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}}>
+          <div className={`mb-6 p-4 rounded-lg ${messageType === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
             {message}
           </div>
         )}
