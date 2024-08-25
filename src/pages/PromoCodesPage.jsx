@@ -64,9 +64,10 @@ const PromoCodesPage = () => {
     setSaving(true);
     try {
       const db = getDatabase();
-      const promoCodeRef = ref(db, `PromoCodes/${id}`);
-      const updatedValue = field === 'promoCode' ? value : parseInt(value);
-      await update(promoCodeRef, { [field]: updatedValue });
+      const promoCodeRef = ref(db, PromoCodes/${id});
+      await update(promoCodeRef, {
+        [field]: field === 'promoCode' ? value : parseInt(value),
+      });
       setMessage('Promo code updated successfully!');
       setMessageType('success');
     } catch (err) {
@@ -81,7 +82,7 @@ const PromoCodesPage = () => {
     if (window.confirm('Are you sure you want to delete this promo code?')) {
       try {
         const db = getDatabase();
-        const promoCodeRef = ref(db, `PromoCodes/${id}`);
+        const promoCodeRef = ref(db, PromoCodes/${id});
         await remove(promoCodeRef);
         setMessage('Promo code deleted successfully!');
         setMessageType('success');
@@ -110,13 +111,13 @@ const PromoCodesPage = () => {
         <div className="flex mb-8 border-b border-gray-300">
           <button
             onClick={() => setActiveTab('add')}
-            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+            className={py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}}
           >
             Add Promo Code
           </button>
           <button
             onClick={() => setActiveTab('edit')}
-            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'edit' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+            className={py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'edit' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}}
           >
             Edit Promo Code
           </button>
@@ -124,7 +125,7 @@ const PromoCodesPage = () => {
 
         {/* Message */}
         {message && (
-          <div className={`mb-6 p-4 rounded-lg ${messageType === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <div className={mb-6 p-4 rounded-lg ${messageType === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}}>
             {message}
           </div>
         )}
@@ -186,46 +187,37 @@ const PromoCodesPage = () => {
                     <input
                       type="text"
                       value={data.promoCode}
-                      onChange={(e) => setPromoCodes((prev) => ({
-                        ...prev,
-                        [id]: { ...prev[id], promoCode: e.target.value }
-                      }))}
+                      onChange={(e) => handleUpdatePromoCode(id, 'promoCode', e.target.value)}
                       className="text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                       type="number"
                       value={data.credits}
-                      onChange={(e) => setPromoCodes((prev) => ({
-                        ...prev,
-                        [id]: { ...prev[id], credits: e.target.value }
-                      }))}
+                      onChange={(e) => handleUpdatePromoCode(id, 'credits', e.target.value)}
                       className="w-full text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       min="0"
                     />
                     <input
                       type="number"
-                      value={data.usesleft}
-                      onChange={(e) => setPromoCodes((prev) => ({
-                        ...prev,
-                        [id]: { ...prev[id], usesleft: e.target.value }
-                      }))}
+                      value={data.usesLeft}
+                      onChange={(e) => handleUpdatePromoCode(id, 'usesleft', e.target.value)}
                       className="w-full text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       min="0"
                     />
                     <div className="flex space-x-4">
                       <button
                         onClick={() => handleUpdatePromoCode(id, 'promoCode', data.promoCode)}
-                        className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out"
+                        className="bg-green-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out"
                         disabled={saving}
                       >
-                        {saving ? 'Saving...' : 'Save Changes'}
+                        Save
                       </button>
                       <button
                         onClick={() => handleDeletePromoCode(id)}
-                        className="bg-red-600 text-white py-2 px-4 rounded-lg shadow-lg hover:bg-red-700 transition duration-300 ease-in-out"
+                        className="bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out"
                         disabled={saving}
                       >
-                        {saving ? 'Deleting...' : 'Delete'}
+                        Delete
                       </button>
                     </div>
                   </div>
