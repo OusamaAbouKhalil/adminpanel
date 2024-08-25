@@ -3,14 +3,12 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
 import { Navbar, Sidebar } from "./components"
-import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage } from "./pages"
+import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage, SendNotificationPage, EditNotificationPage, PromoCodesPage, OffersPage} from "./pages"
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
 import Edit from './pages/Edit';
 import { ProtectedRoute } from './contexts/ProtectedRoutes';
 import PricesPage from './pages/PricesPage'; // price path
-import SendNotificationPage from './pages/SendNotificationPage';
-import EditNotificationPage from './pages/EditNotificationPage';
 
 
 
@@ -32,9 +30,11 @@ const App = () => {
             <Route path="restaurants/:id/:item_id" element={<ProtectedRoute><Test /></ProtectedRoute>} />
             <Route path="kanban" element={<ProtectedRoute><Kanban /></ProtectedRoute>} />
             <Route path="calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
-             <Route path="prices" element={<ProtectedRoute><PricesPage /></ProtectedRoute>} />
+            <Route path="prices" element={<ProtectedRoute><PricesPage /></ProtectedRoute>} />
             <Route path="notification" element={<ProtectedRoute><SendNotificationPage/></ProtectedRoute>} />
             <Route path="editnotification" element={<ProtectedRoute><EditNotificationPage/></ProtectedRoute>} />
+             <Route path="offers" element={<ProtectedRoute><OffersPage/></ProtectedRoute>} />
+            <Route path="promo" element={<ProtectedRoute><PromoCodesPage/></ProtectedRoute>} />
           </Route>
         </Routes>
       </BrowserRouter>
