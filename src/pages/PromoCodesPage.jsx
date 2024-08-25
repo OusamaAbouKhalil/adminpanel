@@ -39,7 +39,7 @@ const PromoCodesPage = () => {
       await update(newPromoCodeRef, {
         promoCode: newPromoCode,
         credits: parseInt(newCredits),
-        usesLeft: parseInt(newUsesLeft),
+        usesleft: parseInt(newUsesLeft),
       });
       setMessage('Promo code added successfully!');
       setMessageType('success');
