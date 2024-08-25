@@ -13,7 +13,7 @@ import {
 } from "react-icons/bs";
 import { IoMdContacts } from "react-icons/io";
 import { RiContactsLine } from "react-icons/ri";
-import { FaDollarSign, FaBell, FaEdit   } from 'react-icons/fa'; // Import the money icon
+import { FaDollarSign, FaBell, FaEdit,FaPercentage,FaGift   } from 'react-icons/fa'; // Import the money icon
 
 export const gridOrderImage = (props) => (
   <div>
@@ -283,6 +283,19 @@ export const links = [
     {
       name: "editnotification", // Route name for the new page
       icon: <FaEdit />, // Changed to Bell icon
+    },
+  ],
+},
+   {
+  title: "Promotions center",
+  links: [
+    {
+      name: "offers", // Route name for the new page
+      icon: <FaPercentage />, // Changed to Bell icon
+    },
+    {
+      name: "promo", // Route name for the new page
+      icon: <FaGift />, // Changed to Bell icon
     },
   ],
 },
