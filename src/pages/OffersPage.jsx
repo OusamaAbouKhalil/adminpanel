@@ -4,8 +4,8 @@ import { getDatabase, ref, onValue, update } from 'firebase/database';
 const OffersPage = () => {
   const [offers, setOffers] = useState({});
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false); // To handle spinner for saving changes
-  const [successMessage, setSuccessMessage] = useState(''); // For success messages
+  const [saving, setSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const db = getDatabase();
@@ -26,7 +26,7 @@ const OffersPage = () => {
       return;
     }
 
-    setSaving(true); // Start the spinner
+    setSaving(true);
     try {
       const db = getDatabase();
       const offerRef = ref(db, `Offers/${key}`);
@@ -37,13 +37,13 @@ const OffersPage = () => {
     } catch (err) {
       console.error('Error updating offer:', err);
     }
-    setSaving(false); // Stop the spinner
+    setSaving(false);
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-blue-500"></div>
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
       </div>
     );
   }
@@ -54,7 +54,7 @@ const OffersPage = () => {
 
       {/* Success message */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6" role="alert">
           <strong className="font-bold">Success!</strong>
           <span className="block sm:inline"> {successMessage}</span>
         </div>
@@ -73,21 +73,23 @@ const OffersPage = () => {
                   <p className="text-2xl font-bold">{packageDescription}</p>
                   <p className="text-lg font-medium">{key}</p>
                 </div>
-                <input
-                  type="number"
-                  value={value}
-                  onChange={(e) => handleUpdateOffer(key, e.target.value)}
-                  className="mr-4 w-20 text-lg font-medium p-3 rounded-lg border border-gray-300 text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  min="0"
-                  max="100"
-                  disabled={saving} // Disable input while saving
-                />
-                {saving && (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-white mr-2"></div>
-                    Saving...
-                  </div>
-                )}
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="number"
+                    value={value}
+                    onChange={(e) => handleUpdateOffer(key, e.target.value)}
+                    className="w-24 text-lg font-medium p-3 rounded-lg border border-gray-300 text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="0"
+                    max="100"
+                    disabled={saving}
+                  />
+                  {saving && (
+                    <div className="flex items-center text-white">
+                      <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-white mr-2"></div>
+                      Saving...
+                    </div>
+                  )}
+                </div>
               </div>
             </li>
           );
