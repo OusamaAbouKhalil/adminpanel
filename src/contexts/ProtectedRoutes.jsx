@@ -16,7 +16,7 @@ export const ProtectedRoute = ({ children }) => {
             return <Navigate to="/login" replace />;
         }
 
-        const driversRef = ref(db, '/drivers');
+        const driversRef = ref(db, '/swiftBitesDrivers');
         const onDriversChange = (snapshot) => {
             const driversArray = snapshot.exists()
                 ? Object.entries(snapshot.val()).map(([key, value]) => ({ id: key, ...value }))
