@@ -1,52 +1,49 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "../components";
 import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { useGetRestaurants } from "../lib/query/queries";
+import useDebounce from "../hooks/useDebounce";
 
-export default function Drivers() {
-  const { data: restaurants, isPending: isLoading, isError } = useGetRestaurants();
+export default function Restaurants() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
-  const tableDisplay = [
-    "Logo",
-    "Restuarnt Name",
-    "Location",
-    "Category",
-    "time",
-    "Action",
-    "Status",
-  ];
+  const debouncedValue = useDebounce(searchTerm, 500);
 
-  const add = () => {
-    navigate("/add");
-  };
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useGetRestaurants(debouncedValue);
 
-  const filteredRestaurants = useMemo(() => {
-    return restaurants?.filter((restaurant) =>
-      restaurant.rest_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [restaurants, searchTerm]);
-
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = filteredRestaurants?.slice(
-    indexOfFirstRow,
-    indexOfLastRow
-  );
-
-  const totalPages = Math.ceil(filteredRestaurants?.length / rowsPerPage);
+  const restaurants = data?.pages.flatMap((page) => page.restaurantList) || [];
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-    setCurrentPage(1); // Reset to first page when search term changes
   };
 
-  const goToPage = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const handleScroll = () => {
+    const scrollPosition =
+      window.innerHeight + document.documentElement.scrollTop;
+    const threshold = document.documentElement.offsetHeight - 100;
+
+    if (scrollPosition >= threshold && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+
+  const add = () => {
+    navigate("/add");
   };
 
   return (
@@ -67,7 +64,7 @@ export default function Drivers() {
           className="border-2 border-gray-300 bg-white h-12 px-4 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      {isLoading ? (
+      {isLoading && restaurants.length === 0 ? (
         <div className="flex justify-center items-center h-64">
           <p className="text-gray-500">Loading...</p>
         </div>
@@ -77,19 +74,18 @@ export default function Drivers() {
             <table className="w-full text-sm text-left text-gray-600">
               <thead className="text-xs text-gray-800 uppercase bg-gray-200">
                 <tr>
-                  {tableDisplay.map((item, index) => (
-                    <th key={index} scope="col" className="py-3 px-4">
-                      {item}
-                    </th>
-                  ))}
+                  <th scope="col" className="py-3 px-4">Logo</th>
+                  <th scope="col" className="py-3 px-4">Restaurant Name</th>
+                  <th scope="col" className="py-3 px-4">Location</th>
+                  <th scope="col" className="py-3 px-4">Category</th>
+                  <th scope="col" className="py-3 px-4">Time</th>
+                  <th scope="col" className="py-3 px-4">Action</th>
+                  <th scope="col" className="py-3 px-4">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {currentRows.map((restaurant, index) => (
-                  <tr
-                    key={index}
-                    className="bg-white border-b hover:bg-gray-50"
-                  >
+                {restaurants.map((restaurant, index) => (
+                  <tr key={index} className="bg-white border-b hover:bg-gray-50">
                     <td className="py-4 px-4">
                       <img
                         src={restaurant.main_image}
@@ -106,9 +102,7 @@ export default function Drivers() {
                       </Link>
                     </td>
                     <td className="py-4 px-4">{restaurant.location}</td>
-                    <td className="py-4 px-4">
-                      {restaurant.Category?.join(", ")}
-                    </td>
+                    <td className="py-4 px-4">{restaurant.Category?.join(", ")}</td>
                     <td className="py-4 px-4">{restaurant.time}</td>
                     <td className="py-4 px-4 text-center">
                       <button
@@ -132,25 +126,16 @@ export default function Drivers() {
               </tbody>
             </table>
           </div>
-          <div className="flex justify-center mt-6">
-            <nav aria-label="Page navigation">
-              <ul className="inline-flex items-center space-x-1">
-                {[...Array(totalPages).keys()].map((number) => (
-                  <li key={number}>
-                    <button
-                      onClick={() => goToPage(number + 1)}
-                      className={`py-2 px-3 text-sm font-medium rounded-md border ${currentPage === number + 1
-                        ? "bg-blue-600 text-white"
-                        : "bg-white text-gray-600 border-gray-300 hover:bg-blue-500 hover:text-white"
-                        } transition duration-300`}
-                    >
-                      {number + 1}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
+          {isFetchingNextPage && (
+            <div className="flex justify-center items-center mt-4">
+              <p className="text-gray-500">Loading more...</p>
+            </div>
+          )}
+        </div>
+      )}
+      {isError && (
+        <div className="flex justify-center items-center mt-4">
+          <p className="text-red-500">Error loading data.</p>
         </div>
       )}
     </div>

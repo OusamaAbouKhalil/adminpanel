@@ -7,16 +7,46 @@ import {
     ref as storageRef,
     uploadBytes,
 } from "firebase/storage";
-import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc, query, orderBy, startAfter, limit, where } from "firebase/firestore";
 import { getLocationByCoordinates } from "../utils";
 
 
-export const getRestaurants = async () => {
+export const getRestaurants = async (
+    lastDocSnapshot = null,
+    searchTerm = ""
+) => {
     try {
-        const querySnapshot = await getDocs(collection(fsdb, "restaurants"));
-        const restaurantList = querySnapshot.docs.map((doc) => ({
+        let queryRef;
+
+        if (lastDocSnapshot) {
+            queryRef = query(
+                collection(fsdb, "restaurants"),
+                orderBy("rest_name"),
+                startAfter(lastDocSnapshot),
+                limit(10)
+            );
+        } else {
+            queryRef = query(
+                collection(fsdb, "restaurants"),
+                orderBy("rest_name"),
+                limit(10)
+            );
+        }
+
+        const querySnapshot = await getDocs(queryRef);
+        let restaurantList = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
             ...doc.data(),
         }));
+
+        if (searchTerm) {
+            const searchTermLower = searchTerm.toLowerCase();
+            restaurantList = restaurantList.filter((restaurant) =>
+                restaurant.rest_name.toLowerCase().includes(searchTermLower)
+            );
+        }
+
+        // Update locations for each restaurant
         for (let i = 0; i < restaurantList.length; i++) {
             const location = await getLocationByCoordinates(
                 restaurantList[i].location._lat,
@@ -24,11 +54,16 @@ export const getRestaurants = async () => {
             );
             restaurantList[i].location = location;
         }
-        return restaurantList;
+
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+        return { restaurantList, lastVisible };
     } catch (error) {
         console.error("Error fetching restaurants: ", error);
+        throw error;
     }
 };
+
 export const getRestaurantById = async (id) => {
     try {
         const restaurantRef = doc(fsdb, "restaurants", id);
@@ -149,22 +184,22 @@ const getOrderStatusMessage = (status) => {
             '🍕 Your order is done! Indulge in your delicious meal! 🍝'
         ],
         rejected: [
-        '🚫 Unfortunately, your order has been rejected. Please contact support if you need assistance. 🙁',
-        '❌ We’re sorry, but your order could not be processed. Please try again later. 😔',
-        '🔴 Your order has been rejected. We apologize for the inconvenience. Please reach out to us for more information. 📞',
-        '🚷 Your order has been canceled due to an issue. Contact us for help with your next order. 📩',
-        '❗ We’re sorry, but something went wrong with your order. Please contact customer service for assistance. 🙇',
-        '⚠️ Your order has been rejected. Please check with us for more details. 🚨',
-        '🚪 Unfortunately, we had to reject your order. Please get in touch with us for support. 🏥',
-        '🛑 Your order could not be completed. Reach out to us if you have questions or need help. 📧',
-        '🚫 Your order has been rejected. We apologize for the inconvenience. Please contact us for a resolution. 🔧',
-        '⚠️ We regret to inform you that your order has been rejected. Please contact us for further assistance. 📞',
-        '💔 Your order was not accepted. We apologize and are here to assist you with any issues. 📬',
-        '😞 Your order has been rejected. Please reach out to us for any queries or support. 💬',
-        '🚷 Your order could not be processed. We’re sorry for the inconvenience and are here to help. 🙋',
-        '🛑 Order rejection notice: We’re sorry, but there was a problem with your order. Contact us for more information. 📞',
-        '🚫 Your order has been rejected. We apologize for any trouble this may have caused. Please contact us for assistance. 📨'
-    ],
+            '🚫 Unfortunately, your order has been rejected. Please contact support if you need assistance. 🙁',
+            '❌ We’re sorry, but your order could not be processed. Please try again later. 😔',
+            '🔴 Your order has been rejected. We apologize for the inconvenience. Please reach out to us for more information. 📞',
+            '🚷 Your order has been canceled due to an issue. Contact us for help with your next order. 📩',
+            '❗ We’re sorry, but something went wrong with your order. Please contact customer service for assistance. 🙇',
+            '⚠️ Your order has been rejected. Please check with us for more details. 🚨',
+            '🚪 Unfortunately, we had to reject your order. Please get in touch with us for support. 🏥',
+            '🛑 Your order could not be completed. Reach out to us if you have questions or need help. 📧',
+            '🚫 Your order has been rejected. We apologize for the inconvenience. Please contact us for a resolution. 🔧',
+            '⚠️ We regret to inform you that your order has been rejected. Please contact us for further assistance. 📞',
+            '💔 Your order was not accepted. We apologize and are here to assist you with any issues. 📬',
+            '😞 Your order has been rejected. Please reach out to us for any queries or support. 💬',
+            '🚷 Your order could not be processed. We’re sorry for the inconvenience and are here to help. 🙋',
+            '🛑 Order rejection notice: We’re sorry, but there was a problem with your order. Contact us for more information. 📞',
+            '🚫 Your order has been rejected. We apologize for any trouble this may have caused. Please contact us for assistance. 📨'
+        ],
         preparing: [
             '👨‍🍳 Your order is being prepared with love and care! 🍲',
             '🔪 Our chef is working their magic on your meal! 🪄',
