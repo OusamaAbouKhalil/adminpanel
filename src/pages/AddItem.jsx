@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Header, SizesForm } from "../components";
 import { useCreateItem } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
+import { transformSizesToObject } from "../lib/utils";
 
 function AddItem() {
   const { id } = useParams();
@@ -42,11 +43,7 @@ function AddItem() {
       [name]: name === "item_price" && value ? parseFloat(value) : value,
     }));
   };
-  const handleSizeChange = (index, field, value) => {
-    const newSizes = [...sizesForm];
-    newSizes[index] = { ...newSizes[index], [field]: value };
-    setSizesForm(newSizes);
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,13 +52,10 @@ function AddItem() {
       if (itemImage) {
         itemImageUrl = await uploadImage(itemImage);
       }
-
-      const menuDataWithImage = {
-        ...menuData,
-        item_image: itemImageUrl,
-      };
-
-      const itemId = createItem({ rest_id: id, itemData: menuDataWithImage });
+      const itemId = createItem({
+        rest_id: id,
+        itemData: { ...menuData, sizes: transformSizesToObject(sizesForm), item_image: itemImageUrl }
+      });
 
       console.log("Menu item added with ID: ", itemId);
       Navigate(`/restaurants/${id}`);
@@ -83,7 +77,6 @@ function AddItem() {
                 <SizesForm
                   sizesForm={sizesForm}
                   setSizesForm={setSizesForm}
-                  handleSizeChange={handleSizeChange}
                 />
               ) : (
                 <input

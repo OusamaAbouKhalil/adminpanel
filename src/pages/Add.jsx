@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import CategoriesForm from "../components/Form/CategoriesForm";
 import { useCreateRestaurant } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
+import { transformSizesToObject } from "../lib/utils";
 
 function Add() {
   const { mutate: createRestaurant } = useCreateRestaurant();
@@ -189,19 +190,15 @@ function Add() {
       formData.Category = categoriesForm;
       formData.sub_categories = subCategoriesForm;
 
-      var subSizes = {};
-      console.log(sizesForm);
-      sizesForm.map((item) => (subSizes[item.name] = parseFloat(item.value)));
-      menuData.sizes = subSizes;
       setProgress(40);
 
       console.log(formData, menuData);
       const restRef = await createRestaurant({
-        formData: formData,
+        formData: { ...formData, sizes: transformSizesToObject(sizesForm) },
         menuData: {
           ...menuData,
           Category: categoriesForm.map((item) => item.trim()),
-          sub_categories: subCategoriesForm.map((item) => item.trim())
+          sub_categories: subCategoriesForm.map((item) => item.trim()),
         }
       });
 
@@ -216,11 +213,6 @@ function Add() {
       setProgress(0);
       setIsRestaurantPending(false);
     }
-  };
-  const handleSizeChange = (index, field, value) => {
-    const newSizes = [...sizesForm];
-    newSizes[index] = { ...newSizes[index], [field]: value };
-    setSizesForm(newSizes);
   };
 
   const handleCategoryChange = (index, value, isSubCategory = false) => {
@@ -384,7 +376,6 @@ function Add() {
                 <SizesForm
                   sizesForm={sizesForm}
                   setSizesForm={setSizesForm}
-                  handleSizeChange={handleSizeChange}
                 />
               ) : (
                 <input required

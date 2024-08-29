@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SizesForm = ({ sizesForm, setSizesForm, handleSizeChange }) => {
+const SizesForm = ({ sizesForm, setSizesForm }) => {
     const addSize = () => {
         setSizesForm(prev => [...prev, { name: "", value: 0 }]);
     };
@@ -9,6 +9,22 @@ const SizesForm = ({ sizesForm, setSizesForm, handleSizeChange }) => {
         const newSizes = [...sizesForm];
         newSizes.splice(index, 1);
         setSizesForm(newSizes);
+    };
+
+    const handleSizeChange = (index, field, value) => {
+        setSizesForm((prevSizes) => {
+            const newSizes = [...prevSizes];
+            const currentSize = newSizes[index];
+
+            if (field === "name") {
+                currentSize.name = value;
+            } else if (field === "value") {
+                currentSize.value = value;
+            }
+
+            newSizes[index] = currentSize;
+            return newSizes;
+        });
     };
 
 
