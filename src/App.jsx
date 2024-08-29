@@ -1,58 +1,47 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
-import { Navbar, Sidebar } from "./components"
-import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage, SendNotificationPage, EditNotificationPage, PromoCodesPage, OffersPage} from "./pages"
+import { Navbar, Sidebar } from "./components";
+import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage, SendNotificationPage, EditNotificationPage, PromoCodesPage, OffersPage } from "./pages";
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
 import Edit from './pages/Edit';
 import { ProtectedRoute } from './contexts/ProtectedRoutes';
-import PricesPage from './pages/PricesPage'; // price path
+import PricesPage from './pages/PricesPage';
 
-
-
-const App = () => {
-  return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<ProtectedRoute ch><Restaurants /></ProtectedRoute>} />
-            <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="restaurants" element={<ProtectedRoute><Restaurants /></ProtectedRoute>} />
-            <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-            <Route path="add" element={<ProtectedRoute><Add /></ProtectedRoute>} />
-            <Route path="restaurants/:id/additem" element={<ProtectedRoute><AddItem /></ProtectedRoute>} />
-            <Route path="restaurants/:id" element={<ProtectedRoute><Menu /></ProtectedRoute>} />
-            <Route path="restaurants/:id/edit" element={<ProtectedRoute><Edit /></ProtectedRoute>} />
-            <Route path="restaurants/:id/:item_id" element={<ProtectedRoute><Test /></ProtectedRoute>} />
-            <Route path="kanban" element={<ProtectedRoute><Kanban /></ProtectedRoute>} />
-            <Route path="calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
-            <Route path="prices" element={<ProtectedRoute><PricesPage /></ProtectedRoute>} />
-            <Route path="notification" element={<ProtectedRoute><SendNotificationPage/></ProtectedRoute>} />
-            <Route path="editnotification" element={<ProtectedRoute><EditNotificationPage/></ProtectedRoute>} />
-             <Route path="offers" element={<ProtectedRoute><OffersPage/></ProtectedRoute>} />
-            <Route path="promo" element={<ProtectedRoute><PromoCodesPage/></ProtectedRoute>} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
-  );
-};
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/login" element={<LoginPage />} />
+    <Route path="/" element={<MainLayout />}>
+      <Route index element={<ProtectedRoute><Restaurants /></ProtectedRoute>} />
+      <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="restaurants" element={<ProtectedRoute><Restaurants /></ProtectedRoute>} />
+      <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+      <Route path="add" element={<ProtectedRoute><Add /></ProtectedRoute>} />
+      <Route path="restaurants/:id/additem" element={<ProtectedRoute><AddItem /></ProtectedRoute>} />
+      <Route path="restaurants/:id" element={<ProtectedRoute><Menu /></ProtectedRoute>} />
+      <Route path="restaurants/:id/edit" element={<ProtectedRoute><Edit /></ProtectedRoute>} />
+      <Route path="restaurants/:id/:item_id" element={<ProtectedRoute><Test /></ProtectedRoute>} />
+      <Route path="kanban" element={<ProtectedRoute><Kanban /></ProtectedRoute>} />
+      <Route path="calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+      <Route path="prices" element={<ProtectedRoute><PricesPage /></ProtectedRoute>} />
+      <Route path="notification" element={<ProtectedRoute><SendNotificationPage /></ProtectedRoute>} />
+      <Route path="editnotification" element={<ProtectedRoute><EditNotificationPage /></ProtectedRoute>} />
+      <Route path="offers" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
+      <Route path="promo" element={<ProtectedRoute><PromoCodesPage /></ProtectedRoute>} />
+    </Route>
+  </Routes>
+);
 
 const MainLayout = () => {
   const { activeMenu } = useStateContext();
+  const sidebarClass = "w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white";
+  const contentClass = activeMenu ? 'dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full' : 'bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2';
 
   return (
     <div className="flex relative dark:bg-main-dark-bg">
-      {activeMenu && (
-        <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white">
-          <Sidebar />
-        </div>
-      )}
-      <div className={activeMenu ? 'dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full' : 'bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2'}>
+      {activeMenu && <div className={sidebarClass}><Sidebar /></div>}
+      <div className={contentClass}>
         <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
           <Navbar />
         </div>
@@ -61,5 +50,13 @@ const MainLayout = () => {
     </div>
   );
 };
+
+const App = () => (
+  <AuthProvider>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  </AuthProvider>
+);
 
 export default App;
