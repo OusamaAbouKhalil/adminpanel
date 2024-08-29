@@ -13,6 +13,7 @@ export const ContextProvider = ({ children }) => {
   const [activeMenu, setActiveMenu] = useState(true);
   const [isClicked, setIsClicked] = useState(initialState);
   const [screenSize, setScreenSize] = useState(undefined);
+  const [ordersList, setOrdersList] = useState([]);
   const [scheduleDates, setScheduleDates] = useState([]);
   const [financials, setFinancials] = useState({ expense: 0, budget: 0 });
   const [cards, setCards] = useState([]);
@@ -40,7 +41,9 @@ export const ContextProvider = ({ children }) => {
         cards,
         scheduleDates,
         setDrivers,
-        drivers
+        drivers,
+        ordersList,
+        setOrdersList,
       }}
     >
       {children}

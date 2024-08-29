@@ -1,59 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { OrdersTable, SpecialOrderCard } from "../components";
 import { useUpdateOrderStatus } from "../lib/query/queries";
-import { onSnapshot, collection } from "firebase/firestore";
-import { fsdb } from "../utils/firebaseconfig";
 import PendingOrders from "../components/Orders/PendingOrders";
-import sound from '/success.mp3';
+
+import { useStateContext } from "../contexts/ContextProvider";
 
 const Orders = () => {
   const [specialOrders, setSpecialOrders] = useState([]);
-  const [ordersList, setOrdersList] = useState([]);
+  const { ordersList } = useStateContext();
   const [openPendingOrders, setOpenPendingOrders] = useState(false);
   const [showCanceledOrders, setShowCanceledOrders] = useState(false); // State to toggle canceled orders view
   const [userHasInteracted, setUserHasInteracted] = useState(false); // Track user interaction
   const { mutate: updateOrderStatus } = useUpdateOrderStatus();
 
-
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(fsdb, "orders"),
-      (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          const orderData = { ...change.doc.data() };
-
-          setOrdersList((prevOrdersList) => {
-            const existingOrderIndex = prevOrdersList.findIndex(
-              (order) => order.order_id === orderData.order_id
-            );
-
-            if (existingOrderIndex !== -1) {
-              const updatedOrdersList = [...prevOrdersList];
-              updatedOrdersList[existingOrderIndex] = orderData;
-              return updatedOrdersList;
-            } else {
-              // New order, play sound if it's pending and user has interacted
-              if (orderData.status === "pending" && userHasInteracted) {
-                setTimeout(() => {
-                  const audio = new Audio(sound);
-                  audio.play().catch((error) => {
-                    console.error("Sound play error:", error);
-                  });
-                }, 100); // Delay of 100ms
-              }
-              return [...prevOrdersList, orderData];
-            }
-          });
-        });
-      },
-      (error) => {
-        console.error("Snapshot error:", error);
-      }
-    );
-
-    return () => unsubscribe();
-  }, [userHasInteracted]);
 
 
   // Set userHasInteracted to true on first interaction
@@ -88,9 +47,6 @@ const Orders = () => {
     setOpenPendingOrders(!openPendingOrders);
   };
 
-  const handleCanceledOrdersClick = () => {
-    setShowCanceledOrders(!showCanceledOrders);
-  };
 
   return (
     <>
