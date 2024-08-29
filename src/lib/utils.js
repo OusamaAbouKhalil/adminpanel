@@ -21,3 +21,10 @@ export const getLocationByCoordinates = async (lat, lng) => {
     console.error("Error fetching location: ", error);
   }
 };
+
+export const transformSizesToObject = (sizesForm) => {
+  return sizesForm.reduce((acc, { name, value }) => {
+    if (name) acc[name] = Number(value); // Convert value to number
+    return acc;
+  }, {});
+};
