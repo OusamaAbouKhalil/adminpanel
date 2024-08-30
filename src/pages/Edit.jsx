@@ -68,7 +68,7 @@ useEffect(() => {
       time: restaurant.time,
       title: restaurant.title,
       mapLink: restaurant.mapLink,
-      hours: restaurant.hours || {}, // Load hours data
+      hours: restaurant.hours || [], // Load hours data
     });
     setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
     setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
