@@ -174,8 +174,8 @@ function Edit() {
     e.preventDefault();
     try {
       setProgress(20);
-      let mainImageUrl;
-      let bgImageUrl;
+      let mainImageUrl = "";
+      let bgImageUrl = "";
       if (images.main_image) {
         mainImageUrl = await uploadImage(images.main_image);
       }
