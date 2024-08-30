@@ -2,7 +2,7 @@ import { GoogleMap, Marker } from '@react-google-maps/api';
 import React from 'react'
 
 const LocationRender = React.memo(({ markerPosition, onMapClick, isLoaded }) => {
-    const containerStyle = { height: "200px", width: "100%" };
+    const containerStyle = { height: "400px", width: "100%" };
 
     return (
         <div style={containerStyle}>

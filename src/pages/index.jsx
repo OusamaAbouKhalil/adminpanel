@@ -12,4 +12,5 @@ export { default as SendNotificationPage } from './SendNotificationPage';
 export { default as EditNotificationPage } from './EditNotificationPage';
 export { default as OffersPage } from './OffersPage';
 export {default as PromoCodesPage} from './PromoCodesPage'
+export {default as Titles} from './title_mangment'
 

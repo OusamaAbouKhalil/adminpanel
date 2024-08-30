@@ -13,7 +13,7 @@ import {
 } from "react-icons/bs";
 import { IoMdContacts } from "react-icons/io";
 import { RiContactsLine } from "react-icons/ri";
-import { FaDollarSign, FaBell, FaEdit,FaPercentage,FaGift   } from 'react-icons/fa'; // Import the money icon
+import { FaDollarSign, FaBell, FaEdit,FaPercentage,FaGift, FaApple   } from 'react-icons/fa'; // Import the money icon
 
 export const gridOrderImage = (props) => (
   <div>
@@ -27,14 +27,19 @@ export const gridOrderImage = (props) => (
 
 export const restaurantGrid = [
   {
+    headerText: "Location",
+    value: "location",
+    inputType: "text",
+  },
+  {
     headerText: "Restaurant Name",
     value: "rest_name",
     inputType: "text",
   },
   {
-    headerText: "Location",
-    value: "location",
-    inputType: "text",
+    headerText: "Status",
+    value: "isClosed",
+    inputType: "checkbox",
   },
   {
     headerText: "Main Image",
@@ -52,7 +57,11 @@ export const restaurantGrid = [
     inputType: "text",
     placeholder: "Categories (comma separated)",
   },
-
+  {
+    headerText: "Sub Categories",
+    value: "sub_categories",
+    inputType: "text",
+  },
   {
     headerText: "Time",
     value: "time",
@@ -60,20 +69,11 @@ export const restaurantGrid = [
     placeholder: "e.g.  20-30 min ",
   },
   {
-    headerText: "Sub Categories",
-    value: "sub_categories",
-    inputType: "text",
-  },
-  {
     headerText: "Title",
     value: "title",
     inputType: "text",
   },
-  {
-    headerText: "Status",
-    value: "isClosed",
-    inputType: "checkbox",
-  },
+  
 ];
 export const menuGrid = [
   {
@@ -297,6 +297,16 @@ export const links = [
       name: "promo", // Route name for the new page
       icon: <FaGift />, // Changed to Bell icon
     },
+  ],
+},
+{
+  title: "Personalization center",
+  links: [
+    {
+      name: "titles", // Route name for the new page
+      icon: <FaApple />, // Changed to Bell icon
+    },
+    
   ],
 },
   {
