@@ -12,6 +12,7 @@ import { uploadImage } from "../lib/firebase/api";
 function Edit() {
   const { id } = useParams();
   const { data: restaurant, isPending: isLoading, error } = useGetRestaurantById(id);
+  console.log(restaurant);
   const [progress, setProgress] = useState(0);
   const [userUpdatingComplete, setUserUpdatingComplete] = useState(false);
   const mainImageRef = useRef(null);
@@ -22,6 +23,7 @@ function Edit() {
     main_image: null,
     bg_image: null,
   });
+
 
   const [hours, setHours] = useState({
     Monday: [{ openingTime: "", closingTime: "" }],
@@ -46,39 +48,47 @@ function Edit() {
     time: "",
     title: [],
     mapLink: "",
-    hours=[]
+    hours: []
   });
   const [markerPosition, setMarkerPosition] = useState({
     lat: 33.26968841037753,
     lng: 35.20611613326288,
   });
 
-useEffect(() => {
-  if (restaurant) {
-    setFormData({
-      Category: restaurant.Category,
-      isClosed: restaurant.isClosed,
-      bg_image: restaurant.bg_image,
-      likes: [],
-      location: new GeoPoint(restaurant.location._lat, restaurant.location._long),
-      main_image: restaurant.main_image,
-      rating: restaurant.rating,
-      rest_name: restaurant.rest_name,
-      sub_categories: restaurant.sub_categories,
-      time: restaurant.time,
-      title: restaurant.title,
-      mapLink: restaurant.mapLink,
-      hours: restaurant.hours || [], // Load hours data
-    });
-    setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
-    setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
-    setSubCategoriesForm(restaurant.sub_categories.map((category) => (category)) || []);
-    setImageFiles({
-      main_image: restaurant.main_image,
-      bg_image: restaurant.bg_image,
-    });
-  }
-}, [restaurant]);
+  useEffect(() => {
+    if (restaurant) {
+      setFormData({
+        Category: restaurant.Category,
+        isClosed: restaurant.isClosed,
+        bg_image: restaurant.bg_image,
+        likes: [],
+        location: new GeoPoint(restaurant.location._lat, restaurant.location._long),
+        main_image: restaurant.main_image,
+        rating: restaurant.rating,
+        rest_name: restaurant.rest_name,
+        sub_categories: restaurant.sub_categories,
+        time: restaurant.time,
+        title: restaurant.title,
+        mapLink: restaurant.mapLink,
+        hours: restaurant.hours || {
+          Monday: [{ openingTime: "", closingTime: "" }],
+          Tuesday: [{ openingTime: "", closingTime: "" }],
+          Wednesday: [{ openingTime: "", closingTime: "" }],
+          Thursday: [{ openingTime: "", closingTime: "" }],
+          Friday: [{ openingTime: "", closingTime: "" }],
+          Saturday: [{ openingTime: "", closingTime: "" }],
+          Sunday: [{ openingTime: "", closingTime: "" }],
+        },
+      });
+      setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
+      setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
+      setSubCategoriesForm(restaurant.sub_categories.map((category) => (category)) || []);
+      setImages({
+        main_image: restaurant.main_image,
+        bg_image: restaurant.bg_image,
+      });
+    }
+  }, [restaurant]);
 
 
   const { isLoaded } = useJsApiLoader({
@@ -116,51 +126,51 @@ useEffect(() => {
     });
   };
 
-const handleAddPeriod = (day) => {
-  setFormData(prevState => {
-    const updatedHours = { ...prevState.hours };
-    if (!updatedHours[day]) {
-      updatedHours[day] = [];
-    }
-    updatedHours[day].push({ openingTime: "", closingTime: "" });
-    return { ...prevState, hours: updatedHours };
-  });
-};
+  const handleAddPeriod = (day) => {
+    setFormData(prevState => {
+      const updatedHours = { ...prevState.hours };
+      if (!updatedHours[day]) {
+        updatedHours[day] = [];
+      }
+      updatedHours[day].push({ openingTime: "", closingTime: "" });
+      return { ...prevState, hours: updatedHours };
+    });
+  };
 
-const handleRemovePeriod = (day, index) => {
-  setFormData(prevState => {
-    const updatedHours = { ...prevState.hours };
-    updatedHours[day].splice(index, 1);
-    return { ...prevState, hours: updatedHours };
-  });
-};
-// Render hours fields
-const renderHoursFields = () => (
-  Object.keys(formData.hours).map(day => (
-    <div key={day}>
-      <h3>{day}</h3>
-      {formData.hours[day].map((period, index) => (
-        <div key={index}>
-          <input
-            type="text"
-            placeholder="Opening Time"
-            value={period.openingTime || ""}
-            onChange={(e) => handleHoursChange(day, index, "openingTime", e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Closing Time"
-            value={period.closingTime || ""}
-            onChange={(e) => handleHoursChange(day, index, "closingTime", e.target.value)}
-          />
-          <button onClick={() => handleRemovePeriod(day, index)}>Remove</button>
-        </div>
-      ))}
-      <button onClick={() => handleAddPeriod(day)}>Add Period</button>
-    </div>
-  ))
-);
-  
+  const handleRemovePeriod = (day, index) => {
+    setFormData(prevState => {
+      const updatedHours = { ...prevState.hours };
+      updatedHours[day].splice(index, 1);
+      return { ...prevState, hours: updatedHours };
+    });
+  };
+  // Render hours fields
+  const renderHoursFields = () => (
+    Object.keys(formData.hours).map(day => (
+      <div key={day}>
+        <h3>{day}</h3>
+        {(Array.isArray(formData.hours[day]) ? formData.hours[day] : []).map((period, index) => (
+          <div key={index}>
+            <input
+              type="text"
+              placeholder="Opening Time"
+              value={period.openingTime || ""}
+              onChange={(e) => handleHoursChange(day, index, "openingTime", e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Closing Time"
+              value={period.closingTime || ""}
+              onChange={(e) => handleHoursChange(day, index, "closingTime", e.target.value)}
+            />
+            <button onClick={() => handleRemovePeriod(day, index)}>Remove</button>
+          </div>
+        ))}
+        <button onClick={() => handleAddPeriod(day)}>Add Period</button>
+      </div>
+    ))
+  );
+
   const handleImageChange = (event, type) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
@@ -272,13 +282,13 @@ const renderHoursFields = () => (
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="Category">
                 Categories
               </label>
-              <CategoriesForm categories={categoriesForm} setCategoriesForm={setCategoriesForm} />
+              <CategoriesForm categoriesForm={categoriesForm} setCategoriesForm={setCategoriesForm} />
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="sub_categories">
                 Sub-Categories
               </label>
-              <CategoriesForm categories={subCategoriesForm} setCategoriesForm={setSubCategoriesForm} />
+              <CategoriesForm categoriesForm={subCategoriesForm} setCategoriesForm={setSubCategoriesForm} />
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="main_image">
