@@ -21,7 +21,7 @@ function Edit() {
     main_image: null,
     bg_image: null,
   });
-  const [schedule, setSchedule] = useState({}); // State for schedule
+  const [schedule, setSchedule] = useState({});
   const [formData, setFormData] = useState({
     Category: [],
     isClosed: false,
@@ -40,8 +40,8 @@ function Edit() {
     lat: 33.26968841037753,
     lng: 35.20611613326288,
   });
-  const [isDirty, setIsDirty] = useState(false); // Track if there are unsaved changes
-  const [buttonDisabled, setButtonDisabled] = useState(false); // Disable button on submit
+  const [isDirty, setIsDirty] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
 
   useEffect(() => {
     if (restaurant) {
@@ -59,7 +59,7 @@ function Edit() {
         title: restaurant.title || [],
         mapLink: restaurant.mapLink || "",
       });
-      setSchedule(restaurant.hours || {}); // Initialize schedule
+      setSchedule(restaurant.hours || {});
       setMarkerPosition({
         lat: restaurant.location ? restaurant.location._lat : 33.26968841037753,
         lng: restaurant.location ? restaurant.location._long : 35.20611613326288,
@@ -86,7 +86,7 @@ function Edit() {
         ? prevState.title.filter(title => title !== clickedOption)
         : [...prevState.title, clickedOption],
     }));
-    setIsDirty(true); // Mark form as dirty
+    setIsDirty(true);
   };
 
   const onMapClick = useCallback((event) => {
@@ -98,7 +98,7 @@ function Edit() {
       location: new GeoPoint(lat, lng),
       mapLink: `https://www.google.com/maps?q=${lat},${lng}`,
     }));
-    setIsDirty(true); // Mark form as dirty
+    setIsDirty(true);
   }, []);
 
   const handleFileInputChange = (e) => {
@@ -109,7 +109,7 @@ function Edit() {
         ...prev,
         [e.target.name]: file,
       }));
-      setIsDirty(true); // Mark form as dirty
+      setIsDirty(true);
     }
   };
 
@@ -119,7 +119,7 @@ function Edit() {
       ...prevState,
       [name]: name === "isClosed" ? checked : value,
     }));
-    setIsDirty(true); // Mark form as dirty
+    setIsDirty(true);
   };
 
   const handleCategoryChange = (index, value, isSubCategory = false) => {
@@ -136,12 +136,12 @@ function Edit() {
         return newCategories;
       });
     }
-    setIsDirty(true); // Mark form as dirty
+    setIsDirty(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setButtonDisabled(true); // Disable button on submit
+    setButtonDisabled(true);
     try {
       setProgress(20);
       let mainImageUrl;
@@ -160,14 +160,14 @@ function Edit() {
         sub_categories: subCategoriesForm,
         main_image: mainImageUrl || formData.main_image,
         bg_image: bgImageUrl || formData.bg_image,
-        hours: schedule, // Include schedule in update
+        hours: schedule,
       });
       setProgress(100);
       setUserUpdatingComplete(true);
     } catch (error) {
       console.error("Error updating document:", error);
     } finally {
-      setButtonDisabled(false); // Re-enable button after submit
+      setButtonDisabled(false);
     }
   };
 
@@ -184,10 +184,9 @@ function Edit() {
               handleCategoryChange={handleCategoryChange}
             />
             <ScheduleTable
-              schedule={schedule}
+              schedule={schedule || {}}
               onChange={setSchedule}
             />
-            {/* File Inputs for Images */}
             <div className="mb-4">
               <label className="block text-gray-700 mb-2" htmlFor="main_image">
                 Main Image
@@ -212,7 +211,6 @@ function Edit() {
                 className="border border-gray-300 rounded-lg p-2"
               />
             </div>
-            {/* Map Component */}
             {isLoaded && (
               <Map
                 center={markerPosition}
