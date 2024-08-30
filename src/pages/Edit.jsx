@@ -10,8 +10,6 @@ import { useGetRestaurantById } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
 import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 import moment from 'moment';
-import TimePicker from 'react-time-picker';
-
 
 function Edit() {
   const { id } = useParams();
