@@ -4,6 +4,8 @@ import { SiShopware } from 'react-icons/si';
 import { MdOutlineCancel } from 'react-icons/md';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import { IoLogOutOutline } from 'react-icons/io5';
+import { AiOutlineLink } from 'react-icons/ai'; // Importing an icon for external links
+import { FaRegBuilding,FaComments  } from 'react-icons/fa'; // Importing an icon for the company
 
 import { links } from '../data/dummy';
 import { useStateContext } from '../contexts/ContextProvider';
@@ -14,6 +16,7 @@ function Sidebar() {
   const { logOut } = useAuth();
 
   const [openSection, setOpenSection] = useState(null);
+  const [openCompanySites, setOpenCompanySites] = useState(false); // New state for company sites
 
   const handleCloseSideBar = () => {
     if (activeMenu && screenSize <= 900) {
@@ -28,6 +31,10 @@ function Sidebar() {
 
   const handleSectionToggle = (title) => {
     setOpenSection(openSection === title ? null : title);
+  };
+
+  const toggleCompanySites = () => {
+    setOpenCompanySites(prev => !prev);
   };
 
   const activeLink = 'flex items-center gap-4 pl-6 py-2 rounded-lg text-white text-md bg-blue-800 hover:bg-blue-900 transition-colors duration-200 ease-in-out';
@@ -73,6 +80,49 @@ function Sidebar() {
                 </div>
               </div>
             ))}
+          </div>
+          {/* Company Sites Section */}
+          <div className="mt-6 px-4">
+            <p 
+              className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 cursor-pointer"
+              onClick={toggleCompanySites}
+            >
+              Company Sites
+            </p>
+            <div 
+              className={`overflow-hidden transition-all duration-300 ${openCompanySites ? 'max-h-screen' : 'max-h-0'}`}
+            >
+              <a
+                href="https://infiniterealm.tech"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors duration-200 ease-in-out"
+                onClick={handleCloseSideBar}
+              >
+                <FaRegBuilding size={20} />
+                <span className="text-md font-medium">Company Website</span>
+              </a>
+              <a
+                href="https://swiftgo-ems.wuaze.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-2 rounded-lg text-purple-600 dark:text-Purple-400 hover:bg-purple-100 dark:hover:bg-purple-700 transition-colors duration-200 ease-in-out mt-2"
+                onClick={handleCloseSideBar}
+              >
+                <AiOutlineLink size={20} />
+                <span className="text-md font-medium">EMS</span>
+              </a>
+              <a
+                href="https://tawk.to"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-2 rounded-lg text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-700 transition-colors duration-200 ease-in-out mt-2"
+                onClick={handleCloseSideBar}
+              >
+                <FaComments size={20} />
+                <span className="text-md font-medium">Chat support</span>
+              </a>
+            </div>
           </div>
           <div className="absolute bottom-0 w-full px-4 py-3 bg-gray-100 dark:bg-gray-700">
             <button

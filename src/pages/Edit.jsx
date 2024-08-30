@@ -8,7 +8,7 @@ import { restaurantGrid } from "../data/dummy";
 import CategoriesForm from "../components/Form/CategoriesForm";
 import { useGetRestaurantById } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
-import { FaPlusCircle, FaMinusCircle, FaSpinner } from 'react-icons/fa';
+import { FaPlusCircle, FaMinusCircle, FaTrash  } from 'react-icons/fa';
 
 
 
@@ -257,7 +257,6 @@ function Edit() {
     return `${hours}:${minutes.toString().padStart(2, '0')} ${period.toUpperCase()}`;
   };
   
-
   const renderHoursTable = () => (
     <div className="w-full p-6 bg-white rounded-xl shadow-lg mb-8">
       <h2 className="text-2xl font-semibold text-gray-900 mb-6">Business Hours</h2>
@@ -273,51 +272,58 @@ function Edit() {
           </thead>
           <tbody>
             {days.map((day) => (
-              <tr key={day} className="border-t border-gray-300 bg-white hover:bg-gray-100">
-                <td className="p-4 text-gray-700 font-medium align-top">
-                  {day}
-                </td>
-                <td colSpan={3} className="p-4">
-                  <div className="flex flex-col space-y-4">
-                    {formData.hours[day]?.map((period, timeIndex) => (
-                      <div key={`${day}-${timeIndex}`} className="flex items-center space-x-4">
-                        <input
-                          type="text"
-                          name="openingTime"
-                          value={period.openingTime || ""}
-                          onChange={(e) => handleHoursChange(e, day, timeIndex)}
-                          placeholder="8:00 AM"
-                          className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              <React.Fragment key={day}>
+                {formData.hours[day]?.map((period, timeIndex) => (
+                  <tr key={`${day}-${timeIndex}`} className="border-t border-gray-300 bg-white hover:bg-gray-100">
+                    <td className="p-4 text-gray-700 font-medium align-top">
+                      {day}
+                    </td>
+                    <td className="p-4">
+                      <input
+                        type="text"
+                        name="openingTime"
+                        value={period.openingTime || ""}
+                        onChange={(e) => handleHoursChange(e, day, timeIndex)}
+                        placeholder="7:59 AM"
+                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    <td className="p-4">
+                      <input
+                        type="text"
+                        name="closingTime"
+                        value={period.closingTime || ""}
+                        onChange={(e) => handleHoursChange(e, day, timeIndex)}
+                        placeholder="9:59 PM"
+                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center space-x-2 justify-center">
+                        {formData.hours[day]?.length > 1 && (
+                          <FaMinusCircle
+                            onClick={() => removeTimeSlot(day, timeIndex)}
+                            className="text-red-600 cursor-pointer hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            size={24}
+                          />
+                        )}
+                        {timeIndex === formData.hours[day]?.length - 1 && (
+                          <FaPlusCircle
+                            onClick={() => addNewTimeSlot(day)}
+                            className="text-green-600 cursor-pointer hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            size={24}
+                          />
+                        )}
+                        <FaTrash
+                          onClick={() => clearTimeSlot(day, timeIndex)}
+                          className="text-yellow-400 cursor-pointer hover:text-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          size={24}
                         />
-                        <input
-                          type="text"
-                          name="closingTime"
-                          value={period.closingTime || ""}
-                          onChange={(e) => handleHoursChange(e, day, timeIndex)}
-                          placeholder="10:00 PM"
-                          className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <div className="flex space-x-2">
-                          {formData.hours[day]?.length > 1 && (
-                            <FaMinusCircle
-                              onClick={() => removeTimeSlot(day, timeIndex)}
-                              className="text-red-600 cursor-pointer hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                              size={24}
-                            />
-                          )}
-                          {timeIndex === formData.hours[day]?.length - 1 && (
-                            <FaPlusCircle
-                              onClick={() => addNewTimeSlot(day)}
-                              className="text-blue-600 cursor-pointer hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              size={24}
-                            />
-                          )}
-                        </div>
                       </div>
-                    ))}
-                  </div>
-                </td>
-              </tr>
+                    </td>
+                  </tr>
+                ))}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
@@ -325,6 +331,30 @@ function Edit() {
     </div>
   );
   
+  // Function to handle clearing inputs for a specific time slot
+  const clearTimeSlot = (day, timeIndex) => {
+    // Get the current hours data
+    const currentHours = formData.hours[day] || [];
+    
+    // Create a new array with the specified slot cleared
+    const updatedHours = currentHours.map((period, index) =>
+      index === timeIndex
+        ? { openingTime: "", closingTime: "" } // Clear the specific slot
+        : period
+    );
+  
+    // Update the state with the new hours array
+    setFormData(prevState => ({
+      ...prevState,
+      hours: {
+        ...prevState.hours,
+        [day]: updatedHours
+      }
+    }));
+  };
+
+
+
   const removeTimeSlot = (day, timeIndex) => {
     setFormData(prevState => ({
       ...prevState,

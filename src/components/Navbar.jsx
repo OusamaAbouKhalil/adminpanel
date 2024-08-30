@@ -90,6 +90,7 @@ const Navbar = () => {
         {isClicked.userProfile && (<UserProfile />)}
       </div> */}
     </div>
+    
   );
 };
 
