@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { GeoPoint, updateDoc, doc } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
-import { Header, Map, ScheduleTable } from "../components";
-import { restaurantGrid } from "../data/dummy";
+import { Header, Map } from "../components";
 import CategoriesForm from "../components/Form/CategoriesForm";
 import { useGetRestaurantById } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
+import ScheduleTable from "../components/ScheduleTable"; // Import the ScheduleTable component
 
 function Edit() {
   const { id } = useParams();
@@ -47,26 +47,29 @@ function Edit() {
   useEffect(() => {
     if (restaurant) {
       setFormData({
-        Category: restaurant.Category,
-        isClosed: restaurant.isClosed,
-        bg_image: restaurant.bg_image,
-        likes: [],
-        location: new GeoPoint(restaurant.location._lat, restaurant.location._long),
-        main_image: restaurant.main_image,
-        rating: restaurant.rating,
-        rest_name: restaurant.rest_name,
-        sub_categories: restaurant.sub_categories,
-        time: restaurant.time,
-        title: restaurant.title,
-        mapLink: restaurant.mapLink,
+        Category: restaurant.Category || [],
+        isClosed: restaurant.isClosed || false,
+        bg_image: restaurant.bg_image || "",
+        likes: restaurant.likes || [],
+        location: restaurant.location ? new GeoPoint(restaurant.location._lat, restaurant.location._long) : new GeoPoint(33.26968841037753, 35.20611613326288),
+        main_image: restaurant.main_image || "",
+        rating: restaurant.rating || 0,
+        rest_name: restaurant.rest_name || "",
+        sub_categories: restaurant.sub_categories || [],
+        time: restaurant.time || "",
+        title: restaurant.title || [],
+        mapLink: restaurant.mapLink || "",
       });
       setSchedule(restaurant.hours || {}); // Initialize schedule
-      setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
-      setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
-      setSubCategoriesForm(restaurant.sub_categories.map((category) => (category)) || []);
+      setMarkerPosition({
+        lat: restaurant.location ? restaurant.location._lat : 33.26968841037753,
+        lng: restaurant.location ? restaurant.location._long : 35.20611613326288,
+      });
+      setCategoriesForm(restaurant.Category || []);
+      setSubCategoriesForm(restaurant.sub_categories || []);
       setImages({
-        main_image: restaurant.main_image,
-        bg_image: restaurant.bg_image,
+        main_image: restaurant.main_image || "",
+        bg_image: restaurant.bg_image || "",
       });
     }
   }, [restaurant]);
