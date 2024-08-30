@@ -9,7 +9,6 @@ import CategoriesForm from "../components/Form/CategoriesForm";
 import { useGetRestaurantById } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
 import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
-import moment from 'moment';
 
 function Edit() {
   const { id } = useParams();
@@ -213,10 +212,9 @@ function Edit() {
     "Sunday",
   ];
 
- 
   const handleHoursChange = (e, day, timeIndex) => {
     const { name, value } = e.target;
-    const formattedTime = moment(value, ["h:mm A", "HH:mm"]).format("h:mm A");
+    const formattedTime = formatTime(value);
   
     setFormData(prevState => ({
       ...prevState,
@@ -230,7 +228,99 @@ function Edit() {
       }
     }));
   };
+  
+  const formatTime = (timeString) => {
+    // Trim whitespace from both sides
+    timeString = timeString.trim();
+  
+    // Define regex to match time in various formats
+    const regex = /^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i;
+    const match = timeString.match(regex);
+  
+    if (!match) return timeString; // return original if not a valid time
+  
+    let [_, hours, minutes, period] = match;
+    hours = parseInt(hours, 10);
+    minutes = parseInt(minutes, 10);
+  
+    // Convert hours to 12-hour format
+    if (hours > 12) hours -= 12;
+    if (hours === 0) hours = 12;
+  
+    // Determine AM/PM if not provided
+    if (!period) {
+      period = (parseInt(hours, 10) < 12) ? 'AM' : 'PM';
+    }
+  
+    return `${hours}:${minutes.toString().padStart(2, '0')} ${period.toUpperCase()}`;
+  };
+  
 
+  const renderHoursTable = () => (
+    <div className="w-full md:w-3/4 p-6 bg-white rounded-xl shadow-lg mb-8">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6">Business Hours</h2>
+      <table className="w-full bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+        <thead className="bg-blue-500 text-white">
+          <tr>
+            <th className="p-4 text-left font-medium">Day</th>
+            <th className="p-4 text-left font-medium">Opening Time</th>
+            <th className="p-4 text-left font-medium">Closing Time</th>
+            <th className="p-4 text-left font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {days.map((day) => (
+            <tr key={day} className="border-t border-gray-300 bg-white hover:bg-gray-100">
+              <td className="p-4 text-gray-700 font-medium align-top">
+                {day}
+              </td>
+              <td colSpan={3} className="p-4">
+                <div className="flex flex-col space-y-4">
+                  {formData.hours[day]?.map((period, timeIndex) => (
+                    <div key={`${day}-${timeIndex}`} className="flex items-center space-x-4">
+                      <input
+                        type="text"
+                        name="openingTime"
+                        value={period.openingTime || ""}
+                        onChange={(e) => handleHoursChange(e, day, timeIndex)}
+                        placeholder="8:00 AM"
+                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <input
+                        type="text"
+                        name="closingTime"
+                        value={period.closingTime || ""}
+                        onChange={(e) => handleHoursChange(e, day, timeIndex)}
+                        placeholder="10:00 PM"
+                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <div className="flex space-x-2">
+                        {formData.hours[day]?.length > 1 && (
+                          <FaMinusCircle
+                            onClick={() => removeTimeSlot(day, timeIndex)}
+                            className="text-red-600 cursor-pointer hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            size={24}
+                          />
+                        )}
+                        {timeIndex === formData.hours[day]?.length - 1 && (
+                          <FaPlusCircle
+                            onClick={() => addNewTimeSlot(day)}
+                            className="text-blue-600 cursor-pointer hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            size={24}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+  
   const removeTimeSlot = (day, timeIndex) => {
     setFormData(prevState => ({
       ...prevState,
@@ -240,7 +330,7 @@ function Edit() {
       }
     }));
   };
-
+  
   const addNewTimeSlot = (day) => {
     setFormData(prevState => ({
       ...prevState,
@@ -250,75 +340,7 @@ function Edit() {
       }
     }));
   };
-  
-  
-const renderHoursTable = () => (
-  <div className="w-full md:w-3/4 p-6 bg-white rounded-xl shadow-lg mb-8">
-    <h2 className="text-2xl font-semibold text-gray-900 mb-6">Business Hours</h2>
-    <table className="w-full bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-      <thead className="bg-blue-500 text-white">
-        <tr>
-          <th className="p-4 text-left font-medium">Day</th>
-          <th className="p-4 text-left font-medium">Opening Time</th>
-          <th className="p-4 text-left font-medium">Closing Time</th>
-          <th className="p-4 text-left font-medium">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {days.map((day) => (
-          <tr key={day} className="border-t border-gray-300 bg-white hover:bg-gray-100">
-            <td className="p-4 text-gray-700 font-medium align-top">
-              {day}
-            </td>
-            <td colSpan={3} className="p-4">
-              <div className="flex flex-col space-y-4">
-                {formData.hours[day]?.map((period, timeIndex) => (
-                  <div key={`${day}-${timeIndex}`} className="flex items-center space-x-4">
-                    <input
-                      type="text"
-                      name="openingTime"
-                      value={period.openingTime || ""}
-                      onChange={(e) => handleHoursChange(e, day, timeIndex)}
-                      placeholder="8:00 AM"
-                      className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <input
-                      type="text"
-                      name="closingTime"
-                      value={period.closingTime || ""}
-                      onChange={(e) => handleHoursChange(e, day, timeIndex)}
-                      placeholder="10:00 PM"
-                      className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <div className="flex space-x-2">
-                      {formData.hours[day]?.length > 1 && (
-                        <FaMinusCircle
-                          onClick={() => removeTimeSlot(day, timeIndex)}
-                          className="text-red-600 cursor-pointer hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                          size={24}
-                        />
-                      )}
-                      {timeIndex === formData.hours[day]?.length - 1 && (
-                        <FaPlusCircle
-                          onClick={() => addNewTimeSlot(day)}
-                          className="text-blue-600 cursor-pointer hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          size={24}
-                        />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
 
-
-  
   const renderFormFields = () => (
     <>
       {restaurantGrid.map(item => (
