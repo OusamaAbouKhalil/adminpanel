@@ -1,8 +1,11 @@
 import React from 'react';
 
 const ScheduleTable = ({ schedule, onChange }) => {
+  // Check if schedule is undefined or not an object, default to an empty object
+  const safeSchedule = schedule || {};
+
   const handleTimeChange = (day, index, value) => {
-    const newSchedule = { ...schedule };
+    const newSchedule = { ...safeSchedule };
     if (!newSchedule[day]) newSchedule[day] = [];
     newSchedule[day][index] = value;
     onChange(newSchedule);
@@ -17,14 +20,14 @@ const ScheduleTable = ({ schedule, onChange }) => {
           <input
             type="text"
             placeholder="Opening Time"
-            value={(schedule[day] && schedule[day][0]) || ''}
+            value={(safeSchedule[day] && safeSchedule[day][0]) || ''}
             onChange={(e) => handleTimeChange(day, 0, e.target.value)}
             className="border border-gray-300 rounded-lg p-2 mr-2"
           />
           <input
             type="text"
             placeholder="Closing Time"
-            value={(schedule[day] && schedule[day][1]) || ''}
+            value={(safeSchedule[day] && safeSchedule[day][1]) || ''}
             onChange={(e) => handleTimeChange(day, 1, e.target.value)}
             className="border border-gray-300 rounded-lg p-2"
           />
