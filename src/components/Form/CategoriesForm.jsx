@@ -6,7 +6,7 @@ const CategoriesForm = ({
   handleCategoryChange,
   title,
 }) => {
-  // console.log(categoriesForm);
+  console.log(categoriesForm);
   const addCategory = () => {
     setCategoriesForm((prev) => [...prev, ""]);
   };
