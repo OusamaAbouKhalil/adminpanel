@@ -46,46 +46,40 @@ function Edit() {
     time: "",
     title: [],
     mapLink: "",
+    hours=[]
   });
   const [markerPosition, setMarkerPosition] = useState({
     lat: 33.26968841037753,
     lng: 35.20611613326288,
   });
 
-  useEffect(() => {
-    if (restaurant) {
-      setFormData({
-        Category: restaurant.Category,
-        isClosed: restaurant.isClosed,
-        bg_image: restaurant.bg_image,
-        likes: [],
-        location: new GeoPoint(restaurant.location._lat, restaurant.location._long),
-        main_image: restaurant.main_image,
-        rating: restaurant.rating,
-        rest_name: restaurant.rest_name,
-        sub_categories: restaurant.sub_categories,
-        time: restaurant.time,
-        title: restaurant.title,
-        mapLink: restaurant.mapLink,
-      });
-      setHours(restaurant.hours || {
-        Monday: [{ openingTime: "", closingTime: "" }],
-        Tuesday: [{ openingTime: "", closingTime: "" }],
-        Wednesday: [{ openingTime: "", closingTime: "" }],
-        Thursday: [{ openingTime: "", closingTime: "" }],
-        Friday: [{ openingTime: "", closingTime: "" }],
-        Saturday: [{ openingTime: "", closingTime: "" }],
-        Sunday: [{ openingTime: "", closingTime: "" }],
-      });
-      setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
-      setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
-      setSubCategoriesForm(restaurant.sub_categories.map((category) => (category)) || []);
-      setImages({
-        main_image: restaurant.main_image,
-        bg_image: restaurant.bg_image,
-      });
-    }
-  }, [restaurant]);
+useEffect(() => {
+  if (restaurant) {
+    setFormData({
+      Category: restaurant.Category,
+      isClosed: restaurant.isClosed,
+      bg_image: restaurant.bg_image,
+      likes: [],
+      location: new GeoPoint(restaurant.location._lat, restaurant.location._long),
+      main_image: restaurant.main_image,
+      rating: restaurant.rating,
+      rest_name: restaurant.rest_name,
+      sub_categories: restaurant.sub_categories,
+      time: restaurant.time,
+      title: restaurant.title,
+      mapLink: restaurant.mapLink,
+      hours: restaurant.hours || {}, // Load hours data
+    });
+    setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
+    setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
+    setSubCategoriesForm(restaurant.sub_categories.map((category) => (category)) || []);
+    setImageFiles({
+      main_image: restaurant.main_image,
+      bg_image: restaurant.bg_image,
+    });
+  }
+}, [restaurant]);
+
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -122,63 +116,51 @@ function Edit() {
     });
   };
 
-  const addTimeSlot = (day) => {
-    setHours(prevHours => ({
-      ...prevHours,
-      [day]: [...(prevHours[day] || []), { openingTime: "", closingTime: "" }]
-    }));
-  };
+const handleAddPeriod = (day) => {
+  setFormData(prevState => {
+    const updatedHours = { ...prevState.hours };
+    if (!updatedHours[day]) {
+      updatedHours[day] = [];
+    }
+    updatedHours[day].push({ openingTime: "", closingTime: "" });
+    return { ...prevState, hours: updatedHours };
+  });
+};
 
-  const removeTimeSlot = (day, index) => {
-    setHours(prevHours => {
-      const updatedHours = { ...prevHours };
-      updatedHours[day] = updatedHours[day].filter((_, i) => i !== index);
-      return updatedHours;
-    });
-  };
-
-  const renderHoursFields = () => (
-    <div className="w-full p-4 bg-gray-50 rounded-lg shadow-md mb-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-2">Operating Hours</h2>
-      {Object.keys(hours).map(day => (
-        <div key={day} className="mb-4">
-          <h3 className="text-lg font-semibold">{day}</h3>
-          {hours[day].map((slot, index) => (
-            <div key={index} className="flex items-center mb-2">
-              <input
-                type="time"
-                value={slot.openingTime}
-                onChange={(e) => handleHoursChange(day, index, "openingTime", e.target.value)}
-                className="border border-gray-300 rounded-lg p-2 w-1/2"
-              />
-              <span className="mx-2">-</span>
-              <input
-                type="time"
-                value={slot.closingTime}
-                onChange={(e) => handleHoursChange(day, index, "closingTime", e.target.value)}
-                className="border border-gray-300 rounded-lg p-2 w-1/2"
-              />
-              <button
-                type="button"
-                onClick={() => removeTimeSlot(day, index)}
-                className="ml-2 bg-red-500 text-white px-2 py-1 rounded"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => addTimeSlot(day)}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Add Time Slot
-          </button>
+const handleRemovePeriod = (day, index) => {
+  setFormData(prevState => {
+    const updatedHours = { ...prevState.hours };
+    updatedHours[day].splice(index, 1);
+    return { ...prevState, hours: updatedHours };
+  });
+};
+// Render hours fields
+const renderHoursFields = () => (
+  Object.keys(formData.hours).map(day => (
+    <div key={day}>
+      <h3>{day}</h3>
+      {formData.hours[day].map((period, index) => (
+        <div key={index}>
+          <input
+            type="text"
+            placeholder="Opening Time"
+            value={period.openingTime || ""}
+            onChange={(e) => handleHoursChange(day, index, "openingTime", e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Closing Time"
+            value={period.closingTime || ""}
+            onChange={(e) => handleHoursChange(day, index, "closingTime", e.target.value)}
+          />
+          <button onClick={() => handleRemovePeriod(day, index)}>Remove</button>
         </div>
       ))}
+      <button onClick={() => handleAddPeriod(day)}>Add Period</button>
     </div>
-  );
-
+  ))
+);
+  
   const handleImageChange = (event, type) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
