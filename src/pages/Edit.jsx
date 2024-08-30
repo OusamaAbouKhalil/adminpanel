@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { GeoPoint, updateDoc, doc } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
-import { Header, Map, ScheduleTable } from "../components";
+import { Header, Map } from "../components";
+import { restaurantGrid } from "../data/dummy";
 import CategoriesForm from "../components/Form/CategoriesForm";
 import { useGetRestaurantById } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
@@ -21,7 +22,17 @@ function Edit() {
     main_image: null,
     bg_image: null,
   });
-  const [schedule, setSchedule] = useState({});
+
+  const [hours, setHours] = useState({
+    Monday: [{ openingTime: "", closingTime: "" }],
+    Tuesday: [{ openingTime: "", closingTime: "" }],
+    Wednesday: [{ openingTime: "", closingTime: "" }],
+    Thursday: [{ openingTime: "", closingTime: "" }],
+    Friday: [{ openingTime: "", closingTime: "" }],
+    Saturday: [{ openingTime: "", closingTime: "" }],
+    Sunday: [{ openingTime: "", closingTime: "" }],
+  });
+
   const [formData, setFormData] = useState({
     Category: [],
     isClosed: false,
@@ -40,35 +51,38 @@ function Edit() {
     lat: 33.26968841037753,
     lng: 35.20611613326288,
   });
-  const [isDirty, setIsDirty] = useState(false);
-  const [buttonDisabled, setButtonDisabled] = useState(false);
 
   useEffect(() => {
     if (restaurant) {
       setFormData({
-        Category: restaurant.Category || [],
-        isClosed: restaurant.isClosed || false,
-        bg_image: restaurant.bg_image || "",
-        likes: restaurant.likes || [],
-        location: restaurant.location ? new GeoPoint(restaurant.location._lat, restaurant.location._long) : new GeoPoint(33.26968841037753, 35.20611613326288),
-        main_image: restaurant.main_image || "",
-        rating: restaurant.rating || 0,
-        rest_name: restaurant.rest_name || "",
-        sub_categories: restaurant.sub_categories || [],
-        time: restaurant.time || "",
-        title: restaurant.title || [],
-        mapLink: restaurant.mapLink || "",
+        Category: restaurant.Category,
+        isClosed: restaurant.isClosed,
+        bg_image: restaurant.bg_image,
+        likes: [],
+        location: new GeoPoint(restaurant.location._lat, restaurant.location._long),
+        main_image: restaurant.main_image,
+        rating: restaurant.rating,
+        rest_name: restaurant.rest_name,
+        sub_categories: restaurant.sub_categories,
+        time: restaurant.time,
+        title: restaurant.title,
+        mapLink: restaurant.mapLink,
       });
-      setSchedule(restaurant.hours || {}); // Ensure hours is always an object
-      setMarkerPosition({
-        lat: restaurant.location ? restaurant.location._lat : 33.26968841037753,
-        lng: restaurant.location ? restaurant.location._long : 35.20611613326288,
+      setHours(restaurant.hours || {
+        Monday: [{ openingTime: "", closingTime: "" }],
+        Tuesday: [{ openingTime: "", closingTime: "" }],
+        Wednesday: [{ openingTime: "", closingTime: "" }],
+        Thursday: [{ openingTime: "", closingTime: "" }],
+        Friday: [{ openingTime: "", closingTime: "" }],
+        Saturday: [{ openingTime: "", closingTime: "" }],
+        Sunday: [{ openingTime: "", closingTime: "" }],
       });
-      setCategoriesForm(restaurant.Category || []);
-      setSubCategoriesForm(restaurant.sub_categories || []);
+      setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
+      setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
+      setSubCategoriesForm(restaurant.sub_categories.map((category) => (category)) || []);
       setImages({
-        main_image: restaurant.main_image || "",
-        bg_image: restaurant.bg_image || "",
+        main_image: restaurant.main_image,
+        bg_image: restaurant.bg_image,
       });
     }
   }, [restaurant]);
@@ -86,7 +100,6 @@ function Edit() {
         ? prevState.title.filter(title => title !== clickedOption)
         : [...prevState.title, clickedOption],
     }));
-    setIsDirty(true);
   };
 
   const onMapClick = useCallback((event) => {
@@ -96,137 +109,239 @@ function Edit() {
     setFormData(prevState => ({
       ...prevState,
       location: new GeoPoint(lat, lng),
-      mapLink: `https://www.google.com/maps?q=${lat},${lng}`,
     }));
-    setIsDirty(true);
   }, []);
 
-  const handleFileInputChange = (e) => {
-    e.preventDefault();
-    const file = e.target.files[0];
-    if (file) {
-      setImages(prev => ({
-        ...prev,
-        [e.target.name]: file,
-      }));
-      setIsDirty(true);
-    }
+  const handleHoursChange = (day, index, field, value) => {
+    setHours(prevHours => {
+      const updatedHours = { ...prevHours };
+      const dayHours = updatedHours[day] || [];
+      dayHours[index] = { ...dayHours[index], [field]: value };
+      updatedHours[day] = dayHours;
+      return updatedHours;
+    });
   };
 
-  const handleChange = (e) => {
-    const { name, value, checked } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: name === "isClosed" ? checked : value,
+  const addTimeSlot = (day) => {
+    setHours(prevHours => ({
+      ...prevHours,
+      [day]: [...(prevHours[day] || []), { openingTime: "", closingTime: "" }]
     }));
-    setIsDirty(true);
   };
 
-  const handleCategoryChange = (index, value, isSubCategory = false) => {
-    if (value === '') {
-      (isSubCategory ? setSubCategoriesForm : setCategoriesForm)(prev => {
-        const newCategories = [...prev];
-        newCategories.splice(index, 1);
-        return newCategories;
-      });
-    } else {
-      (isSubCategory ? setSubCategoriesForm : setCategoriesForm)(prev => {
-        const newCategories = [...prev];
-        newCategories[index] = value;
-        return newCategories;
-      });
+  const removeTimeSlot = (day, index) => {
+    setHours(prevHours => {
+      const updatedHours = { ...prevHours };
+      updatedHours[day] = updatedHours[day].filter((_, i) => i !== index);
+      return updatedHours;
+    });
+  };
+
+  const renderHoursFields = () => (
+    <div className="w-full p-4 bg-gray-50 rounded-lg shadow-md mb-6">
+      <h2 className="text-xl font-bold text-gray-800 mb-2">Operating Hours</h2>
+      {Object.keys(hours).map(day => (
+        <div key={day} className="mb-4">
+          <h3 className="text-lg font-semibold">{day}</h3>
+          {hours[day].map((slot, index) => (
+            <div key={index} className="flex items-center mb-2">
+              <input
+                type="time"
+                value={slot.openingTime}
+                onChange={(e) => handleHoursChange(day, index, "openingTime", e.target.value)}
+                className="border border-gray-300 rounded-lg p-2 w-1/2"
+              />
+              <span className="mx-2">-</span>
+              <input
+                type="time"
+                value={slot.closingTime}
+                onChange={(e) => handleHoursChange(day, index, "closingTime", e.target.value)}
+                className="border border-gray-300 rounded-lg p-2 w-1/2"
+              />
+              <button
+                type="button"
+                onClick={() => removeTimeSlot(day, index)}
+                className="ml-2 bg-red-500 text-white px-2 py-1 rounded"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => addTimeSlot(day)}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Add Time Slot
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+
+  const handleImageChange = (event, type) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setImages(prevImages => ({
+        ...prevImages,
+        [type]: file,
+      }));
     }
-    setIsDirty(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setButtonDisabled(true);
     try {
       setProgress(20);
       let mainImageUrl;
       let bgImageUrl;
+
       if (images.main_image) {
         mainImageUrl = await uploadImage(images.main_image);
       }
-      setProgress(50);
+      setProgress(60);
       if (images.bg_image) {
         bgImageUrl = await uploadImage(images.bg_image);
       }
-      setProgress(70);
-      await updateDoc(doc(fsdb, "restaurants", id), {
+      setProgress(80);
+
+      const collectionRef = doc(fsdb, "restaurants", id);
+      console.log({ ...formData, hours });
+
+      await updateDoc(collectionRef, {
         ...formData,
-        Category: categoriesForm,
-        sub_categories: subCategoriesForm,
-        main_image: mainImageUrl || formData.main_image,
-        bg_image: bgImageUrl || formData.bg_image,
-        hours: schedule,
+        main_image: images.main_image ? mainImageUrl : formData.main_image,
+        bg_image: images.bg_image ? bgImageUrl : formData.bg_image,
+        Category: categoriesForm.map((item) => item.trim()),
+        sub_categories: subCategoriesForm.map((item) => item.trim()),
+        hours: hours,
       });
+
       setProgress(100);
       setUserUpdatingComplete(true);
     } catch (error) {
-      console.error("Error updating document:", error);
-    } finally {
-      setButtonDisabled(false);
+      console.error("Error updating document: ", error);
+      setProgress(0);
     }
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading restaurant data</div>;
 
   return (
     <>
       <Header />
-      <main className="flex justify-center">
-        <div className="w-full md:w-3/4 lg:w-2/4">
-          <h1 className="text-2xl font-bold mb-4">Edit Restaurant</h1>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <CategoriesForm
-              categories={categoriesForm}
-              subCategories={subCategoriesForm}
-              handleCategoryChange={handleCategoryChange}
-            />
-            <ScheduleTable
-              schedule={schedule || {}}
-              onChange={setSchedule}
-            />
+      <div className="container mx-auto p-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="w-full p-4 bg-gray-50 rounded-lg shadow-md mb-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Restaurant Details</h2>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2" htmlFor="main_image">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="rest_name">
+                Restaurant Name
+              </label>
+              <input
+                type="text"
+                id="rest_name"
+                value={formData.rest_name}
+                onChange={(e) => setFormData({ ...formData, rest_name: e.target.value })}
+                className="border border-gray-300 rounded-lg p-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="mapLink">
+                Map Link
+              </label>
+              <input
+                type="text"
+                id="mapLink"
+                value={formData.mapLink}
+                onChange={(e) => setFormData({ ...formData, mapLink: e.target.value })}
+                className="border border-gray-300 rounded-lg p-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="time">
+                Time
+              </label>
+              <input
+                type="text"
+                id="time"
+                value={formData.time}
+                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                className="border border-gray-300 rounded-lg p-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="rating">
+                Rating
+              </label>
+              <input
+                type="number"
+                id="rating"
+                value={formData.rating}
+                onChange={(e) => setFormData({ ...formData, rating: Number(e.target.value) })}
+                className="border border-gray-300 rounded-lg p-2 w-full"
+                min="0"
+                max="5"
+                step="0.1"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="Category">
+                Categories
+              </label>
+              <CategoriesForm categories={categoriesForm} setCategoriesForm={setCategoriesForm} />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="sub_categories">
+                Sub-Categories
+              </label>
+              <CategoriesForm categories={subCategoriesForm} setCategoriesForm={setSubCategoriesForm} />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="main_image">
                 Main Image
               </label>
               <input
                 type="file"
-                name="main_image"
-                onChange={handleFileInputChange}
+                id="main_image"
                 ref={mainImageRef}
+                onChange={(e) => handleImageChange(e, "main_image")}
                 className="border border-gray-300 rounded-lg p-2"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2" htmlFor="bg_image">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="bg_image">
                 Background Image
               </label>
               <input
                 type="file"
-                name="bg_image"
-                onChange={handleFileInputChange}
+                id="bg_image"
                 ref={bgImageRef}
+                onChange={(e) => handleImageChange(e, "bg_image")}
                 className="border border-gray-300 rounded-lg p-2"
               />
             </div>
-            {isLoaded && (
-              <Map
-                center={markerPosition}
-                onMapClick={onMapClick}
-              />
-            )}
-            <button
-              type="submit"
-              className={`bg-blue-500 text-white px-4 py-2 rounded-lg ${buttonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={buttonDisabled || !isDirty}
-            >
-              {buttonDisabled ? 'Updating...' : 'Update Restaurant'}
-            </button>
-          </form>
-        </div>
-      </main>
+          </div>
+          {renderHoursFields()}
+          <Map
+            isLoaded={isLoaded}
+            markerPosition={markerPosition}
+            onMapClick={onMapClick}
+            onMarkerPositionChange={(position) => setMarkerPosition(position)}
+            defaultCenter={markerPosition}
+            className="h-72 w-full"
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Update
+          </button>
+          {progress > 0 && <div>Progress: {progress}%</div>}
+          {userUpdatingComplete && <div>Update Complete!</div>}
+        </form>
+      </div>
     </>
   );
 }
