@@ -19,6 +19,15 @@ function Edit() {
     main_image: null,
     bg_image: null,
   });
+  const [schedule, setSchedule] = useState({
+    Monday: [],
+    Tuesday: [],
+    Wednesday: [],
+    Thursday: [],
+    Friday: [],
+    Saturday: [],
+    Sunday: []
+  });
 
   const [schedule, setSchedule] = useState({
     Monday: [],
