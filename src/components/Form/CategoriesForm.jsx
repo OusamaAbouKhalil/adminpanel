@@ -28,7 +28,7 @@ const CategoriesForm = ({
             onChange={(e) =>
               handleCategoryChange(index, e.target.value)
             }
-            className="bg-gray-200 rounded-lg p-1"
+            className="bg-gray-100 rounded-lg p-1"
           />
 
           <button

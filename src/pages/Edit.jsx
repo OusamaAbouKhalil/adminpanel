@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useJsApiLoader } from "@react-google-maps/api";
+import { useJsApiLoader, Marker } from "@react-google-maps/api";
 import { GeoPoint, updateDoc, doc } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
 import { Header, Map } from "../components";
@@ -8,7 +8,9 @@ import { restaurantGrid } from "../data/dummy";
 import CategoriesForm from "../components/Form/CategoriesForm";
 import { useGetRestaurantById } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
-import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
+import { FaPlusCircle, FaMinusCircle, FaSpinner } from 'react-icons/fa';
+
+
 
 function Edit() {
   const { id } = useParams();
@@ -257,67 +259,69 @@ function Edit() {
   
 
   const renderHoursTable = () => (
-    <div className="w-full md:w-3/4 p-6 bg-white rounded-xl shadow-lg mb-8">
+    <div className="w-full p-6 bg-white rounded-xl shadow-lg mb-8">
       <h2 className="text-2xl font-semibold text-gray-900 mb-6">Business Hours</h2>
-      <table className="w-full bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-        <thead className="bg-blue-500 text-white">
-          <tr>
-            <th className="p-4 text-left font-medium">Day</th>
-            <th className="p-4 text-left font-medium">Opening Time</th>
-            <th className="p-4 text-left font-medium">Closing Time</th>
-            <th className="p-4 text-left font-medium">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {days.map((day) => (
-            <tr key={day} className="border-t border-gray-300 bg-white hover:bg-gray-100">
-              <td className="p-4 text-gray-700 font-medium align-top">
-                {day}
-              </td>
-              <td colSpan={3} className="p-4">
-                <div className="flex flex-col space-y-4">
-                  {formData.hours[day]?.map((period, timeIndex) => (
-                    <div key={`${day}-${timeIndex}`} className="flex items-center space-x-4">
-                      <input
-                        type="text"
-                        name="openingTime"
-                        value={period.openingTime || ""}
-                        onChange={(e) => handleHoursChange(e, day, timeIndex)}
-                        placeholder="8:00 AM"
-                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <input
-                        type="text"
-                        name="closingTime"
-                        value={period.closingTime || ""}
-                        onChange={(e) => handleHoursChange(e, day, timeIndex)}
-                        placeholder="10:00 PM"
-                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <div className="flex space-x-2">
-                        {formData.hours[day]?.length > 1 && (
-                          <FaMinusCircle
-                            onClick={() => removeTimeSlot(day, timeIndex)}
-                            className="text-red-600 cursor-pointer hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                            size={24}
-                          />
-                        )}
-                        {timeIndex === formData.hours[day]?.length - 1 && (
-                          <FaPlusCircle
-                            onClick={() => addNewTimeSlot(day)}
-                            className="text-blue-600 cursor-pointer hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            size={24}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="w-full bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+          <thead className="bg-blue-500 text-white">
+            <tr>
+              <th className="p-4 text-left font-medium">Day</th>
+              <th className="p-4 text-left font-medium">Opening Time</th>
+              <th className="p-4 text-left font-medium">Closing Time</th>
+              <th className="p-4 text-left font-medium">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {days.map((day) => (
+              <tr key={day} className="border-t border-gray-300 bg-white hover:bg-gray-100">
+                <td className="p-4 text-gray-700 font-medium align-top">
+                  {day}
+                </td>
+                <td colSpan={3} className="p-4">
+                  <div className="flex flex-col space-y-4">
+                    {formData.hours[day]?.map((period, timeIndex) => (
+                      <div key={`${day}-${timeIndex}`} className="flex items-center space-x-4">
+                        <input
+                          type="text"
+                          name="openingTime"
+                          value={period.openingTime || ""}
+                          onChange={(e) => handleHoursChange(e, day, timeIndex)}
+                          placeholder="8:00 AM"
+                          className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <input
+                          type="text"
+                          name="closingTime"
+                          value={period.closingTime || ""}
+                          onChange={(e) => handleHoursChange(e, day, timeIndex)}
+                          placeholder="10:00 PM"
+                          className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <div className="flex space-x-2">
+                          {formData.hours[day]?.length > 1 && (
+                            <FaMinusCircle
+                              onClick={() => removeTimeSlot(day, timeIndex)}
+                              className="text-red-600 cursor-pointer hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                              size={24}
+                            />
+                          )}
+                          {timeIndex === formData.hours[day]?.length - 1 && (
+                            <FaPlusCircle
+                              onClick={() => addNewTimeSlot(day)}
+                              className="text-blue-600 cursor-pointer hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              size={24}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
   
@@ -341,12 +345,13 @@ function Edit() {
     }));
   };
 
+
   const renderFormFields = () => (
     <>
       {restaurantGrid.map(item => (
         <React.Fragment key={item.value}>
           {item.value === "location" && (
-            <div className="w-full p-4 bg-gray-100 rounded-lg shadow-md mb-6">
+            <div className="w-full p-4 rounded-lg shadow-md mb-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Location</h2>
               <Map
                 markerPosition={markerPosition}
@@ -359,13 +364,13 @@ function Edit() {
                   type="text"
                   value={formData.mapLink || ""}
                   readOnly
-                  className="bg-gray-200 border border-gray-300 rounded-lg p-2 w-full mt-1"
+                  className="bg-gray-100 border border-gray-300 rounded-lg p-2 w-full mt-1"
                 />
               </div>
             </div>
           )}
           {item.value === "title" && (
-            <div className="w-full md:w-1/2 p-4 bg-gray-100 rounded-lg shadow-md mb-6">
+            <div className="w-full md:w-1/2 p-4 rounded-lg shadow-md mb-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Title</h2>
               <div className="bg-white shadow-inner p-3 rounded-lg w-full">
                 <select
@@ -379,7 +384,7 @@ function Edit() {
                       value={option}
                       className={`p-2 ${formData.title.includes(option)
                         ? "bg-blue-500 text-white"
-                        : "bg-gray-200"
+                        : "bg-gray-100"
                         } rounded-sm`}
                     >
                       {option}
@@ -389,31 +394,69 @@ function Edit() {
               </div>
             </div>
           )}
-          {item.value === "Category" && (
-            <div className="w-full md:w-1/2 p-4 bg-gray-100 rounded-lg shadow-md mb-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Category</h2>
-              <CategoriesForm
-                categoriesForm={categoriesForm}
-                setCategoriesForm={setCategoriesForm}
-                handleCategoryChange={handleCategoryChange}
-                title="Add a Category"
-              />
-            </div>
-          )}
-          {item.value === "sub_categories" && (
-            <div className="w-full md:w-1/2 p-4 bg-gray-100 rounded-lg shadow-md mb-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Sub-Category</h2>
-              <CategoriesForm
-                categoriesForm={subCategoriesForm}
-                setCategoriesForm={setSubCategoriesForm}
-                handleCategoryChange={(index, value) => handleCategoryChange(index, value, true)}
-                title="Add a Sub-category"
-              />
+          {(item.value === "Category" || item.value === "sub_categories") && (
+            <div className="w-full md:w-1/2 p-4 rounded-lg shadow-md mb-6">
+              <div className="flex flex-col">
+                {item.value === "Category" && (
+                  <div className="mb-4">
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">Category</h2>
+                    <CategoriesForm
+                      categoriesForm={categoriesForm}
+                      setCategoriesForm={setCategoriesForm}
+                      handleCategoryChange={handleCategoryChange}
+                      title="Add a Category"
+                    />
+                  </div>
+                )}
+                {item.value === "sub_categories" && (
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">Sub-Category</h2>
+                    <CategoriesForm
+                      categoriesForm={subCategoriesForm}
+                      setCategoriesForm={setSubCategoriesForm}
+                      handleCategoryChange={(index, value) => handleCategoryChange(index, value, true)}
+                      title="Add a Sub-category"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           )}
           {item.value !== "location" && item.value !== "title" && item.value !== "Category" && item.value !== "sub_categories" && (
-            <div className="w-full md:w-1/2 p-4 bg-gray-100 rounded-lg shadow-md mb-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">{item.headerText}</h2>
+            <div className="w-full md:w-1/2 p-4 rounded-lg shadow-md mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800">{item.headerText}</h2>
+                {item.inputType === "checkbox" && (
+                  <label className="relative flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={formData[item.value] || false}
+                      onChange={() => handleToggleChange(item.value)}
+                    />
+                    <div
+                      className={`w-24 h-8 flex items-center rounded-full shadow-inner transition-colors duration-300 ease-in-out ${formData[item.value] ? "bg-green-500" : "bg-red-500"}`}
+                    >
+                      <span
+                        className={`absolute right-2 text-white ${formData[item.value] ? "opacity-0" : "opacity-100"}`}
+                        style={{ zIndex: 1 }}
+                      >
+                        Closed
+                      </span>
+                      <span
+                        className={`absolute left-2 text-white ${formData[item.value] ? "opacity-100" : "opacity-0"}`}
+                        style={{ zIndex: 1 }}
+                      >
+                        Open
+                      </span>
+                      <div
+                        className={`w-8 h-8 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${formData[item.value] ? "translate-x-16" : "translate-x-0"}`}
+                        style={{ zIndex: 2 }}
+                      />
+                    </div>
+                  </label>
+                )}
+              </div>
               <div className="flex items-center mt-2">
                 <input
                   ref={
@@ -423,11 +466,11 @@ function Edit() {
                         ? bgImageRef
                         : null
                   }
-                  className={`bg-gray-200 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
+                  className={`bg-gray-100  border border-gray-100 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
                     ? "hidden"
                     : ""
                     } ${item.inputType === "checkbox"
-                      ? "form-checkbox h-5 w-5"
+                      ? "hidden"
                       : "w-full"
                     }`}
                   type={item.inputType}
@@ -439,7 +482,7 @@ function Edit() {
                   }
                   checked={
                     item.inputType === "checkbox"
-                      ? formData.isClosed
+                      ? formData[item.value] || false
                       : undefined
                   }
                   onChange={
@@ -477,11 +520,6 @@ function Edit() {
                     />
                   </div>
                 )}
-                {item.inputType === "checkbox" && (
-                  <span className="ml-2 text-gray-700">
-                    {formData.isClosed ? "Closed" : "Open"}
-                  </span>
-                )}
               </div>
             </div>
           )}
@@ -489,22 +527,40 @@ function Edit() {
       ))}
     </>
   );
-
+  
+  // Function to handle toggle switch changes
+  const handleToggleChange = (value) => {
+    setFormData(prevData => ({
+      ...prevData,
+      [value]: !prevData[value]
+    }));
+  };
+  
+  
+  
+  
   return (
-    <div className="m-4 md:m-10 mt-24 p-4 md:p-10 bg-white rounded-3xl shadow-md">
+    <div className="m-4 md:m-10 mt-24 p-4 md:p-10 bg-gradient-to-r from-blue-30 to-white rounded-3xl">
       <Header title="Edit Restaurant" />
       <form onSubmit={handleSubmit}>
-        {isLoading ? <p className="text-gray-600">Loading...</p> : <div className="flex flex-wrap">{renderFormFields()} {renderHoursTable()}</div>}
+        {isLoading ? (
+          <p className="text-gray-600">Loading...</p>
+        ) : (
+          <div className="flex flex-wrap">
+            {renderFormFields()}
+            {renderHoursTable()}
+          </div>
+        )}
         <div className="flex justify-end pr-4">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-2 rounded-lg mt-4 shadow-md transition-colors"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-2 rounded-lg mt-4 transition-colors"
           >
             Update
           </button>
         </div>
         <div className="w-full mt-5">
-          <div className="bg-gray-300 rounded-full h-2.5">
+          <div className="bg-gray-100 rounded-full h-2.5">
             <div
               className="bg-blue-600 h-2.5 rounded-full transition-all"
               style={{ width: `${progress}%` }}
@@ -519,6 +575,6 @@ function Edit() {
       </form>
     </div>
   );
-}
+}  
 
 export default Edit;
