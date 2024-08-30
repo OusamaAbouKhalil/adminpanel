@@ -3,11 +3,10 @@ import { useParams } from "react-router-dom";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { GeoPoint, updateDoc, doc } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
-import { Header, Map } from "../components";
+import { Header, Map, ScheduleTable } from "../components";
 import CategoriesForm from "../components/Form/CategoriesForm";
 import { useGetRestaurantById } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
-import ScheduleTable from "../components/ScheduleTable"; // Import the ScheduleTable component
 
 function Edit() {
   const { id } = useParams();
