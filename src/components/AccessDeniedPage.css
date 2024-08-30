@@ -1,0 +1,69 @@
+/* AccessDeniedPage.css */
+.access-denied-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    background-color: #ffffff; /* White background */
+    color: #333333; /* Dark text color for contrast */
+    font-family: 'Roboto', sans-serif; /* Modern, clean font */
+    padding: 20px;
+    border: 1px solid #e0e0e0; /* Light border for separation */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border-radius: 10px; /* Rounded corners */
+    position: relative; /* For positioning background elements */
+    overflow: hidden; /* Hide overflow for clean design */
+  }
+  
+  .access-denied-page::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 100px;
+    height: 100px;
+    background-image: url('/path/to/incognito-icon.svg'); /* Path to your incognito background icon */
+    background-size: cover;
+    opacity: 0.1; /* Light opacity for background icon */
+    z-index: 1; /* Place it behind the content */
+  }
+  
+  .access-denied-page .warning-icon {
+    color: #ff6f6f; /* Red color for the warning icon */
+    margin-bottom: 20px;
+    z-index: 2; /* Ensure it's above the background icon */
+  }
+  
+  .access-denied-page h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    z-index: 2; /* Ensure it's above the background icon */
+  }
+  
+  .access-denied-page p {
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    z-index: 2; /* Ensure it's above the background icon */
+  }
+  
+  .access-denied-page a {
+    font-size: 1rem;
+    color: #007bff; /* Blue color for the link */
+    text-decoration: none;
+    font-weight: bold;
+    border: 2px solid #007bff; /* Blue border for button-like appearance */
+    border-radius: 5px; /* Rounded corners for button */
+    padding: 10px 20px; /* Padding for button size */
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    z-index: 2; /* Ensure it's above the background icon */
+  }
+  
+  .access-denied-page a:hover {
+    background-color: #007bff; /* Background color on hover */
+    color: #ffffff; /* White text color on hover */
+    border-color: #007bff; /* Match border color on hover */
+  }
+  
