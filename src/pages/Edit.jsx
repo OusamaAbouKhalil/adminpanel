@@ -19,15 +19,6 @@ function Edit() {
     main_image: null,
     bg_image: null,
   });
-  const [schedule, setSchedule] = useState({
-    Monday: [],
-    Tuesday: [],
-    Wednesday: [],
-    Thursday: [],
-    Friday: [],
-    Saturday: [],
-    Sunday: []
-  });
 
   const [schedule, setSchedule] = useState({
     Monday: [],
@@ -62,28 +53,27 @@ function Edit() {
   useEffect(() => {
     if (restaurant) {
       setFormData({
-        Category: restaurant.Category,
-        isClosed: restaurant.isClosed,
-        bg_image: restaurant.bg_image,
-        likes: [],
-        location: new GeoPoint(restaurant.location._lat, restaurant.location._long),
-        main_image: restaurant.main_image,
-        rating: restaurant.rating,
-        rest_name: restaurant.rest_name,
-        sub_categories: restaurant.sub_categories,
-        time: restaurant.time,
-        title: restaurant.title,
-        mapLink: restaurant.mapLink,
+        Category: restaurant.Category || [],
+        isClosed: restaurant.isClosed || false,
+        bg_image: restaurant.bg_image || "",
+        likes: restaurant.likes || [],
+        location: new GeoPoint(restaurant.location?._lat || 33.26968841037753, restaurant.location?._long || 35.20611613326288),
+        main_image: restaurant.main_image || "",
+        rating: restaurant.rating || 0,
+        rest_name: restaurant.rest_name || "",
+        sub_categories: restaurant.sub_categories || [],
+        time: restaurant.time || "",
+        title: restaurant.title || [],
+        mapLink: restaurant.mapLink || "",
       });
-      setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
-      setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
-      setSubCategoriesForm(restaurant.sub_categories.map((category) => (category)) || []);
+      setMarkerPosition({ lat: restaurant.location?._lat || 33.26968841037753, lng: restaurant.location?._long || 35.20611613326288 });
+      setCategoriesForm(restaurant.Category ? restaurant.Category.map((category) => category) : []);
+      setSubCategoriesForm(restaurant.sub_categories ? restaurant.sub_categories.map((category) => category) : []);
       setImages({
-        main_image: restaurant.main_image,
-        bg_image: restaurant.bg_image,
+        main_image: restaurant.main_image || "",
+        bg_image: restaurant.bg_image || "",
       });
 
-      // Set initial schedule
       setSchedule(restaurant.hours || {
         Monday: [],
         Tuesday: [],
@@ -219,17 +209,17 @@ function Edit() {
       {Object.keys(schedule).map(day => (
         <div key={day} className="mb-4">
           <h3 className="text-lg font-semibold text-gray-700">{day}</h3>
-          {schedule[day].map((slot, index) => (
+          {(schedule[day] || []).map((slot, index) => (
             <div key={index} className="flex items-center mb-2">
               <input
                 type="time"
-                value={slot.openingTime}
+                value={slot.openingTime || ""}
                 onChange={(e) => handleScheduleChange(day, index, 'openingTime', e.target.value)}
                 className="border rounded-lg p-2 mr-2"
               />
               <input
                 type="time"
-                value={slot.closingTime}
+                value={slot.closingTime || ""}
                 onChange={(e) => handleScheduleChange(day, index, 'closingTime', e.target.value)}
                 className="border rounded-lg p-2 mr-2"
               />
