@@ -190,8 +190,8 @@ function Edit() {
         ...formData,
         main_image: images.main_image ? mainImageUrl : formData.main_image,
         bg_image: images.bg_image ? bgImageUrl : formData.bg_image,
-        Category: categoriesForm.map((item) => item.trim()),
-        sub_categories: subCategoriesForm.map((item) => item.trim()),
+        Category: categoriesForm.map((item) => item.trim()).filter(Boolean),
+        sub_categories: subCategoriesForm.map((item) => item.trim()).filter(Boolean),
         hours: schedule,
       });
 
@@ -235,7 +235,7 @@ function Edit() {
           <button
             type="button"
             onClick={() => addScheduleSlot(day)}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded-lg"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-4 rounded-lg"
           >
             Add Slot
           </button>
@@ -245,12 +245,26 @@ function Edit() {
   );
 
   return (
-    <div className="container mx-auto p-4">
+    <div>
       <Header />
-      {isLoading ? <div>Loading...</div> : error ? <div>Error loading data.</div> :
-        <form onSubmit={handleSubmit}>
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-6">Edit Restaurant</h1>
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+          {/* Main Image Upload */}
           <div className="mb-4">
-            <label htmlFor="rest_name" className="block text-gray-700 text-sm font-bold mb-2">Restaurant Name</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Main Image</label>
+            <input type="file" name="main_image" onChange={handleFileInputChange} className="border rounded-lg p-2 w-full" />
+          </div>
+
+          {/* Background Image Upload */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Background Image</label>
+            <input type="file" name="bg_image" onChange={handleFileInputChange} className="border rounded-lg p-2 w-full" />
+          </div>
+
+          {/* Restaurant Name */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">Restaurant Name</label>
             <input
               type="text"
               name="rest_name"
@@ -259,86 +273,31 @@ function Edit() {
               className="border rounded-lg p-2 w-full"
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="time" className="block text-gray-700 text-sm font-bold mb-2">Opening Time</label>
-            <input
-              type="text"
-              name="time"
-              value={formData.time}
-              onChange={handleChange}
-              className="border rounded-lg p-2 w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="Category" className="block text-gray-700 text-sm font-bold mb-2">Categories</label>
-            {categoriesForm.map((category, index) => (
-              <input
-                key={index}
-                type="text"
-                value={category}
-                onChange={(e) => handleCategoryChange(index, e.target.value)}
-                className="border rounded-lg p-2 w-full mb-2"
-              />
-            ))}
-            <button
-              type="button"
-              onClick={() => setCategoriesForm(prev => [...prev, ""])}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded-lg"
-            >
-              Add Category
-            </button>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="sub_categories" className="block text-gray-700 text-sm font-bold mb-2">Sub Categories</label>
-            {subCategoriesForm.map((subCategory, index) => (
-              <input
-                key={index}
-                type="text"
-                value={subCategory}
-                onChange={(e) => handleCategoryChange(index, e.target.value, true)}
-                className="border rounded-lg p-2 w-full mb-2"
-              />
-            ))}
-            <button
-              type="button"
-              onClick={() => setSubCategoriesForm(prev => [...prev, ""])}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded-lg"
-            >
-              Add Sub Category
-            </button>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="main_image" className="block text-gray-700 text-sm font-bold mb-2">Main Image</label>
-            <input
-              type="file"
-              name="main_image"
-              onChange={handleFileInputChange}
-              className="border rounded-lg p-2 w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="bg_image" className="block text-gray-700 text-sm font-bold mb-2">Background Image</label>
-            <input
-              type="file"
-              name="bg_image"
-              onChange={handleFileInputChange}
-              className="border rounded-lg p-2 w-full"
-            />
-          </div>
-          {renderScheduleFields()}
-          <Map
-            onMapClick={onMapClick}
-            markerPosition={markerPosition}
-            isLoaded={isLoaded}
+
+          {/* Categories */}
+          <CategoriesForm
+            categories={categoriesForm}
+            onCategoryChange={handleCategoryChange}
+            onSubCategoryChange={handleCategoryChange}
+            subCategories={subCategoriesForm}
           />
-          <button
-            type="submit"
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg"
-          >
-            Update Restaurant
-          </button>
+
+          {/* Schedule */}
+          {renderScheduleFields()}
+
+          {/* Submit Button */}
+          <div className="flex items-center justify-between">
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+            >
+              Save Changes
+            </button>
+            {progress > 0 && <p className="text-green-600">Progress: {progress}%</p>}
+          </div>
         </form>
-      }
+      </div>
+      {userUpdatingComplete && <p className="text-green-600">Update Successful!</p>}
     </div>
   );
 }
