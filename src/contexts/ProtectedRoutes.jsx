@@ -9,11 +9,12 @@ import { collection, onSnapshot } from "firebase/firestore";
 import sound from '/success.mp3';
 
 export const ProtectedRoute = ({ children }) => {
-    const { currentUser } = useAuth();
+    const { currentUser, logOut } = useAuth();
     const { setDrivers, setOrdersList } = useStateContext();
     const location = useLocation()
     useEffect(() => {
-        if (!currentUser) {
+        if (!currentUser || !currentUser.email) {
+            logOut();
             return <Navigate to="/login" replace />;
         }
 
