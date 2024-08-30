@@ -246,11 +246,11 @@ function Edit() {
 
   return (
     <div className="container mx-auto p-4">
-      <Header title="Edit Restaurant" />
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex flex-col md:flex-row">
-          <div className="flex-1 md:mr-4">
-            <label className="block text-gray-700">Restaurant Name</label>
+      <Header />
+      {isLoading ? <div>Loading...</div> : error ? <div>Error loading data.</div> :
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="rest_name" className="block text-gray-700 text-sm font-bold mb-2">Restaurant Name</label>
             <input
               type="text"
               name="rest_name"
@@ -259,24 +259,56 @@ function Edit() {
               className="border rounded-lg p-2 w-full"
             />
           </div>
-          <div className="flex-1 md:ml-4">
-            <label className="block text-gray-700">Rating</label>
+          <div className="mb-4">
+            <label htmlFor="time" className="block text-gray-700 text-sm font-bold mb-2">Opening Time</label>
             <input
-              type="number"
-              name="rating"
-              value={formData.rating}
+              type="text"
+              name="time"
+              value={formData.time}
               onChange={handleChange}
               className="border rounded-lg p-2 w-full"
-              min="0"
-              max="5"
-              step="0.1"
             />
           </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row">
-          <div className="flex-1 md:mr-4">
-            <label className="block text-gray-700">Main Image</label>
+          <div className="mb-4">
+            <label htmlFor="Category" className="block text-gray-700 text-sm font-bold mb-2">Categories</label>
+            {categoriesForm.map((category, index) => (
+              <input
+                key={index}
+                type="text"
+                value={category}
+                onChange={(e) => handleCategoryChange(index, e.target.value)}
+                className="border rounded-lg p-2 w-full mb-2"
+              />
+            ))}
+            <button
+              type="button"
+              onClick={() => setCategoriesForm(prev => [...prev, ""])}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded-lg"
+            >
+              Add Category
+            </button>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="sub_categories" className="block text-gray-700 text-sm font-bold mb-2">Sub Categories</label>
+            {subCategoriesForm.map((subCategory, index) => (
+              <input
+                key={index}
+                type="text"
+                value={subCategory}
+                onChange={(e) => handleCategoryChange(index, e.target.value, true)}
+                className="border rounded-lg p-2 w-full mb-2"
+              />
+            ))}
+            <button
+              type="button"
+              onClick={() => setSubCategoriesForm(prev => [...prev, ""])}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded-lg"
+            >
+              Add Sub Category
+            </button>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="main_image" className="block text-gray-700 text-sm font-bold mb-2">Main Image</label>
             <input
               type="file"
               name="main_image"
@@ -284,8 +316,8 @@ function Edit() {
               className="border rounded-lg p-2 w-full"
             />
           </div>
-          <div className="flex-1 md:ml-4">
-            <label className="block text-gray-700">Background Image</label>
+          <div className="mb-4">
+            <label htmlFor="bg_image" className="block text-gray-700 text-sm font-bold mb-2">Background Image</label>
             <input
               type="file"
               name="bg_image"
@@ -293,32 +325,20 @@ function Edit() {
               className="border rounded-lg p-2 w-full"
             />
           </div>
-        </div>
-
-        <CategoriesForm
-          categories={categoriesForm}
-          onChange={(index, value) => handleCategoryChange(index, value)}
-          onAdd={() => handleCategoryChange(categoriesForm.length, "")}
-        />
-
-        <CategoriesForm
-          categories={subCategoriesForm}
-          onChange={(index, value) => handleCategoryChange(index, value, true)}
-          onAdd={() => handleCategoryChange(subCategoriesForm.length, "", true)}
-        />
-
-        {renderScheduleFields()}
-
-        <button
-          type="submit"
-          disabled={progress < 100}
-          className={`py-2 px-4 rounded-lg font-bold ${
-            progress === 100 ? "bg-green-500 hover:bg-green-700" : "bg-gray-500 cursor-not-allowed"
-          } text-white`}
-        >
-          {progress === 100 ? "Update" : "Updating..."}
-        </button>
-      </form>
+          {renderScheduleFields()}
+          <Map
+            onMapClick={onMapClick}
+            markerPosition={markerPosition}
+            isLoaded={isLoaded}
+          />
+          <button
+            type="submit"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg"
+          >
+            Update Restaurant
+          </button>
+        </form>
+      }
     </div>
   );
 }
