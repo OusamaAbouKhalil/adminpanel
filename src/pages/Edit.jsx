@@ -59,7 +59,7 @@ function Edit() {
         title: restaurant.title || [],
         mapLink: restaurant.mapLink || "",
       });
-      setSchedule(restaurant.hours || {});
+      setSchedule(restaurant.hours || {}); // Ensure hours is always an object
       setMarkerPosition({
         lat: restaurant.location ? restaurant.location._lat : 33.26968841037753,
         lng: restaurant.location ? restaurant.location._long : 35.20611613326288,
