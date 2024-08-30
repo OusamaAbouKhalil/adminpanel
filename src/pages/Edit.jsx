@@ -8,6 +8,10 @@ import { restaurantGrid } from "../data/dummy";
 import CategoriesForm from "../components/Form/CategoriesForm";
 import { useGetRestaurantById } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
+import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
+import moment from 'moment';
+import TimePicker from 'react-time-picker';
+
 
 function Edit() {
   const { id } = useParams();
@@ -34,10 +38,12 @@ function Edit() {
     "Fresh & Supermarkets",
     "National Brands",
   ];
+
   const [imageFiles, setImageFiles] = useState({
     main_image: null,
     bg_image: null,
   });
+
   const [formData, setFormData] = useState({
     Category: [],
     isClosed: false,
@@ -51,38 +57,56 @@ function Edit() {
     time: "",
     title: [],
     mapLink: "",
+    hours: {
+      Monday: [{ openingTime: "", closingTime: "" }],
+      Tuesday: [{ openingTime: "", closingTime: "" }],
+      Wednesday: [{ openingTime: "", closingTime: "" }],
+      Thursday: [{ openingTime: "", closingTime: "" }],
+      Friday: [{ openingTime: "", closingTime: "" }],
+      Saturday: [{ openingTime: "", closingTime: "" }],
+      Sunday: [{ openingTime: "", closingTime: "" }],
+    },
   });
+
   const [markerPosition, setMarkerPosition] = useState({
     lat: 33.26968841037753,
     lng: 35.20611613326288,
   });
+
   useEffect(() => {
     if (restaurant) {
       setFormData({
-        Category: restaurant.Category,
-        isClosed: restaurant.isClosed,
-        bg_image: restaurant.bg_image,
-        likes: [],
-        location: new GeoPoint(restaurant.location._lat, restaurant.location._long),
-        main_image: restaurant.main_image,
-        rating: restaurant.rating,
-        rest_name: restaurant.rest_name,
-        sub_categories: restaurant.sub_categories,
-        time: restaurant.time,
-        title: restaurant.title,
-        mapLink: restaurant.mapLink,
+        Category: restaurant.Category || [],
+        isClosed: restaurant.isClosed || false,
+        bg_image: restaurant.bg_image || "",
+        likes: restaurant.likes || [],
+        location: new GeoPoint(restaurant.location?._lat || 33.26968841037753, restaurant.location?._long || 35.20611613326288),
+        main_image: restaurant.main_image || "",
+        rating: restaurant.rating || 0,
+        rest_name: restaurant.rest_name || "",
+        sub_categories: restaurant.sub_categories || [],
+        time: restaurant.time || "",
+        title: restaurant.title || [],
+        mapLink: restaurant.mapLink || "",
+        hours: restaurant.hours || {
+          Monday: [{ openingTime: "", closingTime: "" }],
+          Tuesday: [{ openingTime: "", closingTime: "" }],
+          Wednesday: [{ openingTime: "", closingTime: "" }],
+          Thursday: [{ openingTime: "", closingTime: "" }],
+          Friday: [{ openingTime: "", closingTime: "" }],
+          Saturday: [{ openingTime: "", closingTime: "" }],
+          Sunday: [{ openingTime: "", closingTime: "" }],
+        }
       });
-      setMarkerPosition({ lat: restaurant.location._lat, lng: restaurant.location._long });
-      setCategoriesForm(restaurant.Category.map((category) => (category)) || []);
-      setSubCategoriesForm(restaurant.sub_categories.map((category) => (category)) || []);
+      setMarkerPosition({ lat: restaurant.location?._lat || 33.26968841037753, lng: restaurant.location?._long || 35.20611613326288 });
+      setCategoriesForm(restaurant.Category || []);
+      setSubCategoriesForm(restaurant.sub_categories || []);
       setImageFiles({
-        main_image: restaurant.main_image,
-        bg_image: restaurant.bg_image,
+        main_image: restaurant.main_image || null,
+        bg_image: restaurant.bg_image || null,
       });
     }
-
   }, [restaurant]);
-
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -154,7 +178,7 @@ function Edit() {
     try {
       setProgress(20);
       let mainImageUrl;
-      let bgImageUrl
+      let bgImageUrl;
       if (images.main_image) {
         mainImageUrl = await uploadImage(images.main_image);
       }
@@ -165,13 +189,12 @@ function Edit() {
       setProgress(80);
 
       const collectionRef = doc(fsdb, "restaurants", id);
-      console.log(formData);
       await updateDoc(collectionRef, {
         ...formData,
         main_image: images.main_image ? mainImageUrl : formData.main_image,
         bg_image: images.bg_image ? bgImageUrl : formData.bg_image,
-        Category: categoriesForm.map((item) => item.trim()),
-        sub_categories: subCategoriesForm.map((item) => item.trim())
+        Category: categoriesForm.map(item => item.trim()),
+        sub_categories: subCategoriesForm.map(item => item.trim())
       });
 
       setProgress(100);
@@ -181,207 +204,301 @@ function Edit() {
       setProgress(0);
     }
   };
- 
-const renderFormFields = () => (
-  <>
-    {restaurantGrid.map((item) => (
-      <React.Fragment key={item.value}>
-        {item.value === "location" && (
-          <div className="w-full p-4 bg-gray-50 rounded-lg shadow-md mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Location</h2>
-            <Map
-              markerPosition={markerPosition}
-              onMapClick={onMapClick}
-              isLoaded={isLoaded}
-            />
-            <div className="mt-4">
-              <label className="block font-semibold text-gray-700">Location Link</label>
-              <input
-                type="text"
-                value={formData.mapLink || ""}
-                readOnly
-                className="bg-gray-100 border border-gray-300 rounded-lg p-2 w-full mt-1"
-              />
-            </div>
-          </div>
-        )}
-        {item.value === "title" && (
-          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-6 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Title</h2>
-            <div className="bg-gray-100 shadow-inner p-3 rounded-lg w-full">
-              <select
-                multiple
-                className="bg-white p-2 rounded-lg text-center w-full"
-                onChange={handleSelectChange}
-              >
-                {titles.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
-                    className={`p-2 ${formData.title.includes(option)
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200"
-                      } rounded-sm`}
-                  >
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {item.value === "status" && (
-              <div className="ml-4 w-full md:w-1/2">
-                <label className="block font-semibold text-gray-700">Status</label>
-                <div className="flex items-center mt-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.isClosed}
-                    onChange={handleChange}
-                    name="isClosed"
-                    className="form-checkbox h-5 w-5"
-                  />
-                  <span className="ml-2 text-gray-700">
-                    {formData.isClosed ? "Closed" : "Open"}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        {item.value === "Category" && (
-          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Category</h2>
-            <CategoriesForm
-              categoriesForm={categoriesForm}
-              setCategoriesForm={setCategoriesForm}
-              handleCategoryChange={handleCategoryChange}
-              title="Add a Category"
-            />
-          </div>
-        )}
-        {item.value === "sub_categories" && (
-          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Sub-Category</h2>
-            <CategoriesForm
-              categoriesForm={subCategoriesForm}
-              setCategoriesForm={setSubCategoriesForm}
-              handleCategoryChange={(index, value) =>
-                handleCategoryChange(index, value, true)
-              }
-              title="Add a Sub-category"
-            />
-          </div>
-        )}
-        {item.value !== "location" && item.value !== "title" && item.value !== "Category" && item.value !== "sub_categories" && (
-          <div className="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg shadow-md mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">{item.headerText}</h2>
-            <div className="flex items-center mt-2">
-              <input
-                ref={
-                  item.value === "main_image"
-                    ? mainImageRef
-                    : item.value === "bg_image"
-                      ? bgImageRef
-                      : null
-                }
-                className={`bg-gray-100 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
-                  ? "hidden"
-                  : ""
-                  } ${item.inputType === "checkbox"
-                    ? "form-checkbox h-5 w-5"
-                    : "w-full"
-                  }`}
-                type={item.inputType}
-                name={item.value}
-                value={
-                  item.inputType === "file"
-                    ? undefined
-                    : formData[item.value]
-                }
-                checked={
-                  item.inputType === "checkbox"
-                    ? formData.isClosed
-                    : undefined
-                }
-                onChange={
-                  item.inputType === "file"
-                    ? handleFileInputChange
-                    : handleChange
-                }
-                placeholder={item.placeholder || ""}
-              />
-              {imageFiles[item.value] && (
-                <div className="relative mt-2">
-                  <div
-                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-bold opacity-0 hover:opacity-100 transition-opacity rounded-md cursor-pointer"
-                    style={{ zIndex: 10 }}
-                    onClick={() => {
-                      if (item.value === "main_image") {
-                        mainImageRef.current.click();
-                      } else if (item.value === "bg_image") {
-                        bgImageRef.current.click();
-                      }
-                    }}
-                  >
-                    Change Image
-                  </div>
-                  <img
-                    src={imageFiles[item.value]}
-                    alt={item.headerText}
-                    style={{
-                      objectFit: "cover",
-                      width: "100%",
-                      height: "100%",
-                      maxHeight: "200px",
-                    }}
-                    className="rounded-md w-16 h-16 border-2 border-gray-300 object-cover"
-                  />
-                </div>
-              )}
-              {item.inputType === "checkbox" && (
-                <span className="ml-2 text-gray-700">
-                  {formData.isClosed ? "Closed" : "Open"}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-      </React.Fragment>
-    ))}
-  </>
-);
 
-return (
-  <div className="m-4 md:m-10 mt-24 p-4 md:p-10 bg-white rounded-3xl">
-    <Header title="Edit Restaurant" />
-    <form onSubmit={handleSubmit}>
-      {isLoading ? <p>Loading...</p> : <div className="flex flex-wrap">{renderFormFields()}</div>}
-      <div className="flex justify-end pr-4">
-        <button
-          key="submit"
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mx-2 rounded-lg mt-4 shadow-md transition-colors"
-        >
-          Update
-        </button>
-      </div>
-      <div className="w-full mt-5">
-        <div className="bg-gray-300 rounded-full h-2.5 dark:bg-gray-700">
-          <div
-            className="bg-blue-600 h-2.5 rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-        {userUpdatingComplete && (
-          <p className="text-green-500 mt-2">
-            This Restaurant has successfully been updated!
-          </p>
-        )}
-      </div>
-    </form>
+  const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+ 
+  const handleHoursChange = (e, day, timeIndex) => {
+    const { name, value } = e.target;
+    const formattedTime = moment(value, ["h:mm A", "HH:mm"]).format("h:mm A");
+  
+    setFormData(prevState => ({
+      ...prevState,
+      hours: {
+        ...prevState.hours,
+        [day]: prevState.hours[day].map((period, index) =>
+          index === timeIndex
+            ? { ...period, [name]: formattedTime }
+            : period
+        )
+      }
+    }));
+  };
+
+  const removeTimeSlot = (day, timeIndex) => {
+    setFormData(prevState => ({
+      ...prevState,
+      hours: {
+        ...prevState.hours,
+        [day]: prevState.hours[day].filter((_, index) => index !== timeIndex),
+      }
+    }));
+  };
+
+  const addNewTimeSlot = (day) => {
+    setFormData(prevState => ({
+      ...prevState,
+      hours: {
+        ...prevState.hours,
+        [day]: [...(prevState.hours[day] || []), { openingTime: "", closingTime: "" }]
+      }
+    }));
+  };
+  
+  
+const renderHoursTable = () => (
+  <div className="w-full md:w-3/4 p-6 bg-white rounded-xl shadow-lg mb-8">
+    <h2 className="text-2xl font-semibold text-gray-900 mb-6">Business Hours</h2>
+    <table className="w-full bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+      <thead className="bg-blue-500 text-white">
+        <tr>
+          <th className="p-4 text-left font-medium">Day</th>
+          <th className="p-4 text-left font-medium">Opening Time</th>
+          <th className="p-4 text-left font-medium">Closing Time</th>
+          <th className="p-4 text-left font-medium">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {days.map((day) => (
+          <tr key={day} className="border-t border-gray-300 bg-white hover:bg-gray-100">
+            <td className="p-4 text-gray-700 font-medium align-top">
+              {day}
+            </td>
+            <td colSpan={3} className="p-4">
+              <div className="flex flex-col space-y-4">
+                {formData.hours[day]?.map((period, timeIndex) => (
+                  <div key={`${day}-${timeIndex}`} className="flex items-center space-x-4">
+                    <input
+                      type="text"
+                      name="openingTime"
+                      value={period.openingTime || ""}
+                      onChange={(e) => handleHoursChange(e, day, timeIndex)}
+                      placeholder="8:00 AM"
+                      className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      name="closingTime"
+                      value={period.closingTime || ""}
+                      onChange={(e) => handleHoursChange(e, day, timeIndex)}
+                      placeholder="10:00 PM"
+                      className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div className="flex space-x-2">
+                      {formData.hours[day]?.length > 1 && (
+                        <FaMinusCircle
+                          onClick={() => removeTimeSlot(day, timeIndex)}
+                          className="text-red-600 cursor-pointer hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                          size={24}
+                        />
+                      )}
+                      {timeIndex === formData.hours[day]?.length - 1 && (
+                        <FaPlusCircle
+                          onClick={() => addNewTimeSlot(day)}
+                          className="text-blue-600 cursor-pointer hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          size={24}
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   </div>
 );
 
 
+  
+  const renderFormFields = () => (
+    <>
+      {restaurantGrid.map(item => (
+        <React.Fragment key={item.value}>
+          {item.value === "location" && (
+            <div className="w-full p-4 bg-gray-100 rounded-lg shadow-md mb-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Location</h2>
+              <Map
+                markerPosition={markerPosition}
+                onMapClick={onMapClick}
+                isLoaded={isLoaded}
+              />
+              <div className="mt-4">
+                <label className="block font-semibold text-gray-700">Location Link</label>
+                <input
+                  type="text"
+                  value={formData.mapLink || ""}
+                  readOnly
+                  className="bg-gray-200 border border-gray-300 rounded-lg p-2 w-full mt-1"
+                />
+              </div>
+            </div>
+          )}
+          {item.value === "title" && (
+            <div className="w-full md:w-1/2 p-4 bg-gray-100 rounded-lg shadow-md mb-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Title</h2>
+              <div className="bg-white shadow-inner p-3 rounded-lg w-full">
+                <select
+                  multiple
+                  className="bg-white p-2 rounded-lg text-center w-full"
+                  onChange={handleSelectChange}
+                >
+                  {titles.map(option => (
+                    <option
+                      key={option}
+                      value={option}
+                      className={`p-2 ${formData.title.includes(option)
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                        } rounded-sm`}
+                    >
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+          {item.value === "Category" && (
+            <div className="w-full md:w-1/2 p-4 bg-gray-100 rounded-lg shadow-md mb-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Category</h2>
+              <CategoriesForm
+                categoriesForm={categoriesForm}
+                setCategoriesForm={setCategoriesForm}
+                handleCategoryChange={handleCategoryChange}
+                title="Add a Category"
+              />
+            </div>
+          )}
+          {item.value === "sub_categories" && (
+            <div className="w-full md:w-1/2 p-4 bg-gray-100 rounded-lg shadow-md mb-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Sub-Category</h2>
+              <CategoriesForm
+                categoriesForm={subCategoriesForm}
+                setCategoriesForm={setSubCategoriesForm}
+                handleCategoryChange={(index, value) => handleCategoryChange(index, value, true)}
+                title="Add a Sub-category"
+              />
+            </div>
+          )}
+          {item.value !== "location" && item.value !== "title" && item.value !== "Category" && item.value !== "sub_categories" && (
+            <div className="w-full md:w-1/2 p-4 bg-gray-100 rounded-lg shadow-md mb-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">{item.headerText}</h2>
+              <div className="flex items-center mt-2">
+                <input
+                  ref={
+                    item.value === "main_image"
+                      ? mainImageRef
+                      : item.value === "bg_image"
+                        ? bgImageRef
+                        : null
+                  }
+                  className={`bg-gray-200 border border-gray-300 rounded-lg p-2 ${item.inputType === "file" && imageFiles[item.value]
+                    ? "hidden"
+                    : ""
+                    } ${item.inputType === "checkbox"
+                      ? "form-checkbox h-5 w-5"
+                      : "w-full"
+                    }`}
+                  type={item.inputType}
+                  name={item.value}
+                  value={
+                    item.inputType === "file"
+                      ? undefined
+                      : formData[item.value]
+                  }
+                  checked={
+                    item.inputType === "checkbox"
+                      ? formData.isClosed
+                      : undefined
+                  }
+                  onChange={
+                    item.inputType === "file"
+                      ? handleFileInputChange
+                      : handleChange
+                  }
+                  placeholder={item.placeholder || ""}
+                />
+                {imageFiles[item.value] && (
+                  <div className="relative mt-2">
+                    <div
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-bold opacity-0 hover:opacity-100 transition-opacity rounded-md cursor-pointer"
+                      style={{ zIndex: 10 }}
+                      onClick={() => {
+                        if (item.value === "main_image") {
+                          mainImageRef.current.click();
+                        } else if (item.value === "bg_image") {
+                          bgImageRef.current.click();
+                        }
+                      }}
+                    >
+                      Change Image
+                    </div>
+                    <img
+                      src={imageFiles[item.value]}
+                      alt={item.headerText}
+                      style={{
+                        objectFit: "cover",
+                        width: "100%",
+                        height: "100%",
+                        maxHeight: "200px",
+                      }}
+                      className="rounded-md w-16 h-16 border-2 border-gray-300 object-cover"
+                    />
+                  </div>
+                )}
+                {item.inputType === "checkbox" && (
+                  <span className="ml-2 text-gray-700">
+                    {formData.isClosed ? "Closed" : "Open"}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+        </React.Fragment>
+      ))}
+    </>
+  );
+
+  return (
+    <div className="m-4 md:m-10 mt-24 p-4 md:p-10 bg-white rounded-3xl shadow-md">
+      <Header title="Edit Restaurant" />
+      <form onSubmit={handleSubmit}>
+        {isLoading ? <p className="text-gray-600">Loading...</p> : <div className="flex flex-wrap">{renderFormFields()} {renderHoursTable()}</div>}
+        <div className="flex justify-end pr-4">
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-2 rounded-lg mt-4 shadow-md transition-colors"
+          >
+            Update
+          </button>
+        </div>
+        <div className="w-full mt-5">
+          <div className="bg-gray-300 rounded-full h-2.5">
+            <div
+              className="bg-blue-600 h-2.5 rounded-full transition-all"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          {userUpdatingComplete && (
+            <p className="text-green-500 mt-2">
+              This Restaurant has successfully been updated!
+            </p>
+          )}
+        </div>
+      </form>
+    </div>
+  );
 }
 
 export default Edit;
