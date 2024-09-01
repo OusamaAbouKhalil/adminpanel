@@ -3,7 +3,6 @@ import {
   AiOutlineCalendar,
 } from "react-icons/ai";
 import {
-  FiShoppingBag,
   FiStar,
   FiShoppingCart,
 } from "react-icons/fi";
@@ -13,7 +12,7 @@ import {
 } from "react-icons/bs";
 import { IoMdContacts } from "react-icons/io";
 import { RiContactsLine } from "react-icons/ri";
-import { FaDollarSign, FaBell, FaEdit,FaPercentage,FaGift, FaApple   } from 'react-icons/fa'; // Import the money icon
+import { FaDollarSign, FaBell, FaEdit,FaPercentage,FaGift, FaApple, FaImage, FaDesktop,FaReceipt,FaStore   } from 'react-icons/fa'; // Import the money icon
 
 export const gridOrderImage = (props) => (
   <div>
@@ -246,7 +245,7 @@ export const links = [
     links: [
       {
         name: "dashboard",
-        icon: <FiShoppingBag />,
+        icon: <FaDesktop size={20}/>,
       },
     ],
   },
@@ -256,11 +255,11 @@ export const links = [
     links: [
       {
         name: "restaurants",
-        icon: <RiContactsLine />,
+        icon: <FaStore size={20}/>,
       },
       {
         name: "orders",
-        icon: <IoMdContacts />,
+        icon: <FaReceipt size={20}/>,
       },
     ],
   },
@@ -269,7 +268,7 @@ export const links = [
     links: [
       {
         name: "prices", // Route name for the new page
-        icon: <FaDollarSign />, // Money icon
+        icon: <FaDollarSign size={20}/>, // Money icon
       },
     ],
   },
@@ -278,11 +277,11 @@ export const links = [
   links: [
     {
       name: "notification", // Route name for the new page
-      icon: <FaBell />, // Changed to Bell icon
+      icon: <FaBell size={20}/>, // Changed to Bell icon
     },
     {
       name: "editnotification", // Route name for the new page
-      icon: <FaEdit />, // Changed to Bell icon
+      icon: <FaEdit size={20}/>, // Changed to Bell icon
     },
   ],
 },
@@ -291,11 +290,11 @@ export const links = [
   links: [
     {
       name: "offers", // Route name for the new page
-      icon: <FaPercentage />, // Changed to Bell icon
+      icon: <FaPercentage size={20}/>, // Changed to Bell icon
     },
     {
       name: "promo", // Route name for the new page
-      icon: <FaGift />, // Changed to Bell icon
+      icon: <FaGift size={20} />, // Changed to Bell icon
     },
   ],
 },
@@ -304,7 +303,11 @@ export const links = [
   links: [
     {
       name: "titles", // Route name for the new page
-      icon: <FaApple />, // Changed to Bell icon
+      icon: <FaApple size={20} />, // Changed to Bell icon
+    },
+    {
+      name: "banners", 
+      icon: <FaImage size={20} />, // Changed to Bell icon
     },
     
   ],
@@ -314,11 +317,11 @@ export const links = [
     links: [
       {
         name: "calendar",
-        icon: <AiOutlineCalendar />,
+        icon: <AiOutlineCalendar size={20} />,
       },
       {
         name: "kanban",
-        icon: <BsKanban />,
+        icon: <BsKanban size={20} />,
       },
     ],
   },

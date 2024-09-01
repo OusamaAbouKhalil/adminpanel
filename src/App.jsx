@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
 import { Navbar, Sidebar } from "./components";
 import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage, SendNotificationPage,
-   EditNotificationPage, PromoCodesPage, OffersPage,Titles } from "./pages";
+   EditNotificationPage, PromoCodesPage, OffersPage,Titles,DealsPage } from "./pages";
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
 import Edit from './pages/Edit';
@@ -31,27 +31,41 @@ const AppRoutes = () => (
       <Route path="offers" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
       <Route path="promo" element={<ProtectedRoute><PromoCodesPage /></ProtectedRoute>} />
       <Route path="titles" element={<ProtectedRoute><Titles /></ProtectedRoute>} />
+      <Route path="banners" element={<ProtectedRoute><DealsPage /></ProtectedRoute>} />
+
     </Route>
   </Routes>
 );
 
 const MainLayout = () => {
   const { activeMenu } = useStateContext();
-  const sidebarClass = "w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white";
-  const contentClass = activeMenu ? 'dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full' : 'bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2';
+
+  // Sidebar width class based on active state
+  const sidebarClass = activeMenu 
+    ? "w-64 fixed sidebar dark:bg-secondary-dark-bg bg-white" 
+    : "w-20 fixed sidebar dark:bg-secondary-dark-bg bg-white";
+
+  // Content area class that adjusts based on the sidebar's state
+  const contentClass = activeMenu 
+    ? 'dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-64 w-full transition-all duration-300'
+    : 'bg-main-bg dark:bg-main-dark-bg w-full min-h-screen md:ml-20 flex-2 transition-all duration-300';
 
   return (
     <div className="flex relative dark:bg-main-dark-bg">
-      {activeMenu && <div className={sidebarClass}><Sidebar /></div>}
+      <div className={sidebarClass}>
+        <Sidebar />
+      </div>
       <div className={contentClass}>
-        <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
-          <Navbar />
-        </div>
+        <br />
+        <br />
+        <Navbar />
         <Outlet />  {/* This is where nested routes will be rendered */}
       </div>
     </div>
   );
 };
+
+
 
 const App = () => (
   <AuthProvider>
