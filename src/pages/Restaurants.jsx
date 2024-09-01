@@ -66,7 +66,7 @@ export default function Restaurants() {
       </div>
       {isLoading && restaurants.length === 0 ? (
         <div className="flex justify-center items-center h-64">
-          <p className="text-gray-500">Loading...</p>
+                  <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
         </div>
       ) : (
         <div>
