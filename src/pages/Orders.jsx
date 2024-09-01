@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { OrdersTable, SpecialOrderCard } from "../components";
 import { useUpdateOrderStatus } from "../lib/query/queries";
 import PendingOrders from "../components/Orders/PendingOrders";
-
 import { useStateContext } from "../contexts/ContextProvider";
+import { startOfDay, endOfDay } from 'date-fns';
 
 const Orders = () => {
   const [specialOrders, setSpecialOrders] = useState([]);
-  const { ordersList } = useStateContext();
+  const { ordersList, setDayOrders, dayOrders } = useStateContext();
   const [openPendingOrders, setOpenPendingOrders] = useState(false);
   const [showCanceledOrders, setShowCanceledOrders] = useState(false); // State to toggle canceled orders view
   const [userHasInteracted, setUserHasInteracted] = useState(false); // Track user interaction
   const { mutate: updateOrderStatus } = useUpdateOrderStatus();
-
-
 
   // Set userHasInteracted to true on first interaction
   useEffect(() => {
@@ -42,16 +42,19 @@ const Orders = () => {
     (order) => order.status === "pending"
   ).length;
 
-
   const handlePendingOrdersClick = () => {
     setOpenPendingOrders(!openPendingOrders);
   };
-
 
   return (
     <>
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+          <DatePicker
+            selected={dayOrders || new Date()}
+            onChange={(date) => setDayOrders(date)}
+            className="mb-4 md:mb-0 md:w-64 p-2 border border-gray-300 rounded-lg shadow-sm"
+          />
           <button
             className="relative bg-gradient-to-r from-blue-500 to-blue-700 hover:opacity-80 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
             onClick={handlePendingOrdersClick}
@@ -63,7 +66,6 @@ const Orders = () => {
               </span>
             )}
           </button>
-
         </div>
 
         {openPendingOrders && (
