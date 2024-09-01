@@ -53,7 +53,7 @@ const handleSaveClick = async (key) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-green-500"></div>
       </div>
     );
   }
@@ -85,7 +85,7 @@ const handleSaveClick = async (key) => {
           const packageDescription = key === '10Offer' ? 'Basic Package' : key === '100Offer' ? 'Premium Package' : 'Custom Package';
 
           return (
-            <li key={key} className="bg-gradient-to-r from-blue-500 to-green-500 p-6 rounded-lg shadow-md text-white">
+            <li key={key} className="bg-gradient-to-r from-green-500 to-green-500 p-6 rounded-lg shadow-md text-white">
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-2xl font-bold">{packageDescription}</p>
@@ -98,14 +98,14 @@ const handleSaveClick = async (key) => {
                         type="number"
                         value={tempValue}
                         onChange={(e) => setTempValue(e.target.value)}
-                        className="w-24 text-lg font-medium p-3 rounded-lg border border-gray-300 text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-24 text-lg font-medium p-3 rounded-lg border border-gray-300 text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                         min="0"
                         max="100"
                         disabled={saving}
                       />
                       <button
                         onClick={() => handleSaveClick(key)}
-                        className={`px-4 py-2 text-white rounded-lg ${saving ? 'bg-gray-600' : 'bg-blue-600'} hover:bg-blue-700 focus:outline-none`}
+                        className={`px-4 py-2 text-white rounded-lg ${saving ? 'bg-gray-600' : 'bg-green-600'} hover:bg-green-700 focus:outline-none`}
                         disabled={saving}
                       >
                         {saving ? 'Saving...' : 'Save'}
@@ -114,7 +114,7 @@ const handleSaveClick = async (key) => {
                   ) : (
                     <button
                       onClick={() => handleEditClick(key, value)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none"
                     >
                       Edit
                     </button>

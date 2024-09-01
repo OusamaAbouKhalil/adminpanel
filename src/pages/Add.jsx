@@ -261,7 +261,7 @@ function Add() {
                           key={option}
                           value={option}
                           className={`p-2 ${formData.title.includes(option)
-                            ? "bg-blue-500 text-white"
+                            ? "bg-green-500 text-white"
                             : "bg-gray-200"
                             } rounded-sm`}
                         >
@@ -440,7 +440,7 @@ function Add() {
             key="pageChange"
             type="button"
             onClick={() => setPage(!page)}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded mt-4 self-center"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-6 rounded mt-4 self-center"
           >
             {page ? "Back" : "Next"}
           </button>
@@ -449,7 +449,7 @@ function Add() {
               key="submit"
               type="submit"
               disabled={isRestaurantPending}  // Disable the button if the restaurant creation is in progress
-              className={`bg-blue-500 text-white font-bold py-1 px-4 mx-2 rounded mt-4 ${isRestaurantPending ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+              className={`bg-green-500 text-white font-bold py-1 px-4 mx-2 rounded mt-4 ${isRestaurantPending ? "opacity-50 cursor-not-allowed" : "hover:bg-green-700"
                 }`}
             >
               Submit
@@ -459,7 +459,7 @@ function Add() {
         <div className="w-full mt-3">
           <div className="bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
             <div
-              className="bg-blue-600 h-2.5 rounded-full"
+              className="bg-green-600 h-2.5 rounded-full"
               style={{ width: `${progress}%` }}
             ></div>
           </div>

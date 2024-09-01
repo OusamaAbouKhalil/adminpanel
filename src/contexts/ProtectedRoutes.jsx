@@ -100,7 +100,8 @@ export const ProtectedRoute = ({ children }) => {
       'editnotification',
       'promo',
       'offers',
-      'titles'
+      'titles',
+      'banners',
     ];
     if (!adminRoutes.includes(location.pathname.split('/')[1])) {
       return <AccessDeniedPage />;

@@ -45,7 +45,7 @@ return (
     <div className="flex flex-col md:flex-row items-center justify-between mb-6">
       <button
         onClick={additem}
-        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
+        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
       >
         Add
       </button>
@@ -54,11 +54,11 @@ return (
         placeholder="Search by name..."
         value={searchTerm}
         onChange={handleSearchChange}
-        className="border-2 border-gray-300 bg-white h-12 px-4 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="border-2 border-gray-300 bg-white h-12 px-4 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
       />
     </div>
     <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-      <table className="w-full text-sm text-left text-gray-600">
+      <table className="w-full text-sm text-center text-gray-600">
         <thead className="text-xs text-gray-800 bg-gray-200">
           <tr>
             {tableMenuDsiplay.map((item, index) => (
@@ -84,7 +84,7 @@ return (
               <td className="py-4 px-4">
                 <Link
                   to={`/restaurants/${id}/${item.item_id}`}
-                  className="font-medium text-blue-600 hover:underline"
+                  className="font-medium text-green-600 hover:underline"
                 >
                   {item.item_name}
                 </Link>
@@ -106,8 +106,8 @@ return (
                 <button
                   onClick={() => goToPage(number + 1)}
                   className={`py-2 px-3 text-sm font-semibold rounded-md border ${currentPage === number + 1
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-600 border-gray-300 hover:bg-blue-500 hover:text-white"
+                    ? "bg-green-600 text-white"
+                    : "bg-white text-gray-600 border-gray-300 hover:bg-green-500 hover:text-white"
                     } transition duration-200`}
                 >
                   {number + 1}

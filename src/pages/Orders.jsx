@@ -4,6 +4,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { OrdersTable, SpecialOrderCard } from "../components";
 import { useUpdateOrderStatus } from "../lib/query/queries";
 import PendingOrders from "../components/Orders/PendingOrders";
+import { FaRegClock } from "react-icons/fa";
 import { useStateContext } from "../contexts/ContextProvider";
 import { startOfDay, endOfDay } from 'date-fns';
 
@@ -56,10 +57,10 @@ const Orders = () => {
             className="mb-4 md:mb-0 md:w-64 p-2 border border-gray-300 rounded-lg shadow-sm"
           />
           <button
-            className="relative bg-gradient-to-r from-blue-500 to-blue-700 hover:opacity-80 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+            className="relative bg-gradient-to-r from-green-500 to-green-700 hover:opacity-80 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
             onClick={handlePendingOrdersClick}
           >
-            <span className="text-lg">Pending Orders</span>
+            <span className="text-lg">Pending Orders  <FaRegClock className="inline-block" color="bg-white" size={24} /></span>
             {pendingOrdersCount > 0 && (
               <span className="absolute -top-2 -right-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg">
                 {pendingOrdersCount}

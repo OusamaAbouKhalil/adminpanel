@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { AiOutlineMenu } from 'react-icons/ai';
+import { AiOutlineMenuFold } from 'react-icons/ai';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 import { useStateContext } from '../contexts/ContextProvider';
 
@@ -60,7 +60,7 @@ const Navbar = () => {
 
   return (
     <div ref={navbarRef} className="flex justify-between p-2 md:ml-6 md:mr-6 relative">
-      <NavButton title="Menu" customFunc={handleActiveMenu} color={currentColor} icon={<AiOutlineMenu />} />
+      <NavButton title="Menu" customFunc={handleActiveMenu} color={currentColor} icon={<AiOutlineMenuFold />} />
       {/* <div className="flex">
         <NavButton title="Chat" dotColor="#03C9D7" customFunc={() => handleClick('chat')} color={currentColor} icon={<BsChatLeft />} />
         <NavButton title="Notification" dotColor="rgb(254, 201, 15)" customFunc={() => handleClick('notification')} color={currentColor} icon={<RiNotification3Line />} />

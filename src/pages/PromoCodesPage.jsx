@@ -97,7 +97,7 @@ const PromoCodesPage = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="w-16 h-16 border-4 border-t-4 border-blue-600 rounded-full animate-spin"></div>
+        <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -111,13 +111,13 @@ const PromoCodesPage = () => {
         <div className="flex mb-8 border-b border-gray-300">
           <button
             onClick={() => setActiveTab('add')}
-            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'add' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
           >
             Add Promo Code
           </button>
           <button
             onClick={() => setActiveTab('edit')}
-            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'edit' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === 'edit' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
           >
             Edit Promo Code
           </button>
@@ -140,14 +140,14 @@ const PromoCodesPage = () => {
                 placeholder="Promo Code (e.g., FIRST10)"
                 value={newPromoCode}
                 onChange={(e) => setNewPromoCode(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg p-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <input
                 type="number"
                 placeholder="Credits"
                 value={newCredits}
                 onChange={(e) => setNewCredits(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg p-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 min="0"
               />
               <input
@@ -155,12 +155,12 @@ const PromoCodesPage = () => {
                 placeholder="Uses Left"
                 value={newUsesLeft}
                 onChange={(e) => setNewUsesLeft(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg p-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 min="0"
               />
               <button
                 onClick={handleAddPromoCode}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-600 transition duration-300 ease-in-out"
+                className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white py-3 rounded-lg shadow-lg hover:from-green-700 hover:to-green-600 transition duration-300 ease-in-out"
                 disabled={saving}
               >
                 {saving ? (
@@ -188,20 +188,20 @@ const PromoCodesPage = () => {
                       type="text"
                       value={data.promoCode}
                       onChange={(e) => handleUpdatePromoCode(id, 'promoCode', e.target.value)}
-                      className="text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                     <input
                       type="number"
                       value={data.credits}
                       onChange={(e) => handleUpdatePromoCode(id, 'credits', e.target.value)}
-                      className="w-full text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                       min="0"
                     />
                     <input
                       type="number"
                       value={data.usesLeft}
                       onChange={(e) => handleUpdatePromoCode(id, 'usesleft', e.target.value)}
-                      className="w-full text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full text-lg font-medium text-gray-900 p-3 rounded-lg border border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                       min="0"
                     />
                     <div className="flex space-x-4">

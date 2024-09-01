@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getDocs, collection } from "firebase/firestore";
 import { fsdb } from "../../utils/firebaseconfig";
+import { MdOutlineErrorOutline } from "react-icons/md"; // Importing an icon
 import OrderDetailsPopup from "./OrderDetailsPopup";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
@@ -52,11 +53,10 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       case "preparing":
         return "bg-yellow-200 text-yellow-800";
       case "on the way":
-        return "bg-blue-200 text-blue-800";
+        return "bg-green-200 text-green-800";
       case "completed":
         return "bg-green-400 text-gray-800";
       case "rejected":
-        return "bg-red-300 text-red-800";
       case "cancelled":
         return "bg-red-300 text-red-800";
       default:
@@ -73,11 +73,12 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         />
       )}
 
-      <div className="flex justify-center mb-6 space-x-4">
+      {/* Tabs */}
+      <div className="flex justify-center mb-6 space-x-4 flex-wrap">
         {statuses.map((status) => (
           <button
             key={status}
-            className={`relative px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700"}`}
+            className={`relative px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-green-600 text-white shadow-md" : "bg-gray-200 text-gray-700"} mb-2`}
             onClick={() => setActiveTab(status)}
           >
             {status.toUpperCase()}
@@ -93,64 +94,76 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         ))}
       </div>
 
+      {/* Search Input */}
       <div className="mb-6 flex justify-center">
         <input
           type="text"
           placeholder="Search by Order ID..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg shadow-md w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          aria-label="Search by Order ID"
         />
       </div>
 
-      <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-        <h2 className="text-xl font-bold text-gray-800 bg-gray-100 py-3 px-4 border-b">
-          {activeTab.toUpperCase()}
-        </h2>
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-blue-100 text-blue-600">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium">Logo</th>
-              <th className="px-6 py-3 text-left text-sm font-medium">Restaurant</th>
-              <th className="px-6 py-3 text-left text-sm font-medium">Order ID</th>
-              <th className="px-6 py-3 text-left text-sm font-medium">Recipient</th>
-              <th className="px-6 py-3 text-left text-sm font-medium">Date</th>
-              <th className="px-6 py-3 text-left text-sm font-medium">Total</th>
-              <th className="px-6 py-3 text-left text-sm font-medium">Status</th>
-              <th className="px-6 py-3 text-left text-sm font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sortedOrders.map((order) => {
-              const restaurant = restaurants[order.restaurant_id] || {};
-              return (
-                <tr key={order.order_id} className="hover:bg-gray-100">
-                  <td className="px-6 py-4 text-sm">
-                    <img src={restaurant.main_image} alt="Restaurant" className="w-20 h-20 object-cover rounded-lg" />
-                  </td>
-                  <td className="px-6 py-4 text-sm">{restaurant.rest_name || 'N/A'}</td>
-                  <td className="px-6 py-4 text-sm">
-                    <button
-                      onClick={() => setSelectedOrder(order)}
-                      className="text-blue-500 underline"
-                    >
-                      {order.order_id}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
-                  <td className="px-6 py-4 text-sm">{formatDateTime(order.time)}</td>
-                  <td className="px-6 py-4 text-sm">${order.total + order.delivery_fee}</td>
-                  <td className={`px-6 py-4 text-sm capitalize ${getStatusColor(order.status)}`}>
-                    <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="relative">
+      {/* No Data Available */}
+      {sortedOrders.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16">
+          <MdOutlineErrorOutline className="text-6xl text-gray-400 mb-4" />
+          <p className="text-gray-600 text-xl font-semibold">No orders available.</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+          {/* Table for medium and larger screens */}
+          <table className="hidden md:table min-w-full divide-y divide-gray-200">
+            <thead className="bg-green-600 text-white font-bold"> 
+              <tr>
+                <th className="px-6 py-3 text-center text-l font-bold">Logo</th>
+                <th className="px-6 py-3 text-center text-l font-bold">Restaurant Name</th>
+                <th className="px-6 py-3 text-center text-l font-bold">Order ID</th>
+                <th className="px-6 py-3 text-center text-l font-bold">Recipient</th>
+                <th className="px-6 py-3 text-center text-l font-bold">Date</th>
+                <th className="px-6 py-3 text-center text-l font-bold">Total</th>
+                <th className="px-6 py-3 text-center text-l font-bold">Status</th>
+                <th className="px-6 py-3 text-center text-l font-bold">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {sortedOrders.map((order) => {
+                const restaurant = restaurants[order.restaurant_id] || {};
+                return (
+                  <tr key={order.order_id} className="hover:bg-gray-100">
+                    <td className="px-6 py-4 text-sm">
+                      <img
+                        src={restaurant.main_image}
+                        alt={`${restaurant.rest_name} Logo`}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                    </td>
+                    <td className="px-6 py-4 text-sm">{restaurant.rest_name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm">
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        className="text-blue-500 underline font-bold"
+                        aria-label={`View details for order ${order.order_id}`}
+                      >
+                        {order.order_id}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 text-sm">{order.recipient_name}</td>
+                    <td className="px-6 py-4 text-sm">{formatDateTime(order.time)}</td>
+                    <td className="px-6 py-4 text-sm">${(order.total + order.delivery_fee).toFixed(2)}</td>
+                    <td className={`px-6 py-4 text-sm capitalize`}>
+                      <div className={`p-2 rounded-lg ${getStatusColor(order.status)}`}>
+                        {order.status}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
                       <select
                         value={order.status}
                         onChange={(e) => onStatusChange(order, e.target.value)}
-                        className="bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out py-2 px-4 w-full"
+                        className="w-full bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out py-2 px-4"
+                        aria-label={`Change status for order ${order.order_id}`}
                       >
                         {statuses.map((status) => (
                           <option
@@ -163,14 +176,77 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                           </option>
                         ))}
                       </select>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          {/* Card Layout for small screens */}
+          <div className="md:hidden">
+            {sortedOrders.map((order) => {
+              const restaurant = restaurants[order.restaurant_id] || {};
+              return (
+                <div key={order.order_id} className="border border-gray-200 rounded-lg shadow-md mb-4 p-4 bg-white">
+                  <div className="flex items-center mb-4">
+                    <img
+                      src={restaurant.main_image}
+                      alt={`${restaurant.rest_name} Logo`}
+                      className="w-16 h-16 object-cover rounded-lg mr-4"
+                    />
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-800">{restaurant.rest_name || 'N/A'}</h3>
+                      <p className="text-sm text-gray-600">{formatDateTime(order.time)}</p>
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold text-gray-800">Order ID: </span>
+                    <button
+                      onClick={() => setSelectedOrder(order)}
+                      className="text-green-500 underline"
+                      aria-label={`View details for order ${order.order_id}`}
+                    >
+                      {order.order_id}
+                    </button>
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold text-gray-800">Recipient: </span>
+                    {order.recipient_name}
+                  </div>
+                  <div className="mb-2">
+                    <span className="font-semibold text-gray-800">Total: </span>
+                    ${order.total.toFixed(2)}
+                  </div>
+                  <div className="mb-4">
+                    <span className="font-semibold text-gray-800">Status: </span>
+                    <div className={`inline-block p-2 rounded-lg ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </div>
+                  </div>
+                  <select
+                    value={order.status}
+                    onChange={(e) => onStatusChange(order, e.target.value)}
+                    className="w-full bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out py-2 px-4"
+                    aria-label={`Change status for order ${order.order_id}`}
+                  >
+                    {statuses.map((status) => (
+                      <option
+                        key={status}
+                        value={status}
+                        disabled={status === order.status}
+                        className="text-gray-800"
+                      >
+                        {status.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -49,7 +49,7 @@ const SizesForm = ({ sizesForm, setSizesForm }) => {
                     <button type='button' onClick={() => removeSize(index)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">X</button>
                 </div>
             ))}
-            <button key="addSize" type="button" onClick={addSize} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Size</button>
+            <button key="addSize" type="button" onClick={addSize} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Add Size</button>
         </>
     );
 }

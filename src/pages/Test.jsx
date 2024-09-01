@@ -165,7 +165,7 @@ const Test = () => {
 
           {/* Buttons */}
           <div className="flex flex-col md:flex-row gap-4 mt-6">
-            <button onClick={handleSaveChanges} className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+            <button onClick={handleSaveChanges} className="bg-green-500 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
               Save Changes
             </button>
             <button onClick={() => setShowAddonsForm(!showAddonsForm)} className="bg-green-500 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
