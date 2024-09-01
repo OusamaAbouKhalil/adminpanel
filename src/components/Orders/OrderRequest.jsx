@@ -82,7 +82,7 @@ return (
               href={mapUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-500 hover:text-blue-700 font-semibold"
+              className="text-green-500 hover:text-green-700 font-semibold"
             >
               View on Google Maps
             </a>

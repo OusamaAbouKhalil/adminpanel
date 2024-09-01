@@ -46,7 +46,7 @@ const PricesPage = () => {
   if (error) return <div className="text-center text-red-600 text-lg">Error: {error}</div>;
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-blue-50 to-white shadow-md rounded-lg border border-gray-200 max-w-3xl">
+    <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-green-50 to-white shadow-md rounded-lg border border-gray-200 max-w-3xl">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Edit Prices</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
@@ -84,13 +84,13 @@ const PricesPage = () => {
               id={key}
               value={prices[key]}
               onChange={handleChange}
-              className="border border-gray-300 rounded-lg p-2 w-2/3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+              className="border border-gray-300 rounded-lg p-2 w-2/3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
             />
           </div>
         ))}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
+          className="w-full bg-green-600 text-white py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out"
         >
           Save Changes
         </button>

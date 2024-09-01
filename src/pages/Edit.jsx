@@ -262,20 +262,23 @@ function Edit() {
       <h2 className="text-2xl font-semibold text-gray-900 mb-6">Business Hours</h2>
       <div className="overflow-x-auto">
         <table className="w-full bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-          <thead className="bg-blue-500 text-white">
+          <thead className="bg-green-500 text-white">
             <tr>
-              <th className="p-4 text-left font-medium">Day</th>
-              <th className="p-4 text-left font-medium">Opening Time</th>
-              <th className="p-4 text-left font-medium">Closing Time</th>
-              <th className="p-4 text-left font-medium">Actions</th>
+              <th className="p-4 text-center font-medium">Day</th>
+              <th className="p-4 text-center font-medium">Opening Time</th>
+              <th className="p-4 text-center font-medium">Closing Time</th>
+              <th className="p-4 text-center font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {days.map((day) => (
               <React.Fragment key={day}>
                 {formData.hours[day]?.map((period, timeIndex) => (
-                  <tr key={`${day}-${timeIndex}`} className="border-t border-gray-300 bg-white hover:bg-gray-100">
-                    <td className="p-4 text-gray-700 font-medium align-top">
+                  <tr
+                    key={`${day}-${timeIndex}`}
+                    className="border-t border-gray-300 bg-white hover:bg-gray-100 text-center"
+                  >
+                    <td className="p-4 text-gray-700 font-medium">
                       {day}
                     </td>
                     <td className="p-4">
@@ -285,7 +288,7 @@ function Edit() {
                         value={period.openingTime || ""}
                         onChange={(e) => handleHoursChange(e, day, timeIndex)}
                         placeholder="7:59 AM"
-                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/2 text-center focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </td>
                     <td className="p-4">
@@ -295,11 +298,11 @@ function Edit() {
                         value={period.closingTime || ""}
                         onChange={(e) => handleHoursChange(e, day, timeIndex)}
                         placeholder="9:59 PM"
-                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="bg-gray-100 border border-gray-300 rounded-lg p-3 w-full md:w-1/2 text-center focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </td>
-                    <td className="p-4 text-center">
-                      <div className="flex items-center space-x-2 justify-center">
+                    <td className="p-4">
+                      <div className="flex items-center justify-center space-x-2">
                         {formData.hours[day]?.length > 1 && (
                           <FaMinusCircle
                             onClick={() => removeTimeSlot(day, timeIndex)}
@@ -330,6 +333,7 @@ function Edit() {
       </div>
     </div>
   );
+  
   
   // Function to handle clearing inputs for a specific time slot
   const clearTimeSlot = (day, timeIndex) => {
@@ -423,7 +427,7 @@ function Edit() {
                         key={option}
                         value={option}
                         className={`p-2 ${formData.title.includes(option)
-                          ? "bg-blue-500 text-white"
+                          ? "bg-green-500 text-white"
                           : "bg-gray-100"
                           } rounded-sm transition-colors duration-150 ease-in-out`}
                       >
@@ -582,7 +586,7 @@ function Edit() {
   
   
   return (
-    <div className="m-4 md:m-10 mt-24 p-4 md:p-10 bg-gradient-to-r from-blue-30 to-white rounded-3xl">
+    <div className="m-4 md:m-10 mt-24 p-4 md:p-10 bg-gradient-to-r from-green-30 to-white rounded-3xl">
       <Header title="Edit Restaurant" />
       <form onSubmit={handleSubmit}>
         {isLoading ? (
@@ -596,7 +600,7 @@ function Edit() {
         <div className="flex justify-end pr-4">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 mx-2 rounded-lg mt-4 transition-colors"
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 mx-2 rounded-lg mt-4 transition-colors"
           >
             Update
           </button>
@@ -604,7 +608,7 @@ function Edit() {
         <div className="w-full mt-5">
           <div className="bg-gray-100 rounded-full h-2.5">
             <div
-              className="bg-blue-600 h-2.5 rounded-full transition-all"
+              className="bg-green-600 h-2.5 rounded-full transition-all"
               style={{ width: `${progress}%` }}
             ></div>
           </div>

@@ -32,7 +32,7 @@ const CategoriesForm = ({
               placeholder="Category Name"
               value={category}
               onChange={(e) => handleCategoryChange(index, e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none p-1 focus:ring-2 focus:ring-blue-500"
+              className="flex-1 bg-transparent border-none outline-none p-1 focus:ring-2 focus:ring-green-500"
             />
             <button
               type="button"
@@ -48,7 +48,7 @@ const CategoriesForm = ({
         <button
           type="button"
           onClick={addCategory}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+          className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
         >
           {title}
         </button>

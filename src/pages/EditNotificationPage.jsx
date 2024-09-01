@@ -80,7 +80,7 @@ const EditNotificationsPage = () => {
       ))}
       {notifications.length === 0 ? (
         <div className="flex justify-center items-center h-32">
-          <svg className="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
           </svg>
@@ -90,23 +90,23 @@ const EditNotificationsPage = () => {
           <table className="min-w-full bg-white divide-y divide-gray-200 border border-gray-300 rounded-lg shadow-md">
             <thead className="bg-gray-100 text-gray-500 uppercase text-xs leading-normal">
               <tr>
-                <th className="px-4 py-3 text-left">Title</th>
-                <th className="px-4 py-3 text-left">Message</th>
-                <th className="px-4 py-3 text-left">Type</th>
-                <th className="px-4 py-3 text-left">Time</th>
-                <th className="px-4 py-3 text-left">Actions</th>
+                <th className="px-4 py-3 text-center">Title</th>
+                <th className="px-4 py-3 text-center">Message</th>
+                <th className="px-4 py-3 text-center">Type</th>
+                <th className="px-4 py-3 text-center">Time</th>
+                <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {notifications.map(notification => (
-                <tr key={notification.id} className={isEditing(notification.id) ? 'bg-blue-50' : ''}>
+                <tr key={notification.id} className={isEditing(notification.id) ? 'bg-green-50' : ''}>
                   <td className="px-4 py-2 whitespace-nowrap">
                     {isEditing(notification.id) ? (
                       <input
                         type="text"
                         value={notification.title}
                         onChange={(e) => handleChange(notification.id, 'title', e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
                       />
                     ) : (
                       notification.title
@@ -117,7 +117,7 @@ const EditNotificationsPage = () => {
                       <textarea
                         value={notification.message}
                         onChange={(e) => handleChange(notification.id, 'message', e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
                       ></textarea>
                     ) : (
                       notification.message
@@ -128,7 +128,7 @@ const EditNotificationsPage = () => {
                       <select
                         value={notification.type}
                         onChange={(e) => handleChange(notification.id, 'type', e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
                       >
                         <option value="alert">Alert</option>
                         <option value="info">Info</option>
@@ -144,7 +144,7 @@ const EditNotificationsPage = () => {
                         type="datetime-local"
                         value={notification.time}
                         onChange={(e) => handleChange(notification.id, 'time', e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                        className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
                       />
                     ) : (
                       new Date(notification.time).toLocaleString()
@@ -155,7 +155,7 @@ const EditNotificationsPage = () => {
                       <>
                         <button
                           onClick={() => handleUpdate(notification.id)}
-                          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out mr-2"
+                          className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out mr-2"
                         >
                           Update
                         </button>
@@ -170,7 +170,7 @@ const EditNotificationsPage = () => {
                       <>
                         <button
                           onClick={() => startEditing(notification.id)}
-                          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out mr-2"
+                          className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out mr-2"
                         >
                           Edit
                         </button>

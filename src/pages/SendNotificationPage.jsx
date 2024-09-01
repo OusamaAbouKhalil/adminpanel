@@ -78,7 +78,7 @@ const SendNotificationPage = () => {
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
             disabled={isSubmitting} // Disable input while submitting
           />
         </div>
@@ -90,7 +90,7 @@ const SendNotificationPage = () => {
             id="message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
             disabled={isSubmitting} // Disable input while submitting
           ></textarea>
         </div>
@@ -102,7 +102,7 @@ const SendNotificationPage = () => {
             id="type"
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
             disabled={isSubmitting} // Disable select while submitting
           >
             <option value="alert">Alert</option>
@@ -119,13 +119,13 @@ const SendNotificationPage = () => {
             id="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            className="w-full border border-gray-300 rounded-lg p-3 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
             disabled={isSubmitting} // Disable input while submitting
           />
         </div>
         <button
           type="submit"
-          className={`w-full py-2 rounded-lg shadow-md transition duration-300 ease-in-out ${isSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+          className={`w-full py-2 rounded-lg shadow-md transition duration-300 ease-in-out ${isSubmitting ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'} text-white`}
           disabled={isSubmitting} // Disable button while submitting
         >
           {isSubmitting ? (

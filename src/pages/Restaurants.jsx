@@ -52,7 +52,7 @@ export default function Restaurants() {
       <div className="flex flex-col md:flex-row items-center justify-between mb-6">
         <button
           onClick={add}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-2 rounded-lg transition duration-300"
+          className="bg-green-600 hover:bg-green-700 text-white text-sm px-6 py-2 rounded-lg transition duration-300"
         >
           Add
         </button>
@@ -61,7 +61,7 @@ export default function Restaurants() {
           placeholder="Search by name..."
           value={searchTerm}
           onChange={handleSearchChange}
-          className="border-2 border-gray-300 bg-white h-12 px-4 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border-2 border-gray-300 bg-white h-12 px-4 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
         />
       </div>
       {isLoading && restaurants.length === 0 ? (
@@ -71,8 +71,8 @@ export default function Restaurants() {
       ) : (
         <div>
           <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-            <table className="w-full text-sm text-left text-gray-600">
-              <thead className="text-xs text-gray-800 uppercase bg-gray-200">
+            <table className="w-full text-sm text-center text-gray-600">
+            <thead className="bg-green-600 text-white font-bold"> 
                 <tr>
                   <th scope="col" className="py-3 px-4">Logo</th>
                   <th scope="col" className="py-3 px-4">Restaurant Name</th>
@@ -96,7 +96,7 @@ export default function Restaurants() {
                     <td className="py-4 px-4">
                       <Link
                         to={`/restaurants/${restaurant.rest_id}`}
-                        className="font-medium text-blue-600 hover:underline"
+                        className="font-medium text-green-600 hover:underline"
                       >
                         {restaurant.rest_name}
                       </Link>
@@ -106,7 +106,7 @@ export default function Restaurants() {
                     <td className="py-4 px-4">{restaurant.time}</td>
                     <td className="py-4 px-4 text-center">
                       <button
-                        className="text-blue-500 hover:text-blue-700 transition duration-300"
+                        className="text-green-500 hover:text-green-700 transition duration-300"
                         onClick={() =>
                           navigate(`/restaurants/${restaurant.rest_id}/edit`)
                         }

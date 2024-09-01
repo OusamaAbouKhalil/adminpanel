@@ -128,7 +128,7 @@ const Titles = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="w-16 h-16 border-4 border-t-4 border-blue-600 rounded-full animate-spin"></div>
+        <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -142,13 +142,13 @@ const Titles = () => {
         <div className="flex mb-8 border-b border-gray-300">
           <button
             onClick={() => setActiveTab("add")}
-            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === "add" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === "add" ? "bg-green-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
           >
             Add New Title
           </button>
           <button
             onClick={() => setActiveTab("edit")}
-            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === "edit" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+            className={`py-3 px-6 rounded-t-lg text-lg font-semibold transition-transform transform ${activeTab === "edit" ? "bg-green-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
           >
             Edit Existing Titles
           </button>
@@ -171,7 +171,7 @@ const Titles = () => {
               value={newTitle.title}
               onChange={(e) => handleInputChange(e, setNewTitle)}
               placeholder="Enter title"
-              className="w-full border border-gray-300 rounded-lg p-4 mb-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-lg p-4 mb-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             />
             <div className="flex items-center mb-4">
               <input
@@ -195,7 +195,7 @@ const Titles = () => {
             </div>
             <button
               onClick={handleSave}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-600 transition duration-300 ease-in-out"
+              className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white py-3 rounded-lg shadow-lg hover:from-green-700 hover:to-green-600 transition duration-300 ease-in-out"
             >
               Add Title
             </button>
@@ -214,7 +214,7 @@ const Titles = () => {
                   value={editTitle.title}
                   onChange={(e) => handleInputChange(e, setEditTitle)}
                   placeholder="Enter title"
-                  className="w-full border border-gray-300 rounded-lg p-4 mb-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-lg p-4 mb-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
                 <div className="flex items-center mb-4">
                   <input
@@ -238,7 +238,7 @@ const Titles = () => {
                 </div>
                 <button
                   onClick={handleSave}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-600 transition duration-300 ease-in-out"
+                  className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white py-3 rounded-lg shadow-lg hover:from-green-700 hover:to-green-600 transition duration-300 ease-in-out"
                 >
                   Save Changes
                 </button>
@@ -264,7 +264,7 @@ const Titles = () => {
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleEdit(index)}
-                          className="bg-blue-600 text-white rounded-full p-3 shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
+                          className="bg-green-600 text-white rounded-full p-3 shadow-md hover:bg-green-700 transition duration-300 ease-in-out"
                         >
                           <FaEdit size={20} />
                         </button>

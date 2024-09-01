@@ -44,7 +44,7 @@ function Sidebar() {
     setCollapsed(prev => !prev);
   };
 
-  const activeLink = 'flex items-center gap-4 px-4 py-2 rounded-lg text-white text-md bg-blue-800 hover:bg-blue-900 transition-colors duration-200 ease-in-out';
+  const activeLink = 'flex items-center gap-4 px-4 py-2 rounded-lg text-white text-md bg-green-800 hover:bg-green-900 transition-colors duration-200 ease-in-out';
   const normalLink = 'flex items-center gap-4 px-4 py-2 rounded-lg text-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ease-in-out';
 
   return (
@@ -107,7 +107,7 @@ function Sidebar() {
                   href="https://infiniterealm.tech"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors duration-200 ease-in-out"
+                  className="flex items-center gap-4 p-2 rounded-lg text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-700 transition-colors duration-200 ease-in-out"
                   onClick={handleCloseSideBar}
                 >
                   <FaRegBuilding size={28} className={`${collapsed ? 'mx-auto' : ''}`} />

@@ -53,7 +53,7 @@ const Orders = () => {
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center">
           <button
-            className="relative bg-gradient-to-r from-blue-500 to-blue-700 hover:opacity-80 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+            className="relative bg-gradient-to-r from-green-500 to-green-700 hover:opacity-80 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
             onClick={handlePendingOrdersClick}
           >
             <span className="text-lg">Pending Orders</span>

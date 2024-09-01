@@ -10,7 +10,7 @@ const ConfirmationDialog = ({ isOpen, onConfirm, onCancel, message }) => {
         <div className="flex justify-end space-x-4">
           <button
             onClick={onConfirm}
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
+            className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300"
           >
             Confirm
           </button>

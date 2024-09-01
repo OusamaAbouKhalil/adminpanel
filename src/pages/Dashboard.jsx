@@ -23,7 +23,7 @@ export default function Dashboard() {
             </div>
             <button
               type="button"
-              className="text-2xl opacity-0.9 text-white hover:drop-shadow-xl rounded-full p-4 bg-blue-900"
+              className="text-2xl opacity-0.9 text-white hover:drop-shadow-xl rounded-full p-4 bg-green-900"
             >
               <BsCurrencyDollar />
             </button>
@@ -31,7 +31,7 @@ export default function Dashboard() {
           <div className='mt-4'>
             <Button
               color="white"
-              bgColor="blue"
+              bgColor="green"
               text="Download"
               borderRadius="10px"
               size="md"
@@ -110,12 +110,12 @@ export default function Dashboard() {
                 <p className='text-gray-500 mt-1'>Expense</p>
               </div>
               <div className="mt-5">
-                <SparkLine currentColor="blue" id="line-sparkLine" type="Line" height="80px" width="250px" data={SparklineAreaData} color="blue" />
+                <SparkLine currentColor="green" id="line-sparkLine" type="Line" height="80px" width="250px" data={SparklineAreaData} color="green" />
               </div>
               <div className='mt-10'>
                 <Button
                   color="white"
-                  bgColor="blue"
+                  bgColor="green"
                   text="Download Report"
                   borderRadius="10px"
                 />

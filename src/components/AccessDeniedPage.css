@@ -51,10 +51,10 @@
   
   .access-denied-page a {
     font-size: 1rem;
-    color: #007bff; /* Blue color for the link */
+    color: #007bff; /* green color for the link */
     text-decoration: none;
     font-weight: bold;
-    border: 2px solid #007bff; /* Blue border for button-like appearance */
+    border: 2px solid #007bff; /* green border for button-like appearance */
     border-radius: 5px; /* Rounded corners for button */
     padding: 10px 20px; /* Padding for button size */
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;

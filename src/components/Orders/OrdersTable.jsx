@@ -53,7 +53,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
       case "preparing":
         return "bg-yellow-200 text-yellow-800";
       case "on the way":
-        return "bg-blue-200 text-blue-800";
+        return "bg-green-200 text-green-800";
       case "completed":
         return "bg-green-400 text-gray-800";
       case "rejected":
@@ -78,7 +78,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         {statuses.map((status) => (
           <button
             key={status}
-            className={`relative px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-blue-600 text-white shadow-md" : "bg-gray-200 text-gray-700"} mb-2`}
+            className={`relative px-6 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ease-in-out ${activeTab === status ? "bg-green-600 text-white shadow-md" : "bg-gray-200 text-gray-700"} mb-2`}
             onClick={() => setActiveTab(status)}
           >
             {status.toUpperCase()}
@@ -101,7 +101,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
           placeholder="Search by Order ID..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-500"
           aria-label="Search by Order ID"
         />
       </div>
@@ -116,7 +116,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         <div className="overflow-x-auto bg-white shadow-md rounded-lg">
           {/* Table for medium and larger screens */}
           <table className="hidden md:table min-w-full divide-y divide-gray-200">
-            <thead className="bg-blue-600 text-white font-bold"> 
+            <thead className="bg-green-600 text-white font-bold"> 
               <tr>
                 <th className="px-6 py-3 text-center text-l font-bold">Logo</th>
                 <th className="px-6 py-3 text-center text-l font-bold">Restaurant Name</th>
@@ -144,7 +144,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     <td className="px-6 py-4 text-sm">
                       <button
                         onClick={() => setSelectedOrder(order)}
-                        className="text-blue-500 underline"
+                        className="text-green-500 underline"
                         aria-label={`View details for order ${order.order_id}`}
                       >
                         {order.order_id}
@@ -162,7 +162,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                       <select
                         value={order.status}
                         onChange={(e) => onStatusChange(order, e.target.value)}
-                        className="w-full bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out py-2 px-4"
+                        className="w-full bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out py-2 px-4"
                         aria-label={`Change status for order ${order.order_id}`}
                       >
                         {statuses.map((status) => (
@@ -204,7 +204,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     <span className="font-semibold text-gray-800">Order ID: </span>
                     <button
                       onClick={() => setSelectedOrder(order)}
-                      className="text-blue-500 underline"
+                      className="text-green-500 underline"
                       aria-label={`View details for order ${order.order_id}`}
                     >
                       {order.order_id}
@@ -227,7 +227,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   <select
                     value={order.status}
                     onChange={(e) => onStatusChange(order, e.target.value)}
-                    className="w-full bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out py-2 px-4"
+                    className="w-full bg-gray-100 border border-gray-300 text-gray-800 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out py-2 px-4"
                     aria-label={`Change status for order ${order.order_id}`}
                   >
                     {statuses.map((status) => (

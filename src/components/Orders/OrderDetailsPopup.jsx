@@ -37,7 +37,7 @@ const OrderDetailsPopup = ({ order, onClose }) => {
         <div className="absolute top-3 right-3">
           <button
             onClick={onClose}
-            className="bg-gray-300 text-gray-800 px-3 py-1 rounded-full hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-gray-300 text-gray-800 px-3 py-1 rounded-full hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             &times;
           </button>
@@ -45,7 +45,7 @@ const OrderDetailsPopup = ({ order, onClose }) => {
         <div className="mt-6 flex justify-end space-x-4">
           <button
             onClick={handlePrint}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+            className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-200"
           >
             Print
           </button>

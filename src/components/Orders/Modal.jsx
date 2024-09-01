@@ -12,7 +12,7 @@ const Modal = ({ isOpen, onClose, drivers, onSelectDriver }) => {
             <li key={driver.id} className="my-1">
               {driver.fullname}
               <button
-                className=" float-right ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                className=" float-right ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
                 onClick={() => onSelectDriver(driver)}
               >
                 Assign
