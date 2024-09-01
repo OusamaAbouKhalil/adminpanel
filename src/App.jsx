@@ -56,8 +56,6 @@ const MainLayout = () => {
         <Sidebar />
       </div>
       <div className={contentClass}>
-        <br />
-        <br />
         <Navbar />
         <Outlet />  {/* This is where nested routes will be rendered */}
       </div>
