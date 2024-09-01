@@ -107,7 +107,7 @@ function Sidebar() {
                   href="https://infiniterealm.tech"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-2 rounded-lg text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-700 transition-colors duration-200 ease-in-out"
+                  className="flex items-center gap-4 p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors duration-200 ease-in-out"
                   onClick={handleCloseSideBar}
                 >
                   <FaRegBuilding size={28} className={`${collapsed ? 'mx-auto' : ''}`} />

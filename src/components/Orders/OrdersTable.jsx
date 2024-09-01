@@ -144,7 +144,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     <td className="px-6 py-4 text-sm">
                       <button
                         onClick={() => setSelectedOrder(order)}
-                        className="text-green-500 underline"
+                        className="text-blue-500 underline font-bold"
                         aria-label={`View details for order ${order.order_id}`}
                       >
                         {order.order_id}
