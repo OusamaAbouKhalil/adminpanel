@@ -42,7 +42,9 @@ const PricesPage = () => {
     }
   };
 
-  if (isLoading) return <div className="text-center text-gray-500 text-lg">Loading...</div>;
+  if (isLoading) return  <div className="flex justify-center items-center h-64">
+  <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+</div>;
   if (error) return <div className="text-center text-red-600 text-lg">Error: {error}</div>;
 
   return (

@@ -41,7 +41,7 @@ const LoginPage = () => {
           {/* Inputs */}
           <div className='flex flex-col items-center justify-center w-[35vh]'>
             <input
-              className='rounded-2xl px-2 py-1 w-full border-[1px] border-green-400 m-1 focus:shadow-md focus:border-green-400 focus:outline-none focus:ring-0'
+              className='rounded-xl px-2 py-1 w-full border-[1px] border-green-400 m-1 focus:shadow-md focus:border-green-400 focus:outline-none focus:ring-0'
               type="email"
               placeholder="Email"
               value={email}
@@ -49,7 +49,7 @@ const LoginPage = () => {
               required
             />
             <input
-              className='rounded-2xl px-2 py-1 w-full border-[1px] border-green-400 m-1 focus:shadow-md focus:border-green-400 focus:outline-none focus:ring-0'
+              className='rounded-xl px-2 py-1 w-full border-[1px] border-green-400 m-1 focus:shadow-md focus:border-green-400 focus:outline-none focus:ring-0'
               type="password"
               placeholder="Password"
               value={password}

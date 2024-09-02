@@ -67,7 +67,9 @@ const Test = () => {
   }
 
   if (isPending) {
-    return <div>Loading...</div>;
+    return  <div className="flex justify-center items-center h-64">
+    <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+</div>;
   }
 
   return (
@@ -197,7 +199,9 @@ const Test = () => {
         </>
       ) : (
         <div className="flex justify-center items-center h-48">
-          <p className="text-gray-600 text-lg">Loading...</p>
+           <div className="flex justify-center items-center h-64">
+                  <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+        </div>
         </div>
       )}
     </div>

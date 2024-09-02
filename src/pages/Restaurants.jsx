@@ -128,7 +128,9 @@ export default function Restaurants() {
           </div>
           {isFetchingNextPage && (
             <div className="flex justify-center items-center mt-4">
-              <p className="text-gray-500">Loading more...</p>
+               <div className="flex justify-center items-center h-64">
+                  <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+        </div>
             </div>
           )}
         </div>

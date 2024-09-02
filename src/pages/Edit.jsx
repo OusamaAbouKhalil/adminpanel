@@ -590,7 +590,9 @@ function Edit() {
       <Header title="Edit Restaurant" />
       <form onSubmit={handleSubmit}>
         {isLoading ? (
-          <p className="text-gray-600">Loading...</p>
+          <div className="flex justify-center items-center h-64">
+          <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+</div>
         ) : (
           <div className="flex flex-wrap">
             {renderFormFields()}
