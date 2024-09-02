@@ -47,10 +47,11 @@ function AddItem() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const imageDir = "images";
     try {
       let itemImageUrl = "";
       if (itemImage) {
-        itemImageUrl = await uploadImage(itemImage);
+        itemImageUrl = await uploadImage(itemImage, imageDir);
       }
       const itemId = createItem({
         rest_id: id,

@@ -39,8 +39,9 @@ const Test = () => {
   }
 
   const handleSaveChanges = async () => {
+    const imageDir = "images";
     if (ItemImage) {
-      const mainImageUrl = await uploadImage(ItemImage);
+      const mainImageUrl = await uploadImage(ItemImage, imageDir);
       setItem(prevItem => ({
         ...prevItem,
         item_image: mainImageUrl
@@ -67,9 +68,9 @@ const Test = () => {
   }
 
   if (isPending) {
-    return  <div className="flex justify-center items-center h-64">
-    <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
-</div>;
+    return <div className="flex justify-center items-center h-64">
+      <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+    </div>;
   }
 
   return (
@@ -199,9 +200,9 @@ const Test = () => {
         </>
       ) : (
         <div className="flex justify-center items-center h-48">
-           <div className="flex justify-center items-center h-64">
-                  <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
-        </div>
+          <div className="flex justify-center items-center h-64">
+            <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+          </div>
         </div>
       )}
     </div>

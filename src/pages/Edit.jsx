@@ -8,7 +8,7 @@ import { restaurantGrid } from "../data/dummy";
 import CategoriesForm from "../components/Form/CategoriesForm";
 import { useGetRestaurantById } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
-import { FaPlusCircle, FaMinusCircle, FaTrash  } from 'react-icons/fa';
+import { FaPlusCircle, FaMinusCircle, FaTrash } from 'react-icons/fa';
 
 
 
@@ -174,16 +174,17 @@ function Edit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const imageDir = "images";
     try {
       setProgress(20);
       let mainImageUrl;
       let bgImageUrl;
       if (images.main_image) {
-        mainImageUrl = await uploadImage(images.main_image);
+        mainImageUrl = await uploadImage(images.main_image, imageDir);
       }
       setProgress(60);
       if (images.bg_image) {
-        bgImageUrl = await uploadImage(images.bg_image);
+        bgImageUrl = await uploadImage(images.bg_image, imageDir);
       }
       setProgress(80);
 
@@ -217,7 +218,7 @@ function Edit() {
   const handleHoursChange = (e, day, timeIndex) => {
     const { name, value } = e.target;
     const formattedTime = formatTime(value);
-  
+
     setFormData(prevState => ({
       ...prevState,
       hours: {
@@ -230,33 +231,33 @@ function Edit() {
       }
     }));
   };
-  
+
   const formatTime = (timeString) => {
     // Trim whitespace from both sides
     timeString = timeString.trim();
-  
+
     // Define regex to match time in various formats
     const regex = /^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i;
     const match = timeString.match(regex);
-  
+
     if (!match) return timeString; // return original if not a valid time
-  
+
     let [_, hours, minutes, period] = match;
     hours = parseInt(hours, 10);
     minutes = parseInt(minutes, 10);
-  
+
     // Convert hours to 12-hour format
     if (hours > 12) hours -= 12;
     if (hours === 0) hours = 12;
-  
+
     // Determine AM/PM if not provided
     if (!period) {
       period = (parseInt(hours, 10) < 12) ? 'AM' : 'PM';
     }
-  
+
     return `${hours}:${minutes.toString().padStart(2, '0')} ${period.toUpperCase()}`;
   };
-  
+
   const renderHoursTable = () => (
     <div className="w-full p-6 bg-white rounded-xl shadow-lg mb-8">
       <h2 className="text-2xl font-semibold text-gray-900 mb-6">Business Hours</h2>
@@ -333,20 +334,20 @@ function Edit() {
       </div>
     </div>
   );
-  
-  
+
+
   // Function to handle clearing inputs for a specific time slot
   const clearTimeSlot = (day, timeIndex) => {
     // Get the current hours data
     const currentHours = formData.hours[day] || [];
-    
+
     // Create a new array with the specified slot cleared
     const updatedHours = currentHours.map((period, index) =>
       index === timeIndex
         ? { openingTime: "", closingTime: "" } // Clear the specific slot
         : period
     );
-  
+
     // Update the state with the new hours array
     setFormData(prevState => ({
       ...prevState,
@@ -368,7 +369,7 @@ function Edit() {
       }
     }));
   };
-  
+
   const addNewTimeSlot = (day) => {
     setFormData(prevState => ({
       ...prevState,
@@ -409,7 +410,7 @@ function Edit() {
           )}
         </React.Fragment>
       ))}
-      
+
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
         {restaurantGrid.map(item => (
           <React.Fragment key={item.value}>
@@ -572,8 +573,8 @@ function Edit() {
       </div>
     </div>
   );
-  
-  
+
+
   // Function to handle toggle switch changes
   const handleToggleChange = (value) => {
     setFormData(prevData => ({
@@ -581,18 +582,18 @@ function Edit() {
       [value]: !prevData[value]
     }));
   };
-  
-  
-  
-  
+
+
+
+
   return (
     <div className="m-4 md:m-10 mt-24 p-4 md:p-10 bg-gradient-to-r from-green-30 to-white rounded-3xl">
       <Header title="Edit Restaurant" />
       <form onSubmit={handleSubmit}>
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
-          <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
-</div>
+            <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+          </div>
         ) : (
           <div className="flex flex-wrap">
             {renderFormFields()}
@@ -623,6 +624,6 @@ function Edit() {
       </form>
     </div>
   );
-}  
+}
 
 export default Edit;

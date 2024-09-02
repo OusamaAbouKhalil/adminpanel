@@ -10,9 +10,11 @@ import {
   BsKanban,
   BsChatLeft,
 } from "react-icons/bs";
-import { FaDollarSign, FaBell, FaEdit,FaPercentage,FaGift,
+import {
+  FaDollarSign, FaBell, FaEdit, FaPercentage, FaGift,
   FaRegEdit,
-  FaApple, FaImage, FaDesktop,FaReceipt,FaStore ,FaShieldAlt  } from 'react-icons/fa'; // Import the money icon
+  FaApple, FaImage, FaDesktop, FaReceipt, FaStore, FaShieldAlt
+} from 'react-icons/fa'; // Import the money icon
 
 export const gridOrderImage = (props) => (
   <div>
@@ -72,7 +74,7 @@ export const restaurantGrid = [
     value: "title",
     inputType: "text",
   },
-  
+
 ];
 export const menuGrid = [
   {
@@ -245,7 +247,7 @@ export const links = [
     links: [
       {
         name: "dashboard",
-        icon: <FaDesktop size={20}/>,
+        icon: <FaDesktop size={20} />,
       },
     ],
   },
@@ -255,77 +257,77 @@ export const links = [
     links: [
       {
         name: "restaurants",
-        icon: <FaStore size={20}/>,
+        icon: <FaStore size={20} />,
       },
       {
         name: "orders",
-        icon: <FaReceipt size={20}/>,
+        icon: <FaReceipt size={20} />,
       },
     ],
   },
-{
+  {
     title: "Pricing",
     links: [
       {
         name: "prices", // Route name for the new page
-        icon: <FaDollarSign size={20}/>, // Money icon
+        icon: <FaDollarSign size={20} />, // Money icon
       },
     ],
   },
- {
-  title: "Notification center",
-  links: [
-    {
-      name: "notification", // Route name for the new page
-      icon: <FaBell size={20}/>, // Changed to Bell icon
-    },
-    {
-      name: "editnotification", // Route name for the new page
-      icon: <FaEdit size={20}/>, // Changed to Bell icon
-    },
-  ],
-},
-   {
-  title: "Promotions center",
-  links: [
-    {
-      name: "offers", // Route name for the new page
-      icon: <FaPercentage size={20}/>, // Changed to Bell icon
-    },
-    {
-      name: "promo", // Route name for the new page
-      icon: <FaGift size={20} />, // Changed to Bell icon
-    },
-  ],
-},
-{
-  title: "Personalization center",
-  links: [
-    {
-      name: "titles", // Route name for the new page
-      icon: <FaApple size={20} />, // Changed to Bell icon
-    },
-    {
-      name: "banners", 
-      icon: <FaImage size={20} />, // Changed to Bell icon
-    },
-    
-  ],
-},
-{
-  title: "Admins center",
-  links: [
-    {
-      name: "addadmin", // Route name for the new page
-      icon: <FaShieldAlt size={20} />, // Changed to Bell icon
-    },
-    {
-      name: "editadmin", // Route name for the new page
-      icon: <FaRegEdit size={20} />, // Changed to Bell icon
-    },
-    
-  ],
-},
+  {
+    title: "Notification center",
+    links: [
+      {
+        name: "notification", // Route name for the new page
+        icon: <FaBell size={20} />, // Changed to Bell icon
+      },
+      {
+        name: "editnotification", // Route name for the new page
+        icon: <FaEdit size={20} />, // Changed to Bell icon
+      },
+    ],
+  },
+  {
+    title: "Promotions center",
+    links: [
+      {
+        name: "offers", // Route name for the new page
+        icon: <FaPercentage size={20} />, // Changed to Bell icon
+      },
+      {
+        name: "promo", // Route name for the new page
+        icon: <FaGift size={20} />, // Changed to Bell icon
+      },
+    ],
+  },
+  {
+    title: "Personalization center",
+    links: [
+      {
+        name: "titles", // Route name for the new page
+        icon: <FaApple size={20} />, // Changed to Bell icon
+      },
+      {
+        name: "banners",
+        icon: <FaImage size={20} />, // Changed to Bell icon
+      },
+
+    ],
+  },
+  {
+    title: "Admins center",
+    links: [
+      {
+        name: "addadmin", // Route name for the new page
+        icon: <FaShieldAlt size={20} />, // Changed to Bell icon
+      },
+      {
+        name: "editadmin", // Route name for the new page
+        icon: <FaRegEdit size={20} />, // Changed to Bell icon
+      },
+
+    ],
+  },
   {
     title: "Apps",
     links: [
@@ -369,7 +371,22 @@ export const weeklyStats = [
     pcColor: "green-600",
   },
 ];
-
+export const permissionsList = [
+  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'restaurants', label: 'Restaurants Pages' },
+  { id: 'orders', label: 'Orders' },
+  { id: 'prices', label: 'Pricing' },
+  { id: 'notification', label: 'Notification Center' },
+  { id: 'editnotification', label: 'Edit Notification' },
+  { id: 'offers', label: 'Promotions Center' },
+  { id: 'promo', label: 'Promotions - Promo' },
+  { id: 'titles', label: 'Personalization - Titles' },
+  { id: 'banners', label: 'Personalization - Banners' },
+  { id: 'addadmin', label: 'Admins Center' },
+  { id: 'editadmin', label: 'Edit Admin?' },
+  { id: 'calendar', label: 'Calendar' },
+  { id: 'kanban', label: 'Kanban' },
+];
 
 export const ordersGrid = [
   {

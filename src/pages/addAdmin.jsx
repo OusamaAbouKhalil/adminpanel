@@ -1,74 +1,25 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { doc } from "firebase/firestore";
-import CryptoJS from 'crypto-js';
-import { fsdb, auth } from '../utils/firebaseconfig'; // Ensure storage is imported
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-
-
-
-const permissionsList = [
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'restaurants', label: 'Restaurants Pages' },
-  { id: 'orders', label: 'Orders' },
-  { id: 'prices', label: 'Pricing' },
-  { id: 'notification', label: 'Notification Center' },
-  { id: 'editnotification', label: 'Edit Notification' },
-  { id: 'offers', label: 'Promotions Center' },
-  { id: 'promo', label: 'Promotions - Promo' },
-  { id: 'titles', label: 'Personalization - Titles' },
-  { id: 'banners', label: 'Personalization - Banners' },
-  { id: 'addadmin', label: 'Admins Center' },
-  { id: 'editadmin', label: 'Edit Admin?' },
-  { id: 'calendar', label: 'Calendar' },
-  { id: 'kanban', label: 'Kanban' },
-];
+import { useCreateAdmin } from '../lib/query/queries';
+import { permissionsList } from '../data/dummy';
 
 const AdminPage = () => {
   const { register, handleSubmit, reset, watch } = useForm();
   const avatarFile = watch('avatar'); // Watch the avatar file input
+  const { mutate: createAdmin } = useCreateAdmin();
 
-  const hashPassword = (password) => {
-    return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-  };
-
-  const onSubmit = async (data) => {
-    const permissions = {};
-    permissionsList.forEach(permission => {
-      permissions[permission.id] = data[permission.id] || false;
-    });
-  
-    let avatarURL = '';
-    if (avatarFile && avatarFile.length > 0) {
-      try {
-        const imagePath = `adminPP/${selectedAdmin}`;
-        const imageRef = storageRef(getStorage(), imagePath);
-        await uploadBytes(imageRef, avatarFile[0]);
-  
-        // Retrieve the download URL
-        avatarURL = await getDownloadURL(imageRef);
-      } catch (e) {
-        console.error("Error uploading avatar: ", e);
+  const onSubmit = (data) => {
+    createAdmin({ data, avatarFile }, {
+      onSuccess: () => {
+        alert('Admin created successfully!');
+        reset();
+      },
+      onError: (error) => {
+        console.error("Error creating admin: ", error);
       }
-    }
-  
-    try {
-      const adminRef = doc(fsdb, "admins", selectedAdmin);
-      await updateDoc(adminRef, {
-        name: data.name,
-        email: data.email,
-        password: hashPassword(data.password),
-        avatarURL: avatarURL,
-        permissions: permissions,
-      });
-  
-      alert('Admin updated successfully!');
-      handleCloseModal();
-    } catch (e) {
-      console.error("Error updating admin: ", e);
-    }
+    });
   };
-  
+
   return (
     <div className="min-h-screen bg-green-50 p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">

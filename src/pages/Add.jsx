@@ -166,24 +166,24 @@ function Add() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const imageDir = "images";
     try {
       setIsRestaurantPending(true);
 
       if (imageFiles.main_image) {
-        const mainImageUrl = await uploadImage(imageFiles.main_image);
+        const mainImageUrl = await uploadImage(imageFiles.main_image, imageDir);
         formData.main_image = mainImageUrl;
       }
       setProgress(10);
 
       if (imageFiles.bg_image) {
-        const bgImageUrl = await uploadImage(imageFiles.bg_image);
+        const bgImageUrl = await uploadImage(imageFiles.bg_image, imageDir);
         formData.bg_image = bgImageUrl;
       }
       setProgress(20);
 
       if (imageFiles.item_image) {
-        const itemImageUrl = await uploadImage(imageFiles.item_image);
+        const itemImageUrl = await uploadImage(imageFiles.item_image, imageDir);
         menuData.item_image = itemImageUrl;
       }
       setProgress(30);
