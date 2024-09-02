@@ -135,7 +135,7 @@ export default function Dashboard() {
     labels: ['Normal Users', 'Drivers', 'SwiftBitesDrivers'],
     datasets: [{
       label: 'User Types',
-      data: [usersNum.normal, usersNum.drivers, usersNum.SwiftBitesDrivers],
+      data: [usersNum.normal, usersNum.drivers, driversData.swiftBitesDrivers.length],
       backgroundColor: ['#4CAF50', '#2196F3', '#FF5722'],
     }],
   };
