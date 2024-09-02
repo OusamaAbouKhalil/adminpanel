@@ -144,7 +144,7 @@ export default function Dashboard() {
     labels: ['Rest Profit', 'Delivery Charge'],
     datasets: [{
       label: 'Financials',
-      data: [budget, expense],
+      data: [revenueData.profit.data, revenueData.deliveryCharge.data],
       backgroundColor: ['#4CAF50', '#FF9800'],
     }],
   };
