@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
 import { Navbar, Sidebar } from "./components";
 import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage, SendNotificationPage,
-   EditNotificationPage, PromoCodesPage, OffersPage,Titles,DealsPage, AddAdmin , EditAdmin} from "./pages";
+   EditNotificationPage, PromoCodesPage, OffersPage
+   ,Titles,DealsPage, AddAdmin , EditAdmin, RevenuePage} from "./pages";
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
 import Edit from './pages/Edit';
@@ -34,7 +35,7 @@ const AppRoutes = () => (
       <Route path="banners" element={<ProtectedRoute><DealsPage /></ProtectedRoute>} />
       <Route path="addadmin" element={<ProtectedRoute><AddAdmin /></ProtectedRoute>} />
       <Route path="editadmin" element={<ProtectedRoute><EditAdmin /></ProtectedRoute>} />
-
+      <Route path="revenue" element={<ProtectedRoute><RevenuePage /></ProtectedRoute>} />
     </Route>
   </Routes>
 );

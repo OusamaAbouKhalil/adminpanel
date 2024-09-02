@@ -16,4 +16,5 @@ export {default as Titles} from './title_mangment'
 export {default as DealsPage} from './DealsPage'
 export {default as AddAdmin} from './addAdmin'
 export {default as EditAdmin} from './EditAdmin'
+export {default as RevenuePage} from './RevenuePage'
 
