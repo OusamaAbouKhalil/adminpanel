@@ -18,6 +18,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const secondaryApp = initializeApp(firebaseConfig, "Secondary");
 
 const functions = getFunctions(app);
 
@@ -25,5 +26,6 @@ const functions = getFunctions(app);
 const db = getDatabase(app);
 export const fsdb = getFirestore(app);
 export const auth = getAuth(app);
-export {functions, httpsCallable};
+export const secondaryAuth = getAuth(secondaryApp);
+export { functions, httpsCallable };
 export default db;

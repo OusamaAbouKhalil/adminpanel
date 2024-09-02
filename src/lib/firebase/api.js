@@ -1,6 +1,6 @@
 import { getDatabase, ref, get, onValue } from "firebase/database";
-
-import db, { fsdb, functions, httpsCallable } from "../../utils/firebaseconfig";
+import CryptoJS from 'crypto-js';
+import db, { auth, fsdb, functions, httpsCallable, secondaryAuth } from "../../utils/firebaseconfig";
 import {
     getDownloadURL,
     getStorage,
@@ -9,6 +9,8 @@ import {
 } from "firebase/storage";
 import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc, query, orderBy, startAfter, limit, where } from "firebase/firestore";
 import { getLocationByCoordinates } from "../utils";
+import { permissionsList } from "../../data/dummy";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth, signInWithCustomToken, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 
 export const getRestaurants = async (
@@ -109,10 +111,10 @@ export const setMenuItem = async (restaurantId, itemId, itemData) => {
     }
 };
 
-export const uploadImage = async (file) => {
+export const uploadImage = async (file, path) => {
     const storage = getStorage();
     const filename = Date.now() + "." + file.name.split('.').pop();
-    const storageReference = storageRef(storage, `images/${filename}`);
+    const storageReference = storageRef(storage, `${path}/${filename}`);
     try {
         console.log("Uploading to:", storageReference.fullPath);
         const snapshot = await uploadBytes(storageReference, file);
@@ -354,3 +356,66 @@ export const createItem = async (id, formData) => {
         console.error("Error adding menu item: ", error);
     }
 }
+export const getPermissions = async (currentUser) => {
+    try {
+        const userRef = doc(fsdb, 'admins', currentUser.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+            return userDoc.data().permissions;
+        }
+        console.error('No such document!');
+        return [];
+    } catch (error) {
+        console.error('Error fetching user permissions:', error);
+    }
+};
+
+export const createAdmin = async (data, avatarFile) => {
+    const hashPassword = (password) => {
+        return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+    };
+
+    const permissions = {};
+    permissionsList.forEach(permission => {
+        permissions[permission.id] = data[permission.id] || false;
+    });
+
+    let avatarURL = '';
+    if (avatarFile && avatarFile.length > 0) {
+        avatarURL = await uploadImage(avatarFile[0], 'adminPP');
+    }
+
+    try {
+        // Check if the email is already in use
+        const signInMethods = await fetchSignInMethodsForEmail(secondaryAuth, data.email);
+        if (signInMethods.length > 0) {
+            throw new Error('auth/email-already-in-use');
+        }
+
+        // Create the new user using the secondary Auth instance
+        const userCredential = await createUserWithEmailAndPassword(secondaryAuth, data.email, data.password);
+        const user = userCredential.user;
+
+        // Save the new admin data to Firestore
+        const adminRef = doc(fsdb, "admins", user.uid);
+        await setDoc(adminRef, {
+            name: data.name,
+            email: data.email,
+            password: hashPassword(data.password),
+            avatarURL: avatarURL,
+            permissions: permissions,
+        });
+
+        // Sign out the secondary Auth instance
+        await secondaryAuth.signOut();
+
+        return { success: true };
+    } catch (e) {
+        console.error("Error creating admin: ", e);
+
+        // Sign out the secondary Auth instance in case of error
+        await secondaryAuth.signOut();
+
+        return { success: false, error: e.message };
+    }
+};

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { addAddonToMenuItem, createItem, createRestaurant, getMenuItem, getOrders, getRestaurantById, getRestaurantMenu, getRestaurants, setMenuItem, updateOrderStatus } from '../firebase/api';
+import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, getMenuItem, getOrders, getPermissions, getRestaurantById, getRestaurantMenu, getRestaurants, setMenuItem, updateOrderStatus } from '../firebase/api';
 
 // In queries.js
 export const useGetRestaurants = (searchTerm) => {
@@ -65,3 +65,18 @@ export const useGetRestaurantMenu = (id) => {
         queryFn: () => getRestaurantMenu(id),
     });
 }
+export const useGetPermissions = (currentUser) => {
+    return useQuery({
+        queryKey: ['permissions'],
+        queryFn: () => getPermissions(currentUser),
+    });
+}
+export const useCreateAdmin = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ data, avatarFile }) => createAdmin(data, avatarFile),
+        onSuccess: () => {
+            queryClient.invalidateQueries('admins');
+        },
+    });
+};
