@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../utils/firebaseconfig';
+import { auth, fsdb } from '../utils/firebaseconfig';
 import { useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -11,8 +12,20 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, "admin-" + email, password);
-      navigate('/restaurants');
+      // Sign in with email and password
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // Check if the user is in the 'admins' collection
+      const userDocRef = doc(fsdb, 'admins', auth.currentUser.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        navigate('/restaurants');
+      } else {
+        alert('Access denied. You are not authorized to access this application.');
+        // Optionally, sign out the user
+        await auth.signOut();
+      }
     } catch (error) {
       alert(error.message);
     }

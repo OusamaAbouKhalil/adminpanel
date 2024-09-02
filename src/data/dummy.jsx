@@ -10,9 +10,9 @@ import {
   BsKanban,
   BsChatLeft,
 } from "react-icons/bs";
-import { IoMdContacts } from "react-icons/io";
-import { RiContactsLine } from "react-icons/ri";
-import { FaDollarSign, FaBell, FaEdit,FaPercentage,FaGift, FaApple, FaImage, FaDesktop,FaReceipt,FaStore   } from 'react-icons/fa'; // Import the money icon
+import { FaDollarSign, FaBell, FaEdit,FaPercentage,FaGift,
+  FaRegEdit,
+  FaApple, FaImage, FaDesktop,FaReceipt,FaStore ,FaShieldAlt  } from 'react-icons/fa'; // Import the money icon
 
 export const gridOrderImage = (props) => (
   <div>
@@ -308,6 +308,20 @@ export const links = [
     {
       name: "banners", 
       icon: <FaImage size={20} />, // Changed to Bell icon
+    },
+    
+  ],
+},
+{
+  title: "Admins center",
+  links: [
+    {
+      name: "addadmin", // Route name for the new page
+      icon: <FaShieldAlt size={20} />, // Changed to Bell icon
+    },
+    {
+      name: "editadmin", // Route name for the new page
+      icon: <FaRegEdit size={20} />, // Changed to Bell icon
     },
     
   ],

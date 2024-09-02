@@ -138,11 +138,11 @@ function Sidebar() {
           </div>
           <div className="px-4 py-3 bg-gray-100 dark:bg-gray-700">
             <button
-              className="flex items-center justify-center w-full p-2 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-700 transition-colors duration-200 ease-in-out"
+              className="flex  w-full p-2 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-700 transition-colors duration-200 ease-in-out"
               onClick={handleLogout}
             >
               <IoLogOutOutline size={28} className="mx-auto" />
-              {!collapsed && <span className="ml-2 text-sm font-medium">Logout</span>}
+              {!collapsed && <span className="ml-2 text-sm font-medium text-left">Logout</span>}
             </button>
           </div>
         </div>

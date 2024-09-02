@@ -136,6 +136,7 @@ const PromoCodesPage = () => {
             <h2 className="text-2xl font-semibold mb-4 text-gray-700">Add New Promo Code</h2>
             <div className="space-y-4">
               <input
+              required
                 type="text"
                 placeholder="Promo Code (e.g., FIRST10)"
                 value={newPromoCode}
@@ -143,6 +144,7 @@ const PromoCodesPage = () => {
                 className="w-full border border-gray-300 rounded-lg p-4 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <input
+               required
                 type="number"
                 placeholder="Credits"
                 value={newCredits}
@@ -151,6 +153,7 @@ const PromoCodesPage = () => {
                 min="0"
               />
               <input
+               required
                 type="number"
                 placeholder="Uses Left"
                 value={newUsesLeft}

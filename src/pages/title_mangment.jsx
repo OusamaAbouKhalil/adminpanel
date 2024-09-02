@@ -175,6 +175,7 @@ const Titles = () => {
             />
             <div className="flex items-center mb-4">
               <input
+               required
                 type="checkbox"
                 name="show_in_morning"
                 checked={newTitle.show_in_morning}
@@ -209,6 +210,7 @@ const Titles = () => {
               <div className="p-6 bg-white rounded-lg shadow-lg border border-gray-300">
                 <h2 className="text-2xl font-semibold mb-4 text-gray-700">Edit Title</h2>
                 <input
+                 required
                   type="text"
                   name="title"
                   value={editTitle.title}
