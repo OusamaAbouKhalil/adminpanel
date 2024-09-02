@@ -19,8 +19,10 @@ const getEndOfMonth = () => {
 };
 
 export default function Dashboard() {
-  const [usersNum, setUsersNum] = useState(0);
+  // Counters of users by type client driver SwiftBites driver
+  const [usersNum, setUsersNum] = useState({ normal: 0, drivers: 0, SwiftBitesDrivers: 0 });
   const [revenueData, setRevenueData] = useState({ deliveryCharge: { labels: [], data: [] }, profit: { labels: [], data: [] } });
+  const [driversData, setDriversData] = useState({ drivers: [], swiftBitesDrivers: [] });
   const [startDate, setStartDate] = useState(getStartOfMonth());
   const [endDate, setEndDate] = useState(getEndOfMonth());
   const { ridesNum, driversNum, financials, cards, createdDate } = useStateContext();
@@ -33,9 +35,45 @@ export default function Dashboard() {
 
     onValue(usersRef, (snapshot) => {
       const usersData = snapshot.val();
-      const userCount = usersData ? Object.keys(usersData).length : 0;
+      const userCount = {
+        normal: usersData ? Object.keys(usersData).length : 0,
+        drivers: 0,
+        SwiftBitesDrivers: 0
+      };
       setUsersNum(userCount);
     });
+
+    // Fetch drivers data from Realtime Database
+    const fetchDriversData = () => {
+      const driversRef = ref(db, 'drivers');
+      const swiftBitesDriversRef = ref(db, 'swiftBitesDrivers');
+
+      onValue(driversRef, (snapshot) => {
+        const driversData = snapshot.val();
+        setDriversData(prevData => ({
+          ...prevData,
+          drivers: driversData ? Object.keys(driversData) : []
+        }));
+        setUsersNum(prevNum => ({
+          ...prevNum,
+          drivers: driversData ? Object.keys(driversData).length : 0
+        }));
+      });
+
+      onValue(swiftBitesDriversRef, (snapshot) => {
+        const swiftBitesDriversData = snapshot.val();
+        setDriversData(prevData => ({
+          ...prevData,
+          swiftBitesDrivers: swiftBitesDriversData ? Object.keys(swiftBitesDriversData) : []
+        }));
+        setUsersNum(prevNum => ({
+          ...prevNum,
+          SwiftBitesDrivers: swiftBitesDriversData ? Object.keys(swiftBitesDriversData).length : 0
+        }));
+      });
+    };
+
+    fetchDriversData();
 
     // Fetch revenue data from Firestore
     const fetchRevenueData = async () => {
@@ -44,17 +82,15 @@ export default function Dashboard() {
         const snapshot = await getDocs(revenueRef);
 
         const revenueEntries = snapshot.docs.map(doc => doc.data());
-        console.log('Revenue Entries:', revenueEntries); // Log fetched data
+        console.log('Revenue Entries:', revenueEntries);
 
-        // Filter data based on selected date range
         const filteredEntries = revenueEntries.filter(entry => {
           const entryDate = new Date(entry.date);
           return entryDate >= startDate && entryDate <= endDate;
         });
 
-        console.log('Filtered Entries:', filteredEntries); // Log filtered data
+        console.log('Filtered Entries:', filteredEntries);
 
-        // Organize data by type
         const deliveryChargeData = {
           labels: [],
           data: [],
@@ -96,11 +132,11 @@ export default function Dashboard() {
   const currentDate = new Date();
 
   const userStats = {
-    labels: ['Users'],
+    labels: ['Normal Users', 'Drivers', 'SwiftBitesDrivers'],
     datasets: [{
-      label: 'Count',
-      data: [usersNum],
-      backgroundColor: ['#4CAF50'],
+      label: 'User Types',
+      data: [usersNum.normal, usersNum.drivers, usersNum.SwiftBitesDrivers],
+      backgroundColor: ['#4CAF50', '#2196F3', '#FF5722'],
     }],
   };
 
@@ -111,6 +147,17 @@ export default function Dashboard() {
       data: [budget, expense],
       backgroundColor: ['#4CAF50', '#FF9800'],
     }],
+  };
+
+  const driversChartData = {
+    labels: ['Drivers', 'SwiftBitesDrivers'],
+    datasets: [
+      {
+        label: 'Drivers',
+        data: [driversData.drivers.length, driversData.swiftBitesDrivers.length],
+        backgroundColor: ['#2196F3', '#FF5722'],
+      },
+    ],
   };
 
   const lineChartOptions = {
@@ -148,7 +195,6 @@ export default function Dashboard() {
     }],
   };
 
-  // Function to handle file download
   const handleDownload = () => {
     if (!revenueData.deliveryCharge.labels || !revenueData.deliveryCharge.data || !revenueData.profit.labels || !revenueData.profit.data) {
       console.error('Revenue data is missing');
@@ -182,7 +228,7 @@ export default function Dashboard() {
         </div>
         <button
           type="button"
-          onClick={handleDownload}  // Attach the download function
+          onClick={handleDownload}
           className="bg-green-600 text-white py-2 px-4 rounded-lg flex items-center hover:bg-green-700"
         >
           <BsDownload className="mr-2" />
@@ -211,42 +257,31 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        {cards.map((item) => (
-          <div
-            key={item.title}
-            className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg p-5 rounded-lg shadow-md flex items-center justify-between"
-          >
-            <div>
-              <p className="text-gray-400 font-medium">{item.title}</p>
-              <p className="text-2xl font-semibold text-gray-700">{item.amount}</p>
-            </div>
-            <div
-              className={`text-3xl p-4 rounded-full ${item.iconBg} text-white`}
-              style={{ backgroundColor: item.iconBg }}
-            >
-              {item.title === 'Users' && <MdOutlineSupervisorAccount />}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg p-5 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">User Statistics</h3>
-          <Bar data={userStats} />
-        </div>
-        
-        <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg p-5 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Revenue Trend - Profit</h3>
-          <Line options={lineChartOptions} data={lineChartDataProfit} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4">User Types</h3>
+          <Pie data={userStats} />
         </div>
 
-        <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg p-5 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Revenue Trend - Delivery Charges</h3>
-          <Line options={lineChartOptions} data={lineChartDataDeliveryCharge} />
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4">Financials</h3>
+          <Bar data={financialStats} />
         </div>
 
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4">Revenue (Delivery Charges)</h3>
+          <Line data={lineChartDataDeliveryCharge} options={lineChartOptions} />
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4">Revenue (Profit)</h3>
+          <Line data={lineChartDataProfit} options={lineChartOptions} />
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4">Drivers</h3>
+          <Pie data={driversChartData} />
+        </div>
       </div>
     </div>
   );
