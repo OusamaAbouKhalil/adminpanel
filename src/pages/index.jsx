@@ -17,4 +17,6 @@ export { default as DealsPage } from './DealsPage'
 export { default as AddAdmin } from './addAdmin'
 export { default as EditAdmin } from './EditAdmin'
 export { default as Drivers } from './Drivers/Drivers'
-export { default as Rides } from './Rides'
+export { default as Rides } from './Rides';
+export { default as RevenuePage } from './RevenuePage'
+

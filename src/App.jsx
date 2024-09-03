@@ -4,9 +4,11 @@ import { AuthProvider } from './contexts/AuthProvider';
 import { Navbar, Sidebar } from "./components";
 import {
   Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage, SendNotificationPage,
-  EditNotificationPage, PromoCodesPage, OffersPage, Titles, DealsPage, AddAdmin, EditAdmin,
+  EditNotificationPage, PromoCodesPage, OffersPage
+  , Titles, DealsPage, AddAdmin, EditAdmin,
   Drivers,
   Rides
+  , RevenuePage
 } from "./pages";
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
@@ -39,7 +41,7 @@ const AppRoutes = () => (
       <Route path="addadmin" element={<ProtectedRoute><AddAdmin /></ProtectedRoute>} />
       <Route path="editadmin" element={<ProtectedRoute><EditAdmin /></ProtectedRoute>} />
       <Route path="drivers" element={<ProtectedRoute><Drivers /></ProtectedRoute>} />
-      <Route path="rides" element={<ProtectedRoute><Rides /></ProtectedRoute>} />
+      <Route path="rides" element={<ProtectedRoute><Rides /></ProtectedRoute>} />      <Route path="revenue" element={<ProtectedRoute><RevenuePage /></ProtectedRoute>} />
     </Route>
   </Routes>
 );

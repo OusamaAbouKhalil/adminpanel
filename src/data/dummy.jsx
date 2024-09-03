@@ -8,7 +8,7 @@ import {
 } from "react-icons/fi";
 import {
   BsKanban,
-  BsChatLeft,
+  BsChatLeft,BsCurrencyDollar
 } from "react-icons/bs";
 import {
   FaDollarSign, FaBell, FaEdit, FaPercentage, FaGift,
@@ -251,6 +251,15 @@ export const links = [
       },
     ],
   },
+  {
+    title: "Revenue Pages",
+    links: [
+      {
+        name: "revenue",
+        icon: <BsCurrencyDollar size={20} />,
+      },
+    ],
+  },
 
   {
     title: "Swift Bite",
@@ -386,6 +395,7 @@ export const weeklyStats = [
 ];
 export const permissionsList = [
   { id: 'dashboard', label: 'Dashboard' },
+  { id: 'revenue', label: 'Revenue Pages' },
   { id: 'restaurants', label: 'Restaurants Pages' },
   { id: 'orders', label: 'Orders' },
   { id: 'prices', label: 'Pricing' },
