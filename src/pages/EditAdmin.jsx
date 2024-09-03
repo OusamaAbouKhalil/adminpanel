@@ -21,6 +21,8 @@ const permissionsList = [
   { id: "revenue", label: "Revenues Pages" },
   { id: "restaurants", label: "Restaurants Pages" },
   { id: "orders", label: "Orders" },
+  { id: "drivers", label: "View drivers" },
+  { id: "rides", label: "View rides" },
   { id: "prices", label: "Pricing" },
   { id: "notification", label: "Notification Center" },
   { id: "editnotification", label: "Edit Notification" },

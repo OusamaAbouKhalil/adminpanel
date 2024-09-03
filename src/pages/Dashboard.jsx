@@ -211,7 +211,7 @@ export default function Dashboard() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-
+    
     link.href = url;
     link.setAttribute('download', 'report.csv');
     document.body.appendChild(link);
@@ -262,37 +262,15 @@ export default function Dashboard() {
           <h3 className="text-xl font-semibold mb-4">User Types</h3>
           <Pie data={userStats} />
         </div>
-        <div className="flex flex-wrap justify-center gap-1 items-center w-full">
-          {cards.map((item) => (
-            <div key={item.title}
-              {...item.title === 'Users' ? item.amount = usersNum :
-                item.title === 'biteDrivers' ? item.amount = driversNum :
-                  item.title === 'Requests' ? item.amount = ridesNum :
-                    item.title === 'Guests' ? null :
-                      null
-              }
-              className="bg-white h-44 dark:text-gray-200 dark:bg-secondary-dark-bg md:w-56  p-4 pt-9 rounded-2xl ">
-              <button
-                type="button"
-                style={{ color: item.iconColor, backgroundColor: item.iconBg }}
-                className="text-2xl opacity-0.9 rounded-full  p-4 hover:drop-shadow-xl"
-              >
-                {item.title === 'Users' ? <MdOutlineSupervisorAccount /> :
-                  item.title === 'biteDrivers' ? <FaTaxi /> :
-                    item.title === 'Requests' ? <FaCodePullRequest /> :
-                      item.title === 'Guests' ? <FaAngellist /> :
-                        null
-                }
-              </button>
-              <p className="mt-3">
-                <span className="text-lg font-semibold">{item.amount}</span>
-                <span className={`text-sm text-${item.pcColor} ml-2`}>
-                  {item.percentage}
-                </span>
-              </p>
-              <p className="text-sm text-gray-400  mt-1">{item.title}</p>
-            </div>
-          ))}
+
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4">Financials</h3>
+          <Bar data={financialStats} />
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4">Revenue (Delivery Charges)</h3>
+          <Line data={lineChartDataDeliveryCharge} options={lineChartOptions} />
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">
