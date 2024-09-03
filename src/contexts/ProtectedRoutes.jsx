@@ -12,7 +12,7 @@ import { useGetPermissions } from '../lib/query/queries';
 
 export const ProtectedRoute = ({ children }) => {
   const { currentUser, logOut } = useAuth();
-  const { setDrivers, setOrdersList, dayOrders } = useStateContext();
+  const { setBiteDrivers, setOrdersList, dayOrders, setDrivers } = useStateContext();
   const { data: permissions, isPending: loading } = useGetPermissions(currentUser);
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ export const ProtectedRoute = ({ children }) => {
       const driversArray = snapshot.exists()
         ? Object.entries(snapshot.val()).map(([key, value]) => ({ id: key, ...value }))
         : [];
-      setDrivers(driversArray);
+      setBiteDrivers(driversArray);
     };
 
     const fetchOrdersForDay = (date = new Date()) => {
@@ -77,7 +77,26 @@ export const ProtectedRoute = ({ children }) => {
       unsubscribe();
       off(driversRef, 'value', onDriversChange);
     };
-  }, [currentUser, dayOrders, setDrivers]);
+  }, [currentUser, dayOrders, setBiteDrivers]);
+
+
+  useEffect(() => {
+    const driversRef = ref(db, '/drivers');
+    const onDriversChange = (snapshot) => {
+      console.log('Drivers snapshot:', snapshot);
+      const driversArray = snapshot.exists()
+        ? Object.entries(snapshot.val()).map(([key, value]) => ({ id: key, ...value }))
+        : [];
+      setDrivers(driversArray);
+    };
+
+
+    onValue(driversRef, onDriversChange, (error) => console.error('Error fetching drivers:', error));
+    return () => {
+      off(driversRef, 'value', onDriversChange);
+    };
+  }, [])
+
 
   const hasAccess = useMemo(() => {
     const route = location.pathname.split('/')[1];

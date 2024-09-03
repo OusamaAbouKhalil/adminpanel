@@ -42,7 +42,7 @@ export default function Dashboard() {
           {cards.map((item) => (
             <div key={item.title}
               {...item.title === 'Users' ? item.amount = usersNum :
-                item.title === 'Drivers' ? item.amount = driversNum :
+                item.title === 'biteDrivers' ? item.amount = driversNum :
                   item.title === 'Requests' ? item.amount = ridesNum :
                     item.title === 'Guests' ? null :
                       null
@@ -54,7 +54,7 @@ export default function Dashboard() {
                 className="text-2xl opacity-0.9 rounded-full  p-4 hover:drop-shadow-xl"
               >
                 {item.title === 'Users' ? <MdOutlineSupervisorAccount /> :
-                  item.title === 'Drivers' ? <FaTaxi /> :
+                  item.title === 'biteDrivers' ? <FaTaxi /> :
                     item.title === 'Requests' ? <FaCodePullRequest /> :
                       item.title === 'Guests' ? <FaAngellist /> :
                         null

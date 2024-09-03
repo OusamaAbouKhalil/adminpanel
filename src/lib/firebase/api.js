@@ -1,4 +1,4 @@
-import { getDatabase, ref, get, onValue } from "firebase/database";
+import { getDatabase, ref, get, onValue, set, push } from "firebase/database";
 import CryptoJS from 'crypto-js';
 import db, { auth, fsdb, functions, httpsCallable, secondaryAuth } from "../../utils/firebaseconfig";
 import {
@@ -419,3 +419,23 @@ export const createAdmin = async (data, avatarFile) => {
         return { success: false, error: e.message };
     }
 };
+export const saveDriver = async (driverData) => {
+    try {
+        const driverRef = ref(db, `drivers/${driverData.id}`);
+        await set(driverRef, driverData);
+        console.log("Driver data saved successfully!");
+    } catch (error) {
+        console.error("Error saving driver data: ", error);
+    }
+};
+export const addDriver = async (newDriver) => {
+    try {
+        const driversRef = ref(db, '/drivers');
+        await push(driversRef, {
+            ...newDriver,
+            email: "Driver-" + newDriver.email,
+        });
+    } catch (error) {
+        console.error("Error adding driver: ", error);
+    }
+}

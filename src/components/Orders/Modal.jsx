@@ -1,6 +1,6 @@
 import React from "react";
 
-const Modal = ({ isOpen, onClose, drivers, onSelectDriver }) => {
+const Modal = ({ isOpen, onClose, biteDrivers, onSelectDriver }) => {
   if (!isOpen) return null;
 
   return (
@@ -8,7 +8,7 @@ const Modal = ({ isOpen, onClose, drivers, onSelectDriver }) => {
       <div className="bg-white p-4 rounded shadow-lg">
         <h2 className="text-lg font-bold">Select a Driver</h2>
         <ul className='flex flex-col flex-nowrap'>
-          {drivers.map((driver) => (
+          {biteDrivers.map((driver) => (
             <li key={driver.id} className="my-1">
               {driver.fullname}
               <button

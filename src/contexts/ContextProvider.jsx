@@ -18,6 +18,7 @@ export const ContextProvider = ({ children }) => {
   const [scheduleDates, setScheduleDates] = useState([]);
   const [financials, setFinancials] = useState({ expense: 0, budget: 0 });
   const [cards, setCards] = useState([]);
+  const [biteDrivers, setBiteDrivers] = useState([]);
   const [drivers, setDrivers] = useState([]);
 
   const handleClick = (clicked) => {
@@ -45,12 +46,14 @@ export const ContextProvider = ({ children }) => {
         financials,
         cards,
         scheduleDates,
-        setDrivers,
-        drivers,
+        setBiteDrivers,
+        biteDrivers,
         ordersList,
         setOrdersList,
         dayOrders,
-        setDayOrders
+        setDayOrders,
+        drivers,
+        setDrivers
       }}
     >
       {children}

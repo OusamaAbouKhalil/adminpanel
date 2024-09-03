@@ -253,7 +253,7 @@ export const links = [
   },
 
   {
-    title: "Restaurants Pages",
+    title: "Swift Bite",
     links: [
       {
         name: "restaurants",
@@ -261,6 +261,19 @@ export const links = [
       },
       {
         name: "orders",
+        icon: <FaReceipt size={20} />,
+      },
+    ],
+  },
+  {
+    title: "Swift Drive",
+    links: [
+      {
+        name: "drivers",
+        icon: <FaStore size={20} />,
+      },
+      {
+        name: "rides",
         icon: <FaReceipt size={20} />,
       },
     ],

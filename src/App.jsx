@@ -2,8 +2,12 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
 import { Navbar, Sidebar } from "./components";
-import { Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage, SendNotificationPage,
-   EditNotificationPage, PromoCodesPage, OffersPage,Titles,DealsPage, AddAdmin , EditAdmin} from "./pages";
+import {
+  Dashboard, Add, Calendar, Restaurants, Kanban, Test, AddItem, Menu, Orders, LoginPage, SendNotificationPage,
+  EditNotificationPage, PromoCodesPage, OffersPage, Titles, DealsPage, AddAdmin, EditAdmin,
+  Drivers,
+  Rides
+} from "./pages";
 import './App.css';
 import { useStateContext } from './contexts/ContextProvider';
 import Edit from './pages/Edit';
@@ -34,7 +38,8 @@ const AppRoutes = () => (
       <Route path="banners" element={<ProtectedRoute><DealsPage /></ProtectedRoute>} />
       <Route path="addadmin" element={<ProtectedRoute><AddAdmin /></ProtectedRoute>} />
       <Route path="editadmin" element={<ProtectedRoute><EditAdmin /></ProtectedRoute>} />
-
+      <Route path="drivers" element={<ProtectedRoute><Drivers /></ProtectedRoute>} />
+      <Route path="rides" element={<ProtectedRoute><Rides /></ProtectedRoute>} />
     </Route>
   </Routes>
 );
@@ -43,12 +48,12 @@ const MainLayout = () => {
   const { activeMenu } = useStateContext();
 
   // Sidebar width class based on active state
-  const sidebarClass = activeMenu 
-    ? "w-64 fixed sidebar dark:bg-secondary-dark-bg bg-white" 
+  const sidebarClass = activeMenu
+    ? "w-64 fixed sidebar dark:bg-secondary-dark-bg bg-white"
     : "w-20 fixed sidebar dark:bg-secondary-dark-bg bg-white";
 
   // Content area class that adjusts based on the sidebar's state
-  const contentClass = activeMenu 
+  const contentClass = activeMenu
     ? 'dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-64 w-full transition-all duration-300'
     : 'bg-main-bg dark:bg-main-dark-bg w-full min-h-screen md:ml-20 flex-2 transition-all duration-300';
 
