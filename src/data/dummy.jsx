@@ -8,7 +8,7 @@ import {
 } from "react-icons/fi";
 import {
   BsKanban,
-  BsChatLeft,BsCurrencyDollar
+  BsChatLeft, BsCurrencyDollar
 } from "react-icons/bs";
 import {
   FaDollarSign, FaBell, FaEdit, FaPercentage, FaGift,
@@ -411,6 +411,7 @@ export const permissionsList = [
   { id: "editadmin", label: "Edit Admin?" },
   { id: "calendar", label: "Calendar" },
   { id: "kanban", label: "Kanban" },
+  { id: "add", label: "Add Restaurant" },
 ];
 export const ordersGrid = [
   {

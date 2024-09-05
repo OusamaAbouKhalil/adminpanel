@@ -16,25 +16,7 @@ import {
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
-const permissionsList = [
-  { id: "dashboard", label: "Dashboard" },
-  { id: "revenue", label: "Revenues Pages" },
-  { id: "restaurants", label: "Restaurants Pages" },
-  { id: "orders", label: "Orders" },
-  { id: "drivers", label: "View drivers" },
-  { id: "rides", label: "View rides" },
-  { id: "prices", label: "Pricing" },
-  { id: "notification", label: "Notification Center" },
-  { id: "editnotification", label: "Edit Notification" },
-  { id: "offers", label: "Promotions Center" },
-  { id: "promo", label: "Promotions - Promo" },
-  { id: "titles", label: "Personalization - Titles" },
-  { id: "banners", label: "Personalization - Banners" },
-  { id: "addadmin", label: "Admins Center" },
-  { id: "editadmin", label: "Edit Admin?" },
-  { id: "calendar", label: "Calendar" },
-  { id: "kanban", label: "Kanban" },
-];
+import { permissionsList } from "../data/dummy";
 
 const placeholderImage =
   "https://avatar.iran.liara.run/public/boy?username=Ash"; // Placeholder URL for avatars
