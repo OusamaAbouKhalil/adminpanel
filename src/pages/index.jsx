@@ -19,4 +19,5 @@ export { default as EditAdmin } from './EditAdmin'
 export { default as Drivers } from './Drivers/Drivers'
 export { default as Rides } from './Rides';
 export { default as RevenuePage } from './RevenuePage'
+export { default as PaymentMethod } from './PaymentMethod'
 

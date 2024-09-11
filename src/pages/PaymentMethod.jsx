@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getDatabase, ref, onValue, update } from 'firebase/database';
 import { useAuth } from '../contexts/AuthProvider'; // Assuming you have a useAuth hook for authentication
 
-const PricesPage = () => {
+const PaymentMethod = () => {
   const [prices, setPrices] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,9 +13,9 @@ const PricesPage = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const pricesRef = ref(db, 'PaymentMethods'); // Reference to the 'prices' node
+        const pricesRef = ref(db, 'PaymentMethods'); // Reference to the 'PaymentMethods' node
         onValue(pricesRef, (snapshot) => {
-          setPrices(snapshot.val());
+          setPrices(snapshot.val() || {});
           setIsLoading(false);
         });
       } catch (err) {
@@ -28,7 +28,10 @@ const PricesPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPrices((prevPrices) => ({ ...prevPrices, [name]: parseFloat(value) }));
+    setPrices((prevPrices) => ({
+      ...prevPrices,
+      [name]: value, // No need to parseFloat for strings
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -42,35 +45,21 @@ const PricesPage = () => {
     }
   };
 
-  if (isLoading) return  <div className="flex justify-center items-center h-64">
-  <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
-</div>;
-  if (error) return <div className="text-center text-red-600 text-lg">Error: {error}</div>;
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  if (error) {
+    return <div className="text-center text-red-600 text-lg">Error: {error}</div>;
+  }
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-green-50 to-white shadow-md rounded-lg border border-gray-200 max-w-3xl">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Edit Prices</h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-gray-800">Swift Drive Pricing</h2>
-          <p className="text-gray-600 text-sm">
-            <strong className="font-medium">Formula:</strong> Cost = Base Fare + (Cost per min * Time in ride) + (Cost per km * Distance) + Booking Fee
-          </p>
-        </div>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-gray-800">Swift Bites Pricing</h2>
-          <p className="text-gray-600 text-sm">
-            <strong className="font-medium">Formula:</strong> Cost = Base Fare + (Cost per km * Distance) + Booking Fee
-          </p>
-          <p className="text-gray-600 text-sm">
-            <strong className="font-medium">Distance Rules:</strong>
-            <ul className="list-disc list-inside ml-4 mt-2 text-sm">
-              <li>Distance less than 2.6 km: Cost Per Km * 2 will be added</li>
-              <li>Distance between 2.6 km and 4 km: Cost Per Km is added to the total cost</li>
-              <li>Distance greater than 4 km: Cost Per Km * Distance</li>
-            </ul>
-          </p>
-        </div>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Edit Payment Methods</h1>
+      <form onSubmit={handleSubmit}>
         {Object.keys(prices).map((key) => (
           <div key={key} className="flex items-center justify-between border-b border-gray-300 py-3">
             <label
@@ -80,8 +69,7 @@ const PricesPage = () => {
               {key.replace(/_/g, ' ')}:
             </label>
             <input
-              type="number"
-              step="0.01"
+              type="text"
               name={key}
               id={key}
               value={prices[key]}
@@ -101,4 +89,4 @@ const PricesPage = () => {
   );
 };
 
-export default PricesPage;
+export default PaymentMethod;

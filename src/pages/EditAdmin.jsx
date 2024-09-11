@@ -24,6 +24,7 @@ const permissionsList = [
   { id: "drivers", label: "View drivers" },
   { id: "rides", label: "View rides" },
   { id: "prices", label: "Pricing" },
+  { id: "methods", label: "Payment Methods" },
   { id: "notification", label: "Notification Center" },
   { id: "editnotification", label: "Edit Notification" },
   { id: "offers", label: "Promotions Center" },

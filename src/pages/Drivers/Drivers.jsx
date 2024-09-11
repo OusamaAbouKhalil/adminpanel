@@ -3,10 +3,7 @@ import { useStateContext } from '../../contexts/ContextProvider';
 import { driverGrid } from '../../data/dummy';
 import VehicleInfoModal from './VehicleInfoModal';
 import AddDriverModal from './AddDriver';
-import { push, ref } from 'firebase/database';
-import db from '../../utils/firebaseconfig';
 import { addDriver, saveDriver } from '../../lib/firebase/api';
-import { add } from 'date-fns';
 
 const Drivers = () => {
     const { drivers } = useStateContext();
@@ -68,36 +65,37 @@ const Drivers = () => {
         setShowAddModal(false);
     };
 
+  
     return (
-        <div className="p-4">
-            <h2 className="text-2xl font-bold mb-4">Drivers</h2>
+        <div className="p-6 bg-green-50 min-h-screen">
+            <h2 className="text-3xl font-semibold text-green-800 mb-6">Drivers</h2>
             <button
                 onClick={handleShowAddModal}
-                className="mb-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="mb-6 px-6 py-2 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition-colors"
             >
                 Add Driver
             </button>
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200">
-                    <thead>
+            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+            <table className="w-full text-sm text-center text-gray-600">
+            <thead className="bg-green-600 text-white font-bold"> 
                         <tr>
                             {driverGrid.map((col) => (
-                                <th key={col.value} className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">
+                                <th key={col.value} className="py-3 px-4 text-left text-sm font-bold text-center text-white">
                                     {col.headerText}
                                 </th>
                             ))}
-                            <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">Actions</th>
+                            <th className="py-3 px-4 text-left text-sm font-bold text-white text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-green-200">
                         {drivers.map((driver, index) => (
-                            <tr key={index} className="hover:bg-gray-50">
+                            <tr key={index} className="hover:bg-green-100">
                                 {driverGrid.map((col) => (
-                                    <td key={col.value} className="py-2 px-4 border-b border-gray-200">
+                                    <td key={col.value} className="py-3 px-4 text-sm text-green-700">
                                         {col.value === 'vehicle-info' ? (
                                             <button
                                                 onClick={() => handleShowModal(driver)}
-                                                className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                                className="px-4 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                             >
                                                 View Vehicle Info
                                             </button>
@@ -106,25 +104,25 @@ const Drivers = () => {
                                                 type={col.inputType}
                                                 value={editedDriver[col.value]}
                                                 onChange={(e) => handleChange(e, col.value)}
-                                                className="w-full px-2 py-1 border border-gray-300 rounded"
+                                                className="w-full px-3 py-2 border border-green-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             />
                                         ) : (
                                             driver[col.value]
                                         )}
                                     </td>
                                 ))}
-                                <td className="py-2 px-4 border-b border-gray-200">
+                                <td className="py-3 px-4 text-sm text-green-700">
                                     {editIdx === index ? (
                                         <>
                                             <button
                                                 onClick={() => handleSave(editedDriver)}
-                                                className="mr-2 px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                                className="mr-2 px-4 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                             >
                                                 Save
                                             </button>
                                             <button
                                                 onClick={handleCancel}
-                                                className="px-4 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                                className="px-4 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                                             >
                                                 Cancel
                                             </button>
@@ -132,7 +130,7 @@ const Drivers = () => {
                                     ) : (
                                         <button
                                             onClick={() => handleEdit(index)}
-                                            className="px-4 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                            className="px-4 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                                         >
                                             Edit
                                         </button>
@@ -147,6 +145,6 @@ const Drivers = () => {
             {showAddModal && <AddDriverModal onClose={handleCloseAddModal} onSave={handleAddDriver} />}
         </div>
     );
-}
+};
 
 export default Drivers;

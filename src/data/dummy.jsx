@@ -13,7 +13,7 @@ import {
 import {
   FaDollarSign, FaBell, FaEdit, FaPercentage, FaGift,
   FaRegEdit,
-  FaApple, FaImage, FaDesktop, FaReceipt, FaStore, FaShieldAlt
+  FaApple, FaImage, FaDesktop, FaReceipt, FaStore, FaShieldAlt, FaBitcoin
 } from 'react-icons/fa'; // Import the money icon
 
 export const gridOrderImage = (props) => (
@@ -294,6 +294,10 @@ export const links = [
         name: "prices", // Route name for the new page
         icon: <FaDollarSign size={20} />, // Money icon
       },
+      {
+        name: "methods", // Route name for the new page
+        icon: <FaBitcoin size={20} />, // bitcoin icon
+      },
     ],
   },
   {
@@ -401,6 +405,7 @@ export const permissionsList = [
   { id: "drivers", label: "View drivers" },
   { id: "rides", label: "View rides" },
   { id: "prices", label: "Pricing" },
+  { id: "methods", label: "Payment Methods" },
   { id: "notification", label: "Notification Center" },
   { id: "editnotification", label: "Edit Notification" },
   { id: "offers", label: "Promotions Center" },
