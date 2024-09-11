@@ -221,7 +221,7 @@ const AppRoutes = () => (
         }
       />
       <Route
-        path="payment"
+        path="methods"
         element={
           <ProtectedRoute>
             <PaymentMethod />
