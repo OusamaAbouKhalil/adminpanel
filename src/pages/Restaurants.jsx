@@ -66,21 +66,35 @@ export default function Restaurants() {
       </div>
       {isLoading && restaurants.length === 0 ? (
         <div className="flex justify-center items-center h-64">
-                  <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+          <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
         </div>
       ) : (
         <div>
           <div className="overflow-x-auto bg-white rounded-lg shadow-md">
             <table className="w-full text-sm text-center text-gray-600">
-            <thead className="bg-green-600 text-white font-bold"> 
+              <thead className="bg-green-600 text-white font-bold">
                 <tr>
-                  <th scope="col" className="py-3 px-4">Logo</th>
-                  <th scope="col" className="py-3 px-4">Restaurant Name</th>
-                  <th scope="col" className="py-3 px-4">Location</th>
-                  <th scope="col" className="py-3 px-4">Category</th>
-                  <th scope="col" className="py-3 px-4">Time</th>
-                  <th scope="col" className="py-3 px-4">Action</th>
-                  <th scope="col" className="py-3 px-4">Status</th>
+                  <th scope="col" className="py-3 px-4">
+                    Logo
+                  </th>
+                  <th scope="col" className="py-3 px-4">
+                    Restaurant Name
+                  </th>
+                  <th scope="col" className="py-3 px-4">
+                    Location
+                  </th>
+                  <th scope="col" className="py-3 px-4">
+                    Category
+                  </th>
+                  <th scope="col" className="py-3 px-4">
+                    Time
+                  </th>
+                  <th scope="col" className="py-3 px-4">
+                    Action
+                  </th>
+                  <th scope="col" className="py-3 px-4">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -128,9 +142,9 @@ export default function Restaurants() {
           </div>
           {isFetchingNextPage && (
             <div className="flex justify-center items-center mt-4">
-               <div className="flex justify-center items-center h-64">
-                  <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
-        </div>
+              <div className="w-16 h-16">
+                <div className="border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+              </div>
             </div>
           )}
         </div>
