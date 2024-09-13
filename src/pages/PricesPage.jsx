@@ -34,13 +34,16 @@ const PricesPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const pricesRef = ref(db, 'PaymentMethods');
+      console.log("Submitting prices:", prices); // Log prices before updating
+      const pricesRef = ref(db, 'Prices');
       await update(pricesRef, prices);
       alert('Prices updated successfully!');
     } catch (err) {
+      console.error("Error updating prices:", err); // Log the error
       setError(err.message);
     }
   };
+  
 
   if (isLoading) return  <div className="flex justify-center items-center h-64">
   <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>

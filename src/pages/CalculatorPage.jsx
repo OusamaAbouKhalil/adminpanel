@@ -7,6 +7,8 @@ const CalculatorPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [distance, setDistance] = useState(0);
+  const [time, setTime] = useState(0);
+  const [passengers, setPassengers] = useState(1); // State for number of passengers
   const [result, setResult] = useState(null);
   const { user } = useAuth(); // Assuming user is obtained from AuthProvider
 
@@ -34,48 +36,82 @@ const CalculatorPage = () => {
     fetchPrices();
   }, [db]);
 
+  const estimateArrivalTime = (distance) => {
+    return (distance * 0.3); // Example 0.3 is the average speed of the vehicle
+  };
+
   const handleChange = (e) => {
-    const value = parseFloat(e.target.value) || 0;
-    setDistance(value);
+    const { name, value } = e.target;
+    if (name === 'distance') {
+      const newDistance = parseFloat(value) || 0;
+      setDistance(newDistance);
+      setTime(estimateArrivalTime(newDistance));
+    } else if (name === 'time') {
+      setTime(parseFloat(value) || 0);
+    } else if (name === 'passengers') {
+      setPassengers(parseInt(value, 10) || 1);
+    }
   };
 
   const calculateCost = () => {
     const {
-      base_fare = 0,
-      cost_per_km = 0,
-      cost_per_km_swift_bites = 0,
-      swift_bites_booking_fee = 0,
-      distance_rule_1 = 0,
-      distance_rule_2 = 0
+      Base_Fare = 0,
+      Cost_Per_Km = 0,
+      Cost_Per_Min = 0,
+      Cost_Per_Km_SB = 0,
+      Booking_Fee = 0,
+      // Ensure to include all keys as they appear in Firebase
     } = prices;
 
     console.log('Prices:', prices);
     console.log('Distance:', distance);
+    console.log('Time:', time);
+    console.log('Passengers:', passengers);
 
     // Swift Drive Calculation
-    const swiftDriveCost = base_fare + (cost_per_km * distance) + distance_rule_1;
+    let swiftDriveCost = Base_Fare + (Cost_Per_Min * time) + (Cost_Per_Km * distance) + Booking_Fee;
+
+    // Adjust cost based on number of passengers
+    switch (passengers) {
+      case 2:
+        swiftDriveCost *= 1.8;
+        break;
+      case 3:
+        swiftDriveCost *= 2.65;
+        break;
+      case 4:
+        swiftDriveCost *= 3.2;
+        break;
+      default:
+        // No adjustment for 1 passenger
+        break;
+    }
+
     console.log('Swift Drive Cost Calculation:', {
-      base_fare,
-      cost_per_km,
+      Base_Fare,
+      Cost_Per_Min,
+      Cost_Per_Km,
+      time,
       distance,
-      distance_rule_1,
+      Booking_Fee,
+      passengers,
       result: swiftDriveCost
     });
 
     // Swift Bites Calculation
     let swiftBitesCost;
     if (distance < 2.6) {
-      swiftBitesCost = base_fare + (cost_per_km_swift_bites * 2) + swift_bites_booking_fee;
+      swiftBitesCost = Cost_Per_Km_SB * 2 + (Cost_Per_Km_SB * 2);
     } else if (distance >= 2.6 && distance <= 4) {
-      swiftBitesCost = base_fare + (cost_per_km_swift_bites * distance) + swift_bites_booking_fee;
+      swiftBitesCost = Cost_Per_Km_SB + (Cost_Per_Km_SB * distance);
     } else {
-      swiftBitesCost = base_fare + (cost_per_km_swift_bites * distance) + swift_bites_booking_fee;
+      swiftBitesCost = Cost_Per_Km_SB * distance;
     }
     console.log('Swift Bites Cost Calculation:', {
-      base_fare,
-      cost_per_km_swift_bites,
+      Base_Fare,
+      Cost_Per_Km_SB,
       distance,
-      swift_bites_booking_fee,
+      Booking_Fee,
       result: swiftBitesCost
     });
 
@@ -87,38 +123,67 @@ const CalculatorPage = () => {
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-green-50 to-white shadow-md rounded-lg border border-gray-200 max-w-3xl">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Distance-Based Price Calculator</h1>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          calculateCost();
-        }}
-        className="space-y-6"
-      >
-        <div className="flex flex-col space-y-4">
-          <input
-            type="number"
-            name="distance"
-            value={distance}
-            onChange={handleChange}
-            placeholder="Distance (km)"
-            className="border border-gray-300 rounded-lg p-2 w-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out"
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 text-center">Calculate Costs</h1>
+      <div className="mb-6">
+        <label className="block text-gray-800 font-medium text-lg mb-2" htmlFor="distance">
+          Distance (km):
+        </label>
+        <input
+          type="number"
+          step="0.01"
+          id="distance"
+          name="distance"
+          value={distance}
+          onChange={handleChange}
+          className="border border-gray-300 rounded-lg p-2 w-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
+        />
+      </div>
+      <div className="mb-6">
+        <label className="block text-gray-800 font-medium text-lg mb-2" htmlFor="time">
+          Time (minutes): *Note we consider minutes as extra charge for the ride*
+        </label>
+        <input
+          type="number"
+          step="0.01"
+          id="time"
+          name="time"
+          value={time}
+          onChange={handleChange}
+          className="border border-gray-300 rounded-lg p-2 w-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
+        />
+      </div>
+      <div className="mb-6">
+        <label className="block text-gray-800 font-medium text-lg mb-2" htmlFor="passengers">
+          Number of Passengers:
+        </label>
+        <select
+          id="passengers"
+          name="passengers"
+          value={passengers}
+          onChange={handleChange}
+          className="border border-gray-300 rounded-lg p-2 w-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-150 ease-in-out"
         >
-          Calculate
-        </button>
-        {result && (
-          <div className="mt-6">
-            <h2 className="text-2xl font-semibold text-gray-800">Results</h2>
+          <option value={1}>1</option>
+          <option value={2}>2</option>
+          <option value={3}>3</option>
+          <option value={4}>4</option>
+        </select>
+      </div>
+      <button
+        onClick={calculateCost}
+        className="w-full bg-green-600 text-white py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out"
+      >
+        Calculate
+      </button>
+      {result && (
+        <div className="mt-6">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">Cost Results</h2>
+          <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
             <p className="text-gray-700">Swift Drive Cost: ${result.swiftDriveCost.toFixed(2)}</p>
             <p className="text-gray-700">Swift Bites Cost: ${result.swiftBitesCost.toFixed(2)}</p>
           </div>
-        )}
-      </form>
+        </div>
+      )}
     </div>
   );
 };
