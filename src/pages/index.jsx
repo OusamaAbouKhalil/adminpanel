@@ -20,4 +20,6 @@ export { default as Drivers } from './Drivers/Drivers'
 export { default as Rides } from './Rides';
 export { default as RevenuePage } from './RevenuePage'
 export { default as PaymentMethod } from './PaymentMethod'
+export { default as Users } from './Users'
+export { default as Calculator } from './CalculatorPage'
 

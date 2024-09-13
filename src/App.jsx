@@ -25,6 +25,7 @@ import {
   Rides,
   RevenuePage,
   PaymentMethod,
+  Users,Calculator
 } from "./pages";
 import "./App.css";
 import { useStateContext } from "./contexts/ContextProvider";
@@ -52,6 +53,14 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
       />
+      <Route
+        path="users"
+        element={
+          <ProtectedRoute>
+            <Users />
+          </ProtectedRoute>
+        }
+        />
       <Route
         path="restaurants"
         element={
@@ -228,7 +237,17 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
       />
+       <Route
+        path="calculator"
+        element={
+          <ProtectedRoute>
+            <Calculator />
+          </ProtectedRoute>
+        }
+      />
     </Route>
+    
+
   </Routes>
 );
 

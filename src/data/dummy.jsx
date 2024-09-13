@@ -13,7 +13,7 @@ import {
 import {
   FaDollarSign, FaBell, FaEdit, FaPercentage, FaGift,
   FaRegEdit,
-  FaApple, FaImage, FaDesktop, FaReceipt, FaStore, FaShieldAlt, FaBitcoin
+  FaApple, FaImage, FaDesktop, FaReceipt, FaStore, FaShieldAlt, FaBitcoin, FaPeopleArrows, FaCalculator
 } from 'react-icons/fa'; // Import the money icon
 
 export const gridOrderImage = (props) => (
@@ -243,11 +243,15 @@ export const driverGrid = [
 
 export const links = [
   {
-    title: "Dashboard",
+    title: "Core Center", 
     links: [
       {
         name: "dashboard",
         icon: <FaDesktop size={20} />,
+      },
+      {
+        name: "users",
+        icon: <FaPeopleArrows size={20} />,
       },
     ],
   },
@@ -293,6 +297,10 @@ export const links = [
       {
         name: "prices", // Route name for the new page
         icon: <FaDollarSign size={20} />, // Money icon
+      },
+      {
+        name: "calculator", // Route name for the new page
+        icon: <FaCalculator size={20} />, // Money icon
       },
       {
         name: "methods", // Route name for the new page
@@ -406,6 +414,8 @@ export const permissionsList = [
   { id: "rides", label: "View rides" },
   { id: "prices", label: "Pricing" },
   { id: "methods", label: "Payment Methods" },
+  { id: "users", label: "Users" },
+  {id: "calculator", label: "Calculator"},
   { id: "notification", label: "Notification Center" },
   { id: "editnotification", label: "Edit Notification" },
   { id: "offers", label: "Promotions Center" },
