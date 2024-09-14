@@ -22,4 +22,5 @@ export { default as RevenuePage } from './RevenuePage'
 export { default as PaymentMethod } from './PaymentMethod'
 export { default as Users } from './Users'
 export { default as Calculator } from './CalculatorPage'
+export { default as UpdateVersion } from './UpdateVersion'
 

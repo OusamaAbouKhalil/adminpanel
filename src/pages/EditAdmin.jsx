@@ -35,6 +35,7 @@ const permissionsList = [
   { id: "banners", label: "Personalization - Banners" },
   { id: "addadmin", label: "Admins Center" },
   { id: "editadmin", label: "Edit Admin?" },
+  { id: "version", label: "Edit Version" },
   { id: "calendar", label: "Calendar" },
   { id: "kanban", label: "Kanban" },
 ];

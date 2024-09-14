@@ -25,7 +25,8 @@ import {
   Rides,
   RevenuePage,
   PaymentMethod,
-  Users,Calculator
+  Users,Calculator,
+  UpdateVersion
 } from "./pages";
 import "./App.css";
 import { useStateContext } from "./contexts/ContextProvider";
@@ -61,6 +62,7 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
         />
+
       <Route
         path="restaurants"
         element={
@@ -245,6 +247,14 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
       />
+       <Route
+        path="version"
+        element={
+          <ProtectedRoute>
+            <UpdateVersion />
+          </ProtectedRoute>
+        }
+        />
     </Route>
     
 

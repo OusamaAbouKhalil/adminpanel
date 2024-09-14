@@ -13,7 +13,7 @@ import {
 import {
   FaDollarSign, FaBell, FaEdit, FaPercentage, FaGift,
   FaRegEdit,
-  FaApple, FaImage, FaDesktop, FaReceipt, FaStore, FaShieldAlt, FaBitcoin, FaPeopleArrows, FaCalculator
+  FaApple, FaImage, FaDesktop, FaReceipt, FaStore, FaShieldAlt, FaBitcoin, FaPeopleArrows, FaCalculator, FaCode
 } from 'react-icons/fa'; // Import the money icon
 
 export const gridOrderImage = (props) => (
@@ -363,8 +363,18 @@ export const links = [
     ],
   },
   {
+    title: "Developers Center",
+    links: [
+      {
+        name: "version",
+        icon: <FaCode size={20} />,
+      },
+    ],
+  },
+  {
     title: "Apps",
     links: [
+      
       {
         name: "calendar",
         icon: <AiOutlineCalendar size={20} />,
@@ -424,6 +434,7 @@ export const permissionsList = [
   { id: "banners", label: "Personalization - Banners" },
   { id: "addadmin", label: "Admins Center" },
   { id: "editadmin", label: "Edit Admin?" },
+  { id: "version", label: "Edit Version" },
   { id: "calendar", label: "Calendar" },
   { id: "kanban", label: "Kanban" },
   { id: "add", label: "Add Restaurant" },

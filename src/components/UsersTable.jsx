@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+//import icons
+import { FaEdit } from "react-icons/fa";
 import {
   Table,
   TableBody,
@@ -18,27 +20,61 @@ import {
   ThemeProvider,
   createTheme,
   TableSortLabel,
-  IconButton
+  Switch,
+  TablePagination,
+  Box,
 } from "@mui/material";
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { getDatabase, ref, update } from "firebase/database";
-import SearchIcon from '@mui/icons-material/Search';
+import SearchIcon from "@mui/icons-material/Search";
 
 // Modern theme
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#00796b", // Teal
+      main: "#00796b",
     },
     secondary: {
-      main: "#d32f2f", // Red
+      main: "#d32f2f",
     },
     background: {
-      default: "#f0f2f5" // Light grey background
-    }
+      default: "#e8f5e9",
+    },
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    h5: {
+      color: "#00796b",
+      fontWeight: 600,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+        },
+      },
+    },
+  },
+  shape: {
+    borderRadius: 10,
+  },
+  overrides: {
+    MuiTableCell: {
+      root: {
+        textAlign: "center",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      },
+    },
   },
 });
 
@@ -52,12 +88,25 @@ const UsersTable = ({ users }) => {
     balance: "",
     status: "",
     ProfilePic: "",
+    canOrder: true,
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [orderCounts, setOrderCounts] = useState({});
   const [specialOrderCounts, setSpecialOrderCounts] = useState({});
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [sortAttribute, setSortAttribute] = useState('fullname');
+  const [sortDirection, setSortDirection] = useState("desc"); // Default to descending
+  const [sortAttribute, setSortAttribute] = useState("totalSum"); // Default to totalSum
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  // Compute total sum of rides, orders, and special orders
+  const computeTotalSum = (user) => {
+    const ridesCount = Array.isArray(user.RideHistory)
+      ? user.RideHistory.length
+      : Object.keys(user.RideHistory || {}).length;
+    const ordersCount = orderCounts[user.id] || 0;
+    const specialOrdersCount = specialOrderCounts[user.id] || 0;
+    return ridesCount + ordersCount + specialOrdersCount;
+  };
 
   // Fetch order counts for each user
   const fetchOrderCounts = async () => {
@@ -75,17 +124,30 @@ const UsersTable = ({ users }) => {
         const ordersSnapshot = await getDocs(ordersQuery);
         newOrderCounts[user.id] = ordersSnapshot.size;
       } catch (error) {
-        console.error("Error fetching restaurant order count for user", user.id, ":", error);
+        console.error(
+          "Error fetching restaurant order count for user",
+          user.id,
+          ":",
+          error
+        );
         newOrderCounts[user.id] = 0;
       }
 
       // Fetch special orders count
-      const specialOrdersQuery = query(specialOrdersRef, where("userId", "==", user.id));
+      const specialOrdersQuery = query(
+        specialOrdersRef,
+        where("userId", "==", user.id)
+      );
       try {
         const specialOrdersSnapshot = await getDocs(specialOrdersQuery);
         newSpecialOrderCounts[user.id] = specialOrdersSnapshot.size;
       } catch (error) {
-        console.error("Error fetching special order count for user", user.id, ":", error);
+        console.error(
+          "Error fetching special order count for user",
+          user.id,
+          ":",
+          error
+        );
         newSpecialOrderCounts[user.id] = 0;
       }
     }
@@ -107,6 +169,7 @@ const UsersTable = ({ users }) => {
     rides: (user) => user.RideHistory?.length || 0,
     orders: (user) => orderCounts[user.id] || 0,
     specialOrders: (user) => specialOrderCounts[user.id] || 0,
+    totalSum: (user) => computeTotalSum(user),
   };
 
   // Filtered users based on search query
@@ -119,7 +182,8 @@ const UsersTable = ({ users }) => {
 
   // Sorting function
   const handleSort = (attribute) => {
-    const direction = sortAttribute === attribute && sortDirection === 'asc' ? 'desc' : 'asc';
+    const direction =
+      sortAttribute === attribute && sortDirection === "desc" ? "asc" : "desc";
     setSortAttribute(attribute);
     setSortDirection(direction);
   };
@@ -128,13 +192,29 @@ const UsersTable = ({ users }) => {
     const aValue = attributeMapping[sortAttribute](a);
     const bValue = attributeMapping[sortAttribute](b);
 
-    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+    if (aValue < bValue) return sortDirection === "desc" ? 1 : -1;
+    if (aValue > bValue) return sortDirection === "desc" ? -1 : 1;
     return 0;
   });
 
-  // Open the edit dialog
-  const handleEditClick = (user) => {
+  // Handle pagination
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleImageOpen = (user) => {
+    // open the image is the center of screen without downloading it to the device 
+    window.open(user.ProfilePic, "_blank");
+    
+  };
+
+  // Open dialog
+  const handleClickOpen = (user) => {
     setCurrentUser(user);
     setUpdatedUser({
       fullname: user.fullname,
@@ -143,225 +223,261 @@ const UsersTable = ({ users }) => {
       balance: user.balance,
       status: user.status,
       ProfilePic: user.ProfilePic,
+      canOrder: user.canOrder,
     });
     setOpen(true);
   };
 
-  // Close the dialog
+  // Close dialog
   const handleClose = () => {
     setOpen(false);
   };
 
-  // Save the updated data
-  const handleSave = () => {
-    if (currentUser) {
+  // Update user data
+  const handleUpdateUser = async () => {
+    try {
       const db = getDatabase();
       const userRef = ref(db, `users/${currentUser.id}`);
-
-      // Update the user data in Firebase
-      update(userRef, updatedUser)
-        .then(() => {
-          console.log('User data updated successfully');
-          handleClose();
-        })
-        .catch((error) => {
-          console.error('Error updating user data:', error);
-        });
+      await update(userRef, updatedUser);
+      alert("User updated successfully!");
+      handleClose();
+    } catch (error) {
+      console.error("Error updating user:", error);
+      alert("Error updating user!");
     }
-  };
-
-  // Handle form changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUpdatedUser((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <TableContainer
-        component={Paper}
-        style={{ padding: "20px", backgroundColor: theme.palette.background.default }}
-      >
-        <Typography variant="h5" align="center" gutterBottom style={{ marginBottom: "20px", color: theme.palette.primary.main }}>
-          User List
-        </Typography>
-        <TextField
-          margin="dense"
-          label="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          fullWidth
-          variant="outlined"
-          InputProps={{
-            endAdornment: (
-              <IconButton>
-                <SearchIcon />
-              </IconButton>
-            ),
-          }}
-          style={{ marginBottom: "20px" }}
-        />
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Profile</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortAttribute === 'fullname'}
-                  direction={sortDirection}
-                  onClick={() => handleSort('fullname')}
-                >
-                  Full Name
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortAttribute === 'email'}
-                  direction={sortDirection}
-                  onClick={() => handleSort('email')}
-                >
-                  Email
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortAttribute === 'phone'}
-                  direction={sortDirection}
-                  onClick={() => handleSort('phone')}
-                >
-                  Phone
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortAttribute === 'balance'}
-                  direction={sortDirection}
-                  onClick={() => handleSort('balance')}
-                >
-                  Balance
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortAttribute === 'rides'}
-                  direction={sortDirection}
-                  onClick={() => handleSort('rides')}
-                >
-                  Number of Rides
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortAttribute === 'orders'}
-                  direction={sortDirection}
-                  onClick={() => handleSort('orders')}
-                >
-                  Number of Restaurant Orders
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortAttribute === 'specialOrders'}
-                  direction={sortDirection}
-                  onClick={() => handleSort('specialOrders')}
-                >
-                  Number of Special Orders
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>Edit</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sortedUsers.map((user) => (
-              <TableRow key={user.id}>
+      <Box p={2}>
+        <Typography variant="h5">Users</Typography>
+        {/* make the search at the right  */}
+        <Box display="flex" justifyContent="flex-end" mb={2}>
+          <TextField
+            variant="outlined"
+            placeholder="Search"
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              endAdornment: <SearchIcon />,
+            }}
+            style={{ marginBottom: "16px" }}
+          />
+        </Box>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Profile</TableCell>
                 <TableCell>
-                  <Avatar alt={user.fullname} src={user.ProfilePic} style={{ width: 50, height: 50 }} />
-                </TableCell>
-                <TableCell>{user.fullname}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.phone}</TableCell>
-                <TableCell>{user.balance}</TableCell>
-                <TableCell>{user.status}</TableCell>
-                <TableCell>{user.RideHistory?.length || 0}</TableCell>
-                <TableCell>{orderCounts[user.id] || 0}</TableCell>
-                <TableCell>{specialOrderCounts[user.id] || 0}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleEditClick(user)}
+                  <TableSortLabel
+                    active={sortAttribute === "fullname"}
+                    direction={sortDirection}
+                    onClick={() => handleSort("fullname")}
                   >
-                    Edit
-                  </Button>
+                    Full Name
+                  </TableSortLabel>
                 </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortAttribute === "email"}
+                    direction={sortDirection}
+                    onClick={() => handleSort("email")}
+                  >
+                    Email
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortAttribute === "phone"}
+                    direction={sortDirection}
+                    onClick={() => handleSort("phone")}
+                  >
+                    Phone
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortAttribute === "balance"}
+                    direction={sortDirection}
+                    onClick={() => handleSort("balance")}
+                  >
+                    Balance
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortAttribute === "rides"}
+                    direction={sortDirection}
+                    onClick={() => handleSort("rides")}
+                  >
+                    Rides
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortAttribute === "orders"}
+                    direction={sortDirection}
+                    onClick={() => handleSort("orders")}
+                  >
+                    Orders
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortAttribute === "specialOrders"}
+                    direction={sortDirection}
+                    onClick={() => handleSort("specialOrders")}
+                  >
+                    Special Orders
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortAttribute === "totalSum"}
+                    direction={sortDirection}
+                    onClick={() => handleSort("totalSum")}
+                  >
+                    Total Orders
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>Can Order?</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Edit User</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Full Name"
-            name="fullname"
-            value={updatedUser.fullname}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Phone"
-            name="phone"
-            value={updatedUser.phone}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Email"
-            name="email"
-            value={updatedUser.email}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Balance"
-            name="balance"
-            value={updatedUser.balance}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Status"
-            name="status"
-            value={updatedUser.status}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Profile Picture URL"
-            name="ProfilePic"
-            value={updatedUser.ProfilePic}
-            onChange={handleChange}
-            fullWidth
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleSave} color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
+            </TableHead>
+            <TableBody>
+              {sortedUsers
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <Avatar
+                        onClick={() => handleImageOpen(user)}
+                        src={user.ProfilePic}
+                        alt={user.fullname}
+                        style={{ width: 50, height: 50 }}
+                      />
+                    </TableCell>
+                    <TableCell>{user.fullname}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone}</TableCell>
+                    <TableCell>
+                      {user.status == "unverified"
+                        ? "Not Verified"
+                        : "Verified"}
+                    </TableCell>
+                    <TableCell>🪙{user.balance}</TableCell>
+                    <TableCell>
+                      🚕
+                      {Array.isArray(user.RideHistory)
+                        ? user.RideHistory.length
+                        : Object.keys(user.RideHistory || {}).length}
+                    </TableCell>
+                    <TableCell>🍔{orderCounts[user.id] || 0}</TableCell>
+                    <TableCell>📦{specialOrderCounts[user.id] || 0}</TableCell>
+                    <TableCell>🟰{computeTotalSum(user)}</TableCell>
+                    <TableCell>{user.canOrder ? "Yes😁" : "No👀"}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleClickOpen(user)}
+                      >
+                        <FaEdit />
+                        Edit
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={filteredUsers.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Edit User</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Full Name"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={updatedUser.fullname}
+              onChange={(e) =>
+                setUpdatedUser({ ...updatedUser, fullname: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Phone"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={updatedUser.phone}
+              onChange={(e) =>
+                setUpdatedUser({ ...updatedUser, phone: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Email"
+              type="email"
+              fullWidth
+              variant="outlined"
+              value={updatedUser.email}
+              onChange={(e) =>
+                setUpdatedUser({ ...updatedUser, email: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Balance"
+              type="number"
+              fullWidth
+              variant="outlined"
+              value={updatedUser.balance}
+              onChange={(e) =>
+                setUpdatedUser({ ...updatedUser, balance: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Profile Picture URL"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={updatedUser.ProfilePic}
+              onChange={(e) =>
+                setUpdatedUser({ ...updatedUser, ProfilePic: e.target.value })
+              }
+            />
+            <Box display="flex" alignItems="center" mt={2}>
+              <Typography>Can Order:</Typography>
+              <Switch
+                checked={updatedUser.canOrder}
+                onChange={(e) =>
+                  setUpdatedUser({ ...updatedUser, canOrder: e.target.checked })
+                }
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleUpdateUser}>Update</Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
     </ThemeProvider>
   );
 };
