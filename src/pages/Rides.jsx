@@ -182,9 +182,9 @@ const RideTable = ({ rides, users, drivers }) => {
                   <TableCellStyled>
                     {formatDate(ride.created_at)}
                   </TableCellStyled>
-                  <TableCellStyled>{ride.cost}</TableCellStyled>
-                  <TableCellStyled>{ride.cost_lira}</TableCellStyled>
-                  <TableCellStyled>
+                  <TableCellStyled>${ride.cost}</TableCellStyled>
+                  <TableCellStyled>L.L{ride.cost_lira}</TableCellStyled>
+                  <TableCellStyled>🪙
                     {parseFloat(ride.costInCredits).toFixed(2)}
                   </TableCellStyled>
                   <TableCellStyled>{ride.payment_method}</TableCellStyled>
