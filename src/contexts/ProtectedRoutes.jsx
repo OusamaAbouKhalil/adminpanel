@@ -16,6 +16,7 @@ export const ProtectedRoute = ({ children }) => {
   const { data: permissions, isPending: loading } = useGetPermissions(currentUser);
   const location = useLocation();
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     if (!currentUser || !currentUser.email) {

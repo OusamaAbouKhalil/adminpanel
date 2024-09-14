@@ -115,7 +115,12 @@ export default function Restaurants() {
                         {restaurant.rest_name}
                       </Link>
                     </td>
-                    <td className="py-4 px-4">{restaurant.location}</td>
+                    <td className="py-4 px-4">{
+                      //if location is long, show only first 20 characters
+                      restaurant.location.length > 20
+                        ? restaurant.location.substring(0, 45) + "..."
+                        : restaurant.location
+                      }</td>
                     <td className="py-4 px-4">{restaurant.Category?.join(", ")}</td>
                     <td className="py-4 px-4">{restaurant.time}</td>
                     <td className="py-4 px-4 text-center">

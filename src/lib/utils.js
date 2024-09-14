@@ -1,21 +1,20 @@
-import { clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const getLocationByCoordinates = async (lat, lng) => {
   try {
     const response = await fetch(
-      `https://photon.komoot.io/reverse?lon=${lng}&lat=${lat}`
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=en`
     );
     const data = await response.json();
     // console.log(data);
     return (
-      data["features"][0]["properties"]["city"] +
-      ", " +
-      data["features"][0]["properties"]["country"]
+      data.display_name ||
+      `${data.address?.city || ''}, ${data.address?.state || ''}, ${data.address?.country || ''}`
     );
   } catch (error) {
     console.error("Error fetching location: ", error);
