@@ -976,7 +976,7 @@ export const kanbanData = [
     Type: "Story",
     Priority: "Low",
     Tags: "Review,IE",
-    Estimate: 5.5,
+    Estimate: 5.6,
     Assignee: "Margaret hamilt",
     RankId: 3,
     Color: "#02897B",
