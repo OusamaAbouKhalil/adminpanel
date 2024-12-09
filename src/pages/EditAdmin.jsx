@@ -20,6 +20,7 @@ const permissionsList = [
   { id: "dashboard", label: "Dashboard" },
   { id: "revenue", label: "Revenues Pages" },
   { id: "restaurants", label: "Restaurants Pages" },
+  { id: "add", label: "add Restaurants" },
   { id: "orders", label: "Orders" },
   { id: "drivers", label: "View drivers" },
   { id: "rides", label: "View rides" },
@@ -38,6 +39,7 @@ const permissionsList = [
   { id: "version", label: "Edit Version" },
   { id: "calendar", label: "Calendar" },
   { id: "kanban", label: "Kanban" },
+  
 ];
 
 const placeholderImage =
