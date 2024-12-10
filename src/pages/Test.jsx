@@ -119,8 +119,8 @@ const handleSaveChanges = async () => {
 
               <label className="block text-gray-700 text-sm font-semibold mb-2">Item Price:</label>
               <input
-                type="text"
-                name="item_price"
+                type="number"
+                step="0.01"
                 value={item.item_price}
                 onChange={handleInputChange}
                 placeholder="Item Price"
