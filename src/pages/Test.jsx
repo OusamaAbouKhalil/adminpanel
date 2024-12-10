@@ -64,7 +64,7 @@ const handleSaveChanges = async () => {
     };
 
     // Call the mutation with the updated item data
-    setMenuItem({ rest_id: id, item_id: item_id, itemData: updatedItem });
+    setMenuItem({ rest_id: id, item_id: item_id, itemData: updatedItem,item_image: updatedImageUrl });
 
     // Navigate to the restaurant's page
     Navigate(`/restaurants/${id}`);
