@@ -9,13 +9,13 @@ import { transformSizesToObject } from "../lib/utils";
 function AddItem() {
   const { id } = useParams();
   const { mutate: createItem } = useCreateItem();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const [sizesForm, setSizesForm] = useState([]);
+  const [loading, setLoading] = useState(false); // Loading state
 
   const [menuData, setMenuData] = useState({
     item_category: "",
     available: true,
-    // preferences: "",
     combo: {},
     item_description: "",
     item_name: "",
@@ -44,9 +44,11 @@ function AddItem() {
     }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent multiple submissions
+
+    setLoading(true); // Set loading state
     const imageDir = "images";
     try {
       let itemImageUrl = "";
@@ -55,14 +57,15 @@ function AddItem() {
       }
       const itemId = createItem({
         rest_id: id,
-        itemData: { ...menuData, sizes: transformSizesToObject(sizesForm), item_image: itemImageUrl }
+        itemData: { ...menuData, sizes: transformSizesToObject(sizesForm), item_image: itemImageUrl },
       });
 
       console.log("Menu item added with ID: ", itemId);
-      Navigate(`/restaurants/${id}`);
-
+      navigate(`/restaurants/${id}`);
     } catch (error) {
       console.error("Error adding menu item: ", error);
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -81,7 +84,6 @@ function AddItem() {
                 />
               ) : (
                 <input
-                  // required
                   className="bg-gray-200 rounded-lg p-1 w-full"
                   type={item.inputType}
                   name={item.value}
@@ -100,9 +102,12 @@ function AddItem() {
           ))}
           <button
             type="submit"
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
+            disabled={loading} // Disable button while loading
+            className={`${
+              loading ? "bg-gray-500 cursor-not-allowed" : "bg-green-500 hover:bg-green-700"
+            } text-white font-bold py-2 px-4 rounded mt-4`}
           >
-            Submit
+            {loading ? "Submitting..." : "Submit"}
           </button>
         </form>
       </div>
