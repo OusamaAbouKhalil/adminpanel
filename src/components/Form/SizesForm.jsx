@@ -40,12 +40,13 @@ const SizesForm = ({ sizesForm, setSizesForm }) => {
                         className="bg-gray-200 rounded-lg p-1"
                     />
                     <input
-                        type="number"
-                        placeholder="Value"
-                        value={size.value}
-                        onChange={(e) => handleSizeChange(index, 'value', e.target.value)}
-                        className="bg-gray-200 rounded-lg p-1"
-                    />
+                    type="number"
+                    step="0.01"
+                    placeholder="Value"
+                    value={size.value}
+                    onChange={(e) => handleSizeChange(index, 'value', e.target.value)}
+                    className="bg-gray-200 rounded-lg p-1"
+                />
                     <button type='button' onClick={() => removeSize(index)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">X</button>
                 </div>
             ))}
