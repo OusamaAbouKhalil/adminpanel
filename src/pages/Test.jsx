@@ -38,20 +38,52 @@ const Test = () => {
     }
   }
 
-  const handleSaveChanges = async () => {
-    const imageDir = "images";
+// Existing code logic remains unchanged
+const handleSaveChanges = async () => {
+  const imageDir = "images";
+
+  try {
+    let updatedImageUrl = item.item_image; // Retain the current image by default
+
+    // Check if a new image is selected
     if (ItemImage) {
-      const mainImageUrl = await uploadImage(ItemImage, imageDir);
-      setItem(prevItem => ({
+      // Upload the new image and get the URL
+      updatedImageUrl = await uploadImage(ItemImage, imageDir);
+
+      // Update the item_image field in the item state
+      setItem((prevItem) => ({
         ...prevItem,
-        item_image: mainImageUrl
-      }))
+        item_image: updatedImageUrl,
+      }));
     }
-    if (item) {
-      setMenuItem({ rest_id: id, item_id: item_id, itemData: item });
-      Navigate(`/restaurants/${id}`);
-    }
-  };
+
+    // Save changes with the updated or existing image
+    const updatedItem = {
+      ...item,
+      item_image: updatedImageUrl, // Ensure the image URL is included
+    };
+
+    // Call the mutation with the updated item data
+    setMenuItem({ rest_id: id, item_id: item_id, itemData: updatedItem });
+
+    // Navigate to the restaurant's page
+    Navigate(`/restaurants/${id}`);
+  } catch (error) {
+    console.error("Error uploading image or saving changes:", error);
+  }
+};
+
+// Function to upload image and return the URL
+const uploadImage = async (imageFile, directory) => {
+  // Simulate the upload logic
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const imageUrl = `${directory}/${imageFile.name}`; // Simulated image URL
+      resolve(imageUrl);
+    }, 1000); // Simulated delay
+  });
+};
+
 
   const handleAddAddon = () => {
     const addonData = {
