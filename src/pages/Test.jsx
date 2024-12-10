@@ -47,15 +47,15 @@ const handleSaveChanges = async () => {
 
     // Check if a new image is selected
     if (ItemImage) {
-      // Upload the new image and get the URL
+      // Upload the new image and get the full URL from Firebase Storage
       updatedImageUrl = await uploadImage(ItemImage, imageDir);
-
-      // Update the item_image field in the item state
-      setItem((prevItem) => ({
-        ...prevItem,
-        item_image: updatedImageUrl,
-      }));
     }
+
+    // Update the item_image field in the item state with the correct URL
+    setItem((prevItem) => ({
+      ...prevItem,
+      item_image: updatedImageUrl, // Ensure the image URL is the full Firebase URL
+    }));
 
     // Save changes with the updated or existing image
     const updatedItem = {
@@ -64,7 +64,7 @@ const handleSaveChanges = async () => {
     };
 
     // Call the mutation with the updated item data
-    setMenuItem({ rest_id: id, item_id: item_id, itemData: updatedItem,item_image: updatedImageUrl });
+    setMenuItem({ rest_id: id, item_id: item_id, itemData: updatedItem, item_image: updatedImageUrl });
 
     // Navigate to the restaurant's page
     Navigate(`/restaurants/${id}`);
@@ -73,16 +73,6 @@ const handleSaveChanges = async () => {
   }
 };
 
-// Function to upload image and return the URL
-const uploadImage = async (imageFile, directory) => {
-  // Simulate the upload logic
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const imageUrl = `${directory}/${imageFile.name}`; // Simulated image URL
-      resolve(imageUrl);
-    }, 1000); // Simulated delay
-  });
-};
 
 
   const handleAddAddon = () => {
