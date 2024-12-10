@@ -85,7 +85,8 @@ function AddItem() {
               ) : (
                 <input
                   className="bg-gray-200 rounded-lg p-1 w-full"
-                  type={item.inputType}
+                  type={item.value === "item_price" ? "number" : item.inputType}
+                  step={item.value === "item_price" ? "0.01" : undefined}
                   name={item.value}
                   value={
                     item.inputType === "file" ? undefined : menuData[item.value]
