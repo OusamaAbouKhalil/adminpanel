@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useLocation, Navigate, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import { useStateContext } from './ContextProvider';
 import { off, onValue, query, ref } from 'firebase/database';
@@ -12,11 +12,11 @@ import { useGetPermissions } from '../lib/query/queries';
 
 export const ProtectedRoute = ({ children }) => {
   const { currentUser, logOut } = useAuth();
-  const { setBiteDrivers, setOrdersList, dayOrders, setDrivers } = useStateContext();
+  const { setBiteDrivers, setOrdersList, dayOrders, setDrivers, ordersList } = useStateContext();
   const { data: permissions, isPending: loading } = useGetPermissions(currentUser);
   const location = useLocation();
   const navigate = useNavigate();
-  
+  const [pendingOrderIds, setPendingOrderIds] = useState(new Set());
 
   useEffect(() => {
     if (!currentUser || !currentUser.email) {
@@ -42,27 +42,39 @@ export const ProtectedRoute = ({ children }) => {
         where('time', '>=', start),
         where('time', '<=', end)
       );
-      setOrdersList([]);
+
       const unsubscribe = onSnapshot(
         ordersQuery,
         (snapshot) => {
-          const newOrdersList = [];
+          const newOrdersList = [...ordersList]; // Copy the existing orders list
+          const newPendingOrderIds = new Set(pendingOrderIds); // Copy the existing pending order IDs
+
           snapshot.docChanges().forEach((change) => {
             const data = { ...change.doc.data() };
             const orderData = { ...data, status: data.status.toLowerCase() };
 
-            if (orderData.status === 'pending') {
+            if (orderData.status === 'pending' && !newPendingOrderIds.has(orderData.order_id)) {
               setTimeout(() => {
                 const audio = new Audio(sound);
                 audio.play().catch((error) => {
                   console.error('Sound play error:', error);
                 });
               }, 100);
+              newPendingOrderIds.add(orderData.order_id);
             }
 
-            newOrdersList.push(orderData);
+            const existingOrderIndex = newOrdersList.findIndex(order => order.order_id === orderData.order_id);
+            if (existingOrderIndex !== -1) {
+              // Overwrite the existing order
+              newOrdersList[existingOrderIndex] = orderData;
+            } else {
+              // Push the new order
+              newOrdersList.push(orderData);
+            }
           });
+
           setOrdersList(newOrdersList);
+          setPendingOrderIds(newPendingOrderIds);
         },
         (error) => {
           console.error('Snapshot error:', error);
@@ -78,8 +90,7 @@ export const ProtectedRoute = ({ children }) => {
       unsubscribe();
       off(driversRef, 'value', onDriversChange);
     };
-  }, [currentUser, dayOrders, setBiteDrivers]);
-
+  }, [currentUser, dayOrders, setBiteDrivers, setOrdersList, ordersList, pendingOrderIds]);
 
   useEffect(() => {
     const driversRef = ref(db, '/drivers');
@@ -91,13 +102,11 @@ export const ProtectedRoute = ({ children }) => {
       setDrivers(driversArray);
     };
 
-
     onValue(driversRef, onDriversChange, (error) => console.error('Error fetching drivers:', error));
     return () => {
       off(driversRef, 'value', onDriversChange);
     };
-  }, [])
-
+  }, [setDrivers]);
 
   const hasAccess = useMemo(() => {
     const route = location.pathname.split('/')[1];
