@@ -103,7 +103,8 @@ export default function Restaurants() {
                     <td className="py-4 px-4">
                       <img
                         src={restaurant.main_image}
-                        className="w-16 h-16 object-cover rounded-md shadow-sm"
+                        className="w-16 h-16 object-fit rounded-md shadow-sm"
+                        
                         alt={restaurant.rest_name}
                       />
                     </td>
