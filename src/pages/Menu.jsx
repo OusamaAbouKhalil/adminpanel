@@ -13,7 +13,7 @@ export default function Menu() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
-  const tableMenuDsiplay = ["Item Image", "Name", "Price", "Description", "Order Count"];
+  const tableMenuDsiplay = ["Item Image", "Name", "Price", "Description","Discount percentage","Availabilty", "Order Count"];
 
 
   const filteredItems = useMemo(() => {
@@ -59,7 +59,7 @@ return (
     </div>
     <div className="overflow-x-auto bg-white rounded-lg shadow-md">
       <table className="w-full text-sm text-center text-gray-600">
-        <thead className="text-xs text-gray-800 bg-gray-200">
+        <thead className="text-xs text-gray-100 bg-green-600">
           <tr>
             {tableMenuDsiplay.map((item, index) => (
               <th key={index} className="py-3 px-4">
@@ -76,6 +76,8 @@ return (
             >
               <td className="py-4 px-4 text-center">
                 <img
+                // make specific image size for the item image
+                  style={{ width: "225px", height: "100px" }}
                   src={item.item_image}
                   className="w-24 sm:w-32 lg:w-40 h-auto max-w-full rounded-lg shadow-md"
                   alt={item.item_name || 'Item Image'}
@@ -89,8 +91,24 @@ return (
                   {item.item_name}
                 </Link>
               </td>
-              <td className="py-4 px-4">{item.item_price}</td>
+              <td className="py-4 px-4 text-green-800 font-medium" 
+              >{item.item_price} $</td>
               <td className="py-4 px-4">{item.item_description}</td>
+              <td className="py-4 px-4"
+              style={{color: item.item_discount > 0 ? "red" : "green"}}
+              >{item.item_discount}</td>
+              <td className="py-4 px-4"
+              style={{color: item.available ? "green" : "red"}}
+              >
+                <div className="py-1 px-2  text-xs font-semibold text-white"
+                style={{backgroundColor: item.available ? "green" : "red" 
+                  // round the corners of the available or not available
+                  , borderRadius: "0.5rem"
+                }}
+                >
+                  {item.available ? "Available" : "Not Available"}
+                </div>
+              </td>
               <td className="py-4 px-4">{item.orders_count}</td>
             </tr>
           ))}

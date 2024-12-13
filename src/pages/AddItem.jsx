@@ -34,11 +34,11 @@ function AddItem() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const docRef = doc(fsdb, "restaurants", id); // Replace 'restaurants' with the correct collection name
+        const docRef = doc(fsdb, "restaurants", id); 
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setCategories(data.sub_categories || []); // Assuming `sub_categories` is an array
+          setCategories(data.sub_categories || []); 
         } else {
           console.error("No such document!");
         }
