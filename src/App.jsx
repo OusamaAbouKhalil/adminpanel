@@ -26,7 +26,8 @@ import {
   RevenuePage,
   PaymentMethod,
   Users,Calculator,
-  UpdateVersion
+  UpdateVersion,
+  AddRestaurantOwner
 } from "./pages";
 import "./App.css";
 import { useStateContext } from "./contexts/ContextProvider";
@@ -62,7 +63,14 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
         />
-
+      <Route
+        path="addowner"
+        element={
+          <ProtectedRoute>
+            <AddRestaurantOwner />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="restaurants"
         element={

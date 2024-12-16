@@ -5,11 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { useGetRestaurants } from "../lib/query/queries";
 import useDebounce from "../hooks/useDebounce";
+import ReactModal from "react-modal"; // Import react-modal
+import { getRestaurantReviews } from "../lib/firebase/api";
 
 export default function Restaurants() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedValue = useDebounce(searchTerm, 500);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
   const {
     data,
@@ -41,9 +45,42 @@ export default function Restaurants() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-
   const add = () => {
     navigate("/add");
+  };
+
+  const fetchReviews = async (restaurantId) => {
+    try {
+      const reviewsSnapshot = await getRestaurantReviews(restaurantId);
+      console.log("Fetched reviews:", reviewsSnapshot); // Add this log to verify the fetched data
+      const reviews = reviewsSnapshot.docs.map((doc) => doc.data());
+      return reviews;
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      return []; // Return an empty array if there's an error
+    }
+  };
+
+  const openReviewsModal = async (restaurant) => {
+    console.log("Opening reviews for:", restaurant); // Log to verify restaurant object
+    setSelectedRestaurant((prev) => ({
+      ...prev,
+      rest_name: restaurant.rest_name,
+      rest_id: restaurant.rest_id,
+      reviews: [], // Set reviews as an empty array initially
+    }));
+    setIsModalOpen(true);
+
+    const reviews = await fetchReviews(restaurant.rest_id);
+    setSelectedRestaurant((prev) => ({
+      ...prev,
+      reviews: reviews || [], // Ensure reviews is set to an empty array if fetching fails
+    }));
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedRestaurant(null);
   };
 
   return (
@@ -95,16 +132,21 @@ export default function Restaurants() {
                   <th scope="col" className="py-3 px-4">
                     Status
                   </th>
+                  <th scope="col" className="py-3 px-4">
+                    Reviews
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {restaurants.map((restaurant, index) => (
-                  <tr key={index} className="bg-white border-b hover:bg-gray-50">
+                  <tr
+                    key={index}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
                     <td className="py-4 px-4">
                       <img
                         src={restaurant.main_image}
                         className="w-16 h-16 object-fit rounded-md shadow-sm"
-                        
                         alt={restaurant.rest_name}
                       />
                     </td>
@@ -116,13 +158,14 @@ export default function Restaurants() {
                         {restaurant.rest_name}
                       </Link>
                     </td>
-                    <td className="py-4 px-4">{
-                      //if location is long, show only first 20 characters
-                      restaurant.location.length > 20
+                    <td className="py-4 px-4">
+                      {restaurant.location.length > 20
                         ? restaurant.location.substring(0, 45) + "..."
-                        : restaurant.location
-                      }</td>
-                    <td className="py-4 px-4">{restaurant.Category?.join(", ")}</td>
+                        : restaurant.location}
+                    </td>
+                    <td className="py-4 px-4">
+                      {restaurant.Category?.join(", ")}
+                    </td>
                     <td className="py-4 px-4">{restaurant.time}</td>
                     <td className="py-4 px-4 text-center">
                       <button
@@ -136,10 +179,22 @@ export default function Restaurants() {
                     </td>
                     <td className="py-4 px-4 text-center">
                       {restaurant.isClosed ? (
-                        <span className="text-red-500 font-semibold">Closed</span>
+                        <span className="text-red-500 font-semibold">
+                          Closed
+                        </span>
                       ) : (
-                        <span className="text-green-500 font-semibold">Open</span>
+                        <span className="text-green-500 font-semibold">
+                          Open
+                        </span>
                       )}
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <button
+                        onClick={() => openReviewsModal(restaurant)}
+                        className="text-green-500 hover:text-green-700 transition duration-300"
+                      >
+                        Reviews
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -160,6 +215,38 @@ export default function Restaurants() {
           <p className="text-red-500">Error loading data.</p>
         </div>
       )}
+
+      {/* Modal to show reviews */}
+      <ReactModal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Restaurant Reviews"
+        className="bg-white rounded-lg p-8 max-w-2xl mx-auto shadow-lg"
+      >
+        <h2 className="text-xl font-bold mb-4">
+          Reviews for {selectedRestaurant?.rest_name}
+        </h2>
+        {/* Display reviews for the selected restaurant */}
+        {selectedRestaurant?.reviews?.length > 0 ? (
+          selectedRestaurant.reviews.map((review, index) => (
+            <div key={index} className="mb-4">
+              <p className="font-semibold">{review.uid}</p>
+              <p className="text-gray-600">{review.text}</p>
+              <p className="text-sm text-gray-400">
+                {review.datePublished.toDate().toLocaleString()}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p>No reviews available.</p>
+        )}
+        <button
+          onClick={closeModal}
+          className="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded-lg"
+        >
+          Close
+        </button>
+      </ReactModal>
     </div>
   );
 }

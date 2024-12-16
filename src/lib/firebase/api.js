@@ -79,6 +79,20 @@ export const getRestaurantById = async (id) => {
         console.error("Error fetching restaurant: ", error);
     }
 };
+export const getRestaurantReviews = async (id) => {
+    try {
+        const reviewsRef = collection(fsdb, `restaurants/${id}/reviews`);
+        const querySnapshot = await getDocs(reviewsRef);
+        const reviewsList = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        return reviewsList;
+    } catch (error) {
+        console.error("Error fetching reviews: ", error);
+    }
+};
+
 export const getMenuItem = async (restaurantId, itemId) => {
     try {
         const itemRef = doc(

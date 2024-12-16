@@ -273,6 +273,10 @@ export const links = [
         icon: <FaStore size={20} />,
       },
       {
+        name: "addowner",
+        icon: <FaEdit size={20} />,
+      },
+      {
         name: "orders",
         icon: <FaReceipt size={20} />,
       },
@@ -438,7 +442,8 @@ export const permissionsList = [
   { id: "version", label: "Edit Version" },
   { id: "calendar", label: "Calendar" },
   { id: "kanban", label: "Kanban" },
-  { id: "add", label: "Add Restaurant" },
+  { id: "reviews", label: "Restaurant reviews" },
+  { id: "addowner", label: "Add Restaurant Owner" },
 ];
 export const ordersGrid = [
   {

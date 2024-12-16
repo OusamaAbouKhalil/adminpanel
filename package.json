@@ -30,6 +30,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.53.0",
     "react-icons": "^4.3.1",
+    "react-modal": "^3.16.1",
     "react-router-dom": "^6.2.1",
     "tailwind-merge": "^0.0.0-dev.6eb93dc76960c063a694647e2460a15ff4c16791",
     "xlsx": "^0.18.5"
