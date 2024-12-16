@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { collection, getDocs, addDoc, Timestamp } from "firebase/firestore";
-import { fsdb } from "../utils/firebaseconfig";
+import { collection, getDocs, setDoc, doc, Timestamp } from "firebase/firestore";
+import { fsdb } from "../utils/firebaseconfig"; // Your Firestore config
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import CryptoJS from "crypto-js";
 
 const AddRestaurantOwner = () => {
@@ -12,6 +13,9 @@ const AddRestaurantOwner = () => {
     reset,
     formState: { errors },
   } = useForm();
+  const [loading, setLoading] = useState(false); // To handle loading state
+
+  const auth = getAuth();
 
   // Fetch restaurants from Firestore
   useEffect(() => {
@@ -28,29 +32,44 @@ const AddRestaurantOwner = () => {
     fetchRestaurants();
   }, []);
 
-   const hashPassword = (password) => {
-      return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-    };
+  const hashPassword = (password) => {
+    return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+  };
 
   // Handle form submission
   const onSubmit = async (data) => {
     try {
-      // Hash the password before storing it
+      setLoading(true);
+
+      // Create a new user using Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      const user = userCredential.user;
+
+      // Hash the password before storing it in Firestore
       const hashedPassword = hashPassword(data.password);
 
-      await addDoc(collection(fsdb, "restOwners"), {
+      // Create or update user document in Firestore using the UID as the document ID
+      await setDoc(doc(fsdb, "restOwners", user.uid), {
         owner_name: data.ownerName,
         email: data.email,
         phone: data.phone,
         password: hashedPassword, // Store the hashed password
         rest_id: data.restaurant,
         created_at: Timestamp.now(),
+        uid: user.uid, // Store the Firebase UID
       });
+
       alert("Restaurant owner added successfully!");
       reset();
     } catch (error) {
       console.error("Error adding owner: ", error);
       alert("Failed to add owner. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -184,9 +203,10 @@ const AddRestaurantOwner = () => {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full bg-green-500 text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition duration-300"
           >
-            Add Owner
+            {loading ? "Adding..." : "Add Owner"}
           </button>
         </form>
       </div>
