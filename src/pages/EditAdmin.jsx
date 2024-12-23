@@ -39,7 +39,7 @@ const permissionsList = [
   { id: "version", label: "Edit Version" },
   { id: "calendar", label: "Calendar" },
   { id: "kanban", label: "Kanban" },
-  
+  { id: "addowner", label: "Add Restaurant Owner" },
 ];
 
 const placeholderImage =

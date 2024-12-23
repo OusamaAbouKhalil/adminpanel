@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { menuGrid } from "../data/dummy";
 import { useNavigate, useParams } from "react-router-dom";
 import { Header, SizesForm } from "../components";
 import { useCreateItem } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
 import { transformSizesToObject } from "../lib/utils";
+import { getDoc, doc } from "firebase/firestore";
+import {fsdb} from "../utils/firebaseconfig";
 
 function AddItem() {
   const { id } = useParams();
@@ -27,6 +29,26 @@ function AddItem() {
   });
 
   const [itemImage, setItemImage] = useState(null);
+  const [categories, setCategories] = useState([]); // State for categories
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const docRef = doc(fsdb, "restaurants", id); 
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setCategories(data.sub_categories || []); 
+        } else {
+          console.error("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, [id]);
 
   const handleFileInputChange = (e) => {
     e.preventDefault();
@@ -78,10 +100,21 @@ function AddItem() {
             <div key={item.value} className="w-full md:w-1/2 p-2">
               <label className="block">{item.headerText}</label>
               {item.value === "sizes" ? (
-                <SizesForm
-                  sizesForm={sizesForm}
-                  setSizesForm={setSizesForm}
-                />
+                <SizesForm sizesForm={sizesForm} setSizesForm={setSizesForm} />
+              ) : item.value === "item_category" ? (
+                <select
+                  className="bg-gray-200 rounded-lg p-1 w-full"
+                  name={item.value}
+                  value={menuData.item_category}
+                  onChange={handleChange}
+                >
+                  <option value="">Select a Category</option>
+                  {categories.map((category, index) => (
+                    <option key={index} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
               ) : (
                 <input
                   className="bg-gray-200 rounded-lg p-1 w-full"
