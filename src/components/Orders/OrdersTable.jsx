@@ -1,32 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { getDocs, collection } from "firebase/firestore";
 import { fsdb } from "../../utils/firebaseconfig";
 import { MdOutlineErrorOutline } from "react-icons/md"; // Importing an icon
 import OrderDetailsPopup from "./OrderDetailsPopup";
+import { useGetRestaurantsForOrders } from "../../lib/query/queries";
 
 const OrdersTable = ({ orders, onStatusChange }) => {
   const statuses = ["accepted", "preparing", "on the way", "completed", "rejected", "cancelled"];
   const [activeTab, setActiveTab] = useState(statuses[0]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [restaurants, setRestaurants] = useState({});
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  useEffect(() => {
-    const fetchRestaurants = async () => {
-      try {
-        const restaurantsCollection = collection(fsdb, 'restaurants');
-        const restaurantsSnapshot = await getDocs(restaurantsCollection);
-        const restaurantData = {};
-        restaurantsSnapshot.forEach(doc => {
-          restaurantData[doc.id] = doc.data();
-        });
-        setRestaurants(restaurantData);
-      } catch (error) {
-        console.error("Error fetching restaurants:", error);
-      }
-    };
-    fetchRestaurants();
-  }, []);
+  // Get unique restaurant IDs from orders
+  const restaurantIds = useMemo(() =>
+    [...new Set(orders.map(order => order.restaurant_id))],
+    [orders]
+  );
+
+  // Fetch restaurants data
+  const { data: restaurants = {} } = useGetRestaurantsForOrders(restaurantIds);
 
   const getStatusCount = (status) => orders.filter((order) => order.status === status).length;
 
@@ -116,7 +108,7 @@ const OrdersTable = ({ orders, onStatusChange }) => {
         <div className="overflow-x-auto bg-white shadow-md rounded-lg">
           {/* Table for medium and larger screens */}
           <table className="hidden md:table min-w-full divide-y divide-gray-200">
-            <thead className="bg-green-600 text-white font-bold"> 
+            <thead className="bg-green-600 text-white font-bold">
               <tr>
                 <th className="px-6 py-3 text-center text-l font-bold">Logo</th>
                 <th className="px-6 py-3 text-center text-l font-bold">Restaurant Name</th>
@@ -143,9 +135,14 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                     <td className="px-6 py-4 text-sm">{restaurant.rest_name || 'N/A'}</td>
                     <td className="px-6 py-4 text-sm">
                       <button
-                        onClick={() => setSelectedOrder(order)}
+                        onClick={() => {
+                          const restaurant = restaurants[order.restaurant_id] || {};
+                          setSelectedOrder({
+                            ...order,
+                            restaurant_details: restaurant
+                          });
+                        }}
                         className="text-blue-500 underline font-bold"
-                        aria-label={`View details for order ${order.order_id}`}
                       >
                         {order.order_id}
                       </button>
@@ -203,9 +200,14 @@ const OrdersTable = ({ orders, onStatusChange }) => {
                   <div className="mb-2">
                     <span className="font-semibold text-gray-800">Order ID: </span>
                     <button
-                      onClick={() => setSelectedOrder(order)}
-                      className="text-green-500 underline"
-                      aria-label={`View details for order ${order.order_id}`}
+                      onClick={() => {
+                        const restaurant = restaurants[order.restaurant_id] || {};
+                        setSelectedOrder({
+                          ...order,
+                          restaurant_details: restaurant
+                        });
+                      }}
+                      className="text-blue-500 underline font-bold"
                     >
                       {order.order_id}
                     </button>
