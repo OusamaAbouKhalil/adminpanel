@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, getMenuItem, getOrders, getPermissions, getRestaurantById, getRestaurantMenu, getRestaurants, setMenuItem, updateOrderStatus } from '../firebase/api';
+import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, getDashboardData, getMenuItem, getOrders, getPermissions, getRestaurantById, getRestaurantMenu, getRestaurants, setMenuItem, updateOrderStatus } from '../firebase/api';
 
 // In queries.js
 export const useGetRestaurants = (searchTerm) => {
@@ -63,6 +63,11 @@ export const useGetRestaurantMenu = (id) => {
     return useQuery({
         queryKey: ['restaurant_menu', id],
         queryFn: () => getRestaurantMenu(id),
+        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+        cacheTime: 30 * 60 * 1000, // Cache kept for 30 minutes
+        retry: 2, // Retry failed requests 2 times
+        refetchOnWindowFocus: false, // Don't refetch when window regains focus
+        refetchOnMount: false, // Don't refetch if data is cached
     });
 }
 export const useGetPermissions = (currentUser) => {
@@ -78,5 +83,16 @@ export const useCreateAdmin = () => {
         onSuccess: () => {
             queryClient.invalidateQueries('admins');
         },
+    });
+};
+
+export const useGetDashboardData = (startDate, endDate) => {
+    return useQuery({
+        queryKey: ['dashboard', startDate, endDate],
+        queryFn: () => getDashboardData(startDate, endDate),
+        staleTime: 5 * 60 * 1000,
+        cacheTime: 30 * 60 * 1000,
+        retry: 2,
+        refetchOnWindowFocus: false,
     });
 };
