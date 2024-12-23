@@ -97,7 +97,6 @@ export const getRestaurantById = async (id) => {
     const restaurantRef = doc(fsdb, "restaurants", id);
     const restaurantSnapshot = await getDoc(restaurantRef);
     if (restaurantSnapshot.exists()) {
-      console.log(restaurantSnapshot.data());
       return restaurantSnapshot.data();
     }
   } catch (error) {
@@ -123,10 +122,7 @@ export const getMenuItem = async (restaurantId, itemId) => {
     const itemRef = doc(fsdb, `restaurants/${restaurantId}/menu_items`, itemId);
     const itemSnapshot = await getDoc(itemRef);
     if (itemSnapshot.exists()) {
-      console.log(itemSnapshot.data());
       return itemSnapshot.data();
-    } else {
-      console.log("No such document!");
     }
   } catch (error) {
     console.error("Error fetching menu item: ", error);
@@ -136,7 +132,7 @@ export const setMenuItem = async (restaurantId, itemId, itemData) => {
   try {
     const itemRef = doc(fsdb, `restaurants/${restaurantId}/menu_items`, itemId);
     await updateDoc(itemRef, itemData);
-    console.log("Document successfully updated!");
+
   } catch (error) {
     console.error("Error updating document: ", error);
   }
@@ -147,10 +143,10 @@ export const uploadImage = async (file, path) => {
   const filename = Date.now() + "." + file.name.split(".").pop();
   const storageReference = storageRef(storage, `${path}/${filename}`);
   try {
-    console.log("Uploading to:", storageReference.fullPath);
+
     const snapshot = await uploadBytes(storageReference, file);
     const downloadURL = await getDownloadURL(snapshot.ref);
-    console.log("File available at:", downloadURL);
+
     return downloadURL;
   } catch (error) {
     console.error("Error during file upload:", error);
@@ -302,7 +298,7 @@ const getOrderStatusMessage = (status) => {
 };
 
 export const updateOrderStatus = async (order) => {
-  console.log("Updating order:", order);
+
   const orderRef = doc(fsdb, "orders", order.order_id);
 
   try {
@@ -315,9 +311,9 @@ export const updateOrderStatus = async (order) => {
     const userSnapshot = await get(userRef);
     if (userSnapshot.exists()) {
       const userData = userSnapshot.val();
-      console.log("User found:", userData);
+
       if (userData.firebaseMessagingToken) {
-        // console.log("Sending notification to user");
+        // 
         await sendNotification(
           userData.firebaseMessagingToken,
           "SwiftBites Order Status",
@@ -325,7 +321,7 @@ export const updateOrderStatus = async (order) => {
         );
       }
     } else {
-      console.log("User not found");
+
     }
   } catch (error) {
     console.error("Error updating order: ", error);
@@ -336,11 +332,11 @@ const sendNotification = async (token, title, body) => {
   const sendNotificationFunction = httpsCallable(functions, "sendNotification");
   try {
     const result = await sendNotificationFunction({ token, title, body });
-    console.log(result.data);
+
     if (result.data.success) {
-      console.log("Notification sent successfully");
+
     } else {
-      console.log("Failed to send notification:", result.data.error);
+
     }
   } catch (error) {
     console.error("Error sending notification:", error);
@@ -351,13 +347,13 @@ export const createRestaurant = async (formData, menuData) => {
     const collectionRef = collection(fsdb, "restaurants");
     const docRef = await addDoc(collectionRef, formData);
 
-    console.log("Document written with ID: ", docRef.id);
+
 
     const menuRef = collection(fsdb, `restaurants/${docRef.id}/menu_items`);
     const menuItemRef = await addDoc(menuRef, menuData);
 
     await setDoc(menuItemRef, { item_id: menuItemRef.id }, { merge: true });
-    console.log("Menu item added with ID: ", menuItemRef.id);
+
 
     await setDoc(docRef, { ...formData, rest_id: docRef.id }, { merge: true });
   } catch (error) {
@@ -450,7 +446,7 @@ export const saveDriver = async (driverData) => {
   try {
     const driverRef = ref(db, `drivers/${driverData.id}`);
     await set(driverRef, driverData);
-    console.log("Driver data saved successfully!");
+
   } catch (error) {
     console.error("Error saving driver data: ", error);
   }
@@ -464,5 +460,42 @@ export const addDriver = async (newDriver) => {
     });
   } catch (error) {
     console.error("Error adding driver: ", error);
+  }
+};
+
+export const getDashboardData = async (startDate, endDate) => {
+  const db = getDatabase();
+  try {
+
+
+    const usersSnapshot = await get(ref(db, 'users'));
+    const driversSnapshot = await get(ref(db, 'drivers'));
+    const swiftBitesDriversSnapshot = await get(ref(db, 'swiftBitesDrivers'));
+
+
+    const revenueRef = collection(fsdb, 'revenue');
+    const revenueSnapshot = await getDocs(revenueRef);
+    const revenueEntries = revenueSnapshot.docs.map(doc => doc.data());
+
+    const filteredEntries = revenueEntries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= startDate && entryDate <= endDate;
+    });
+
+    return {
+      users: {
+        normal: usersSnapshot.exists() ? Object.keys(usersSnapshot.val()).length : 0,
+        drivers: driversSnapshot.exists() ? Object.keys(driversSnapshot.val()).length : 0,
+        swiftBitesDrivers: swiftBitesDriversSnapshot.exists() ? Object.keys(swiftBitesDriversSnapshot.val()).length : 0,
+      },
+      revenue: filteredEntries,
+      driversData: {
+        drivers: driversSnapshot.exists() ? Object.keys(driversSnapshot.val()) : [],
+        swiftBitesDrivers: swiftBitesDriversSnapshot.exists() ? Object.keys(swiftBitesDriversSnapshot.val()) : [],
+      }
+    };
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    throw error;
   }
 };
