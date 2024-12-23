@@ -5,7 +5,6 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetRestaurantMenu } from "../lib/query/queries";
 
 export default function Menu() {
-  const { getRestaurantsMenu } = useStateContext();
   const { id } = useParams();
   const Navigate = useNavigate();
 
@@ -130,8 +129,8 @@ export default function Menu() {
                   <button
                     onClick={() => goToPage(number + 1)}
                     className={`py-2 px-3 text-sm font-semibold rounded-md border ${currentPage === number + 1
-                        ? "bg-green-600 text-white"
-                        : "bg-white text-gray-600 border-gray-300 hover:bg-green-500 hover:text-white"
+                      ? "bg-green-600 text-white"
+                      : "bg-white text-gray-600 border-gray-300 hover:bg-green-500 hover:text-white"
                       } transition duration-200`}
                   >
                     {number + 1}
