@@ -7,6 +7,12 @@ export const useGetRestaurants = (searchTerm) => {
         queryKey: ['restaurants', searchTerm],
         queryFn: ({ pageParam = null }) => getRestaurants(pageParam, searchTerm),
         getNextPageParam: (lastPage) => lastPage.lastVisible || undefined,
+        staleTime: 5 * 60 * 1000,
+        cacheTime: 30 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        retry: 2,
+        keepPreviousData: true
     });
 }
 
