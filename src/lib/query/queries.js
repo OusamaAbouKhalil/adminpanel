@@ -15,7 +15,26 @@ export const useGetRestaurants = (searchTerm) => {
         keepPreviousData: true
     });
 }
-
+export const useGetRestaurantsForOrders = (restaurantIds) => {
+    return useQuery({
+        queryKey: ['restaurants_for_orders', restaurantIds],
+        queryFn: async () => {
+            const uniqueIds = [...new Set(restaurantIds)];
+            const restaurants = {};
+            await Promise.all(
+                uniqueIds.map(async (id) => {
+                    const data = await getRestaurantById(id);
+                    restaurants[id] = data;
+                })
+            );
+            return restaurants;
+        },
+        enabled: restaurantIds?.length > 0,
+        staleTime: 5 * 60 * 1000,
+        cacheTime: 30 * 60 * 1000,
+        refetchOnWindowFocus: false
+    });
+};
 export const useGetRestaurantById = (id) => {
     return useQuery({
         queryKey: ['restaurant', id],
