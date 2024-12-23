@@ -95,7 +95,7 @@ export const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     const driversRef = ref(db, '/drivers');
     const onDriversChange = (snapshot) => {
-      console.log('Drivers snapshot:', snapshot);
+
       const driversArray = snapshot.exists()
         ? Object.entries(snapshot.val()).map(([key, value]) => ({ id: key, ...value }))
         : [];

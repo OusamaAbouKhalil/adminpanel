@@ -35,7 +35,7 @@ const Orders = () => {
 
   const handleStatusChange = (order, newStatus) => {
     const updatedOrder = { ...order, status: newStatus };
-    console.log(updatedOrder);
+
     updateOrderStatus(updatedOrder);
   };
 

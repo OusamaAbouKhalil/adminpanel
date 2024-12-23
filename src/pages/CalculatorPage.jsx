@@ -23,7 +23,7 @@ const CalculatorPage = () => {
           if (data) {
             setPrices(data);
           } else {
-            console.log('No data found at Prices node');
+
             setPrices({});
           }
           setIsLoading(false);
@@ -63,10 +63,10 @@ const CalculatorPage = () => {
       // Ensure to include all keys as they appear in Firebase
     } = prices;
 
-    console.log('Prices:', prices);
-    console.log('Distance:', distance);
-    console.log('Time:', time);
-    console.log('Passengers:', passengers);
+
+
+
+
 
     // Swift Drive Calculation
     let swiftDriveCost = Base_Fare + (Cost_Per_Min * time) + (Cost_Per_Km * distance) + Booking_Fee;

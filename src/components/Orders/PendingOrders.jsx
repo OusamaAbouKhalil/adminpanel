@@ -33,13 +33,13 @@ const PendingOrders = ({ orders, handlePendingOrdersClick }) => {
   };
 
   const handleSelectDriver = (driver) => {
-    console.log(driver);
+
     const updatedOrder = {
       ...selectedOrder,
       status: "accepted",
       driver_id: driver.id,
     };
-    console.log("selecting");
+
     updateOrderStatus(updatedOrder);
     setIsModalOpen(false);
   };

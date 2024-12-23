@@ -18,12 +18,6 @@ const SendNotificationPage = () => {
     const sendNotificationFunction = httpsCallable(functions, "sendTopicNotification");
     try {
       const result = await sendNotificationFunction({ title, message });
-      console.log(result.data);
-      if (result.data.success) {
-        console.log("Notification sent successfully");
-      } else {
-        console.log("Failed to send notification:", result.data.error);
-      }
     } catch (error) {
       console.error("Error sending notification:", error);
     }

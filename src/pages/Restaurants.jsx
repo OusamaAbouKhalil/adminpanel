@@ -52,7 +52,7 @@ export default function Restaurants() {
   const fetchReviews = async (restaurantId) => {
     try {
       const reviewsSnapshot = await getRestaurantReviews(restaurantId);
-      console.log("Fetched reviews:", reviewsSnapshot); // Add this log to verify the fetched data
+      // Add this log to verify the fetched data
       const reviews = reviewsSnapshot.docs.map((doc) => doc.data());
       return reviews;
     } catch (error) {
@@ -62,7 +62,7 @@ export default function Restaurants() {
   };
 
   const openReviewsModal = async (restaurant) => {
-    console.log("Opening reviews for:", restaurant); // Log to verify restaurant object
+    // Log to verify restaurant object
     setSelectedRestaurant((prev) => ({
       ...prev,
       rest_name: restaurant.rest_name,

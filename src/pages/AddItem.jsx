@@ -6,7 +6,7 @@ import { useCreateItem } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
 import { transformSizesToObject } from "../lib/utils";
 import { getDoc, doc } from "firebase/firestore";
-import {fsdb} from "../utils/firebaseconfig";
+import { fsdb } from "../utils/firebaseconfig";
 
 function AddItem() {
   const { id } = useParams();
@@ -34,11 +34,11 @@ function AddItem() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const docRef = doc(fsdb, "restaurants", id); 
+        const docRef = doc(fsdb, "restaurants", id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setCategories(data.sub_categories || []); 
+          setCategories(data.sub_categories || []);
         } else {
           console.error("No such document!");
         }
@@ -82,7 +82,7 @@ function AddItem() {
         itemData: { ...menuData, sizes: transformSizesToObject(sizesForm), item_image: itemImageUrl },
       });
 
-      console.log("Menu item added with ID: ", itemId);
+
       navigate(`/restaurants/${id}`);
     } catch (error) {
       console.error("Error adding menu item: ", error);
@@ -137,9 +137,8 @@ function AddItem() {
           <button
             type="submit"
             disabled={loading} // Disable button while loading
-            className={`${
-              loading ? "bg-gray-500 cursor-not-allowed" : "bg-green-500 hover:bg-green-700"
-            } text-white font-bold py-2 px-4 rounded mt-4`}
+            className={`${loading ? "bg-gray-500 cursor-not-allowed" : "bg-green-500 hover:bg-green-700"
+              } text-white font-bold py-2 px-4 rounded mt-4`}
           >
             {loading ? "Submitting..." : "Submit"}
           </button>

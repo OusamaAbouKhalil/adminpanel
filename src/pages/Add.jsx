@@ -106,7 +106,7 @@ function Add() {
         title: [...prevState.title, clickedOption],
       }));
     }
-    console.log(formData.title);
+
   };
 
   const onMapClick = useCallback((event) => {
@@ -192,7 +192,7 @@ function Add() {
 
       setProgress(40);
 
-      console.log(formData, menuData);
+
       const restRef = await createRestaurant({
         formData: { ...formData, sizes: transformSizesToObject(sizesForm) },
         menuData: {
