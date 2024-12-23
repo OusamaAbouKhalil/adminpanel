@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "../components";
 import { useNavigate } from "react-router-dom";
@@ -30,15 +30,15 @@ export default function Restaurants() {
     setSearchTerm(event.target.value);
   };
 
-  const handleScroll = () => {
-    const scrollPosition =
-      window.innerHeight + document.documentElement.scrollTop;
+  const handleScroll = useCallback(() => {
+    const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
     const threshold = document.documentElement.offsetHeight - 100;
 
     if (scrollPosition >= threshold && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -49,34 +49,30 @@ export default function Restaurants() {
     navigate("/add");
   };
 
-  const fetchReviews = async (restaurantId) => {
+  const fetchReviews = useCallback(async (restaurantId) => {
     try {
       const reviewsSnapshot = await getRestaurantReviews(restaurantId);
-      // Add this log to verify the fetched data
-      const reviews = reviewsSnapshot.docs.map((doc) => doc.data());
-      return reviews;
+      return reviewsSnapshot.docs.map((doc) => doc.data());
     } catch (error) {
       console.error("Error fetching reviews:", error);
-      return []; // Return an empty array if there's an error
+      return [];
     }
-  };
+  }, []);
 
-  const openReviewsModal = async (restaurant) => {
-    // Log to verify restaurant object
-    setSelectedRestaurant((prev) => ({
-      ...prev,
+  const openReviewsModal = useCallback(async (restaurant) => {
+    setSelectedRestaurant({
       rest_name: restaurant.rest_name,
       rest_id: restaurant.rest_id,
-      reviews: [], // Set reviews as an empty array initially
-    }));
+      reviews: []
+    });
     setIsModalOpen(true);
 
     const reviews = await fetchReviews(restaurant.rest_id);
-    setSelectedRestaurant((prev) => ({
+    setSelectedRestaurant(prev => ({
       ...prev,
-      reviews: reviews || [], // Ensure reviews is set to an empty array if fetching fails
+      reviews: reviews || []
     }));
-  };
+  }, [fetchReviews]);
 
   const closeModal = () => {
     setIsModalOpen(false);
