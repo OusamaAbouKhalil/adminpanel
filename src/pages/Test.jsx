@@ -7,37 +7,26 @@ const Test = () => {
   const { mutate: setMenuItem } = useSetMenuItem();
   const { id, item_id } = useParams();
   const { data: itemData, isPending } = useGetMenuItem({ rest_id: id, item_id: item_id });
-  const { mutate: addAddonToMenuItem } = useAddAddonToMenuItem();
-  const [ItemImage, setItemImage] = useState(null);
-
-  // State for addons, sizes, and combos
-  const [addonName, setAddonName] = useState('');
-  const [addonPrice, setAddonPrice] = useState('');
-  const [showAddonsForm, setShowAddonsForm] = useState(false);
-  const [sizes, setSizes] = useState([]);
-  const [combos, setCombos] = useState([]);
-  const [sizeForm, setSizeForm] = useState({ name: '', price: '' });
-  const [comboForm, setComboForm] = useState({ name: '', price: '' });
-
   const [item, setItem] = useState();
-  const Navigate = useNavigate();
+  const [sizesForm, setSizesForm] = useState([]);
+  const [comboForm, setComboForm] = useState({});
+  const [itemImage, setItemImage] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (itemData) {
       setItem(itemData);
-      setSizes(itemData.sizes || []);
-      setCombos(itemData.combo || []);
+      setSizesForm(itemData.sizes || []);
+      setComboForm(itemData.combo || {});
     }
   }, [itemData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setItem((prevItem) => ({
+    setItem(prevItem => ({
       ...prevItem,
-      [name]: (name === "item_price" || name === "item_discount") && value
-        ? parseFloat(value)
-        : name === "available"
-        ? value === "true"
+      [name]: (name === "item_price" || name === "item_discount") && value 
+        ? parseFloat(value) 
         : value,
     }));
   };
@@ -53,114 +42,126 @@ const Test = () => {
   const handleSaveChanges = async () => {
     const imageDir = "images";
     try {
-      let updatedImageUrl = item.item_image; // Retain the current image by default
-      if (ItemImage) {
-        updatedImageUrl = await uploadImage(ItemImage, imageDir);
+      let updatedImageUrl = item.item_image;
+      if (itemImage) {
+        updatedImageUrl = await uploadImage(itemImage, imageDir);
       }
-      const updatedItem = { ...item, item_image: updatedImageUrl, sizes, combo: combos };
+
+      const updatedItem = {
+        ...item,
+        sizes: sizesForm,
+        combo: comboForm,
+        item_image: updatedImageUrl,
+      };
+
       setMenuItem({ rest_id: id, item_id: item_id, itemData: updatedItem });
-      Navigate(`/restaurants/${id}`);
+      navigate(`/restaurants/${id}`);
     } catch (error) {
-      console.error("Error uploading image or saving changes:", error);
+      console.error("Error saving changes:", error);
     }
   };
 
-  const handleAddAddon = () => {
-    const addonData = { addon_name: addonName, addon_price: parseFloat(addonPrice) };
-    addAddonToMenuItem({ rest_id: id, item_id: item_id, addonData });
-    setAddonName('');
-    setAddonPrice('');
-  };
-
   const handleAddSize = () => {
-    setSizes([...sizes, { ...sizeForm, price: parseFloat(sizeForm.price) }]);
-    setSizeForm({ name: '', price: '' });
+    setSizesForm([...sizesForm, { name: "", price: 0 }]);
   };
 
-  const handleAddCombo = () => {
-    setCombos([...combos, { ...comboForm, price: parseFloat(comboForm.price) }]);
-    setComboForm({ name: '', price: '' });
+  const handleSizeChange = (index, field, value) => {
+    const updatedSizes = [...sizesForm];
+    updatedSizes[index][field] = field === "price" ? parseFloat(value) : value;
+    setSizesForm(updatedSizes);
   };
 
-  const handleDelete = (index, type) => {
-    if (type === 'size') setSizes(sizes.filter((_, i) => i !== index));
-    if (type === 'combo') setCombos(combos.filter((_, i) => i !== index));
+  const handleComboChange = (field, value) => {
+    setComboForm(prevCombo => ({
+      ...prevCombo,
+      [field]: value,
+    }));
   };
+
+  const back = () => {
+    navigate(`/restaurants/${id}`);
+  };
+
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="container mx-auto p-8 space-y-12">
-      <button
-        onClick={() => Navigate(`/restaurants/${id}`)}
-        className="mb-8 bg-gray-700 text-white rounded-full p-4"
-      >
-        &#x2190; Back
+      <button onClick={back} className="mb-8 bg-gray-700 text-white rounded-full p-4">
+        Back
       </button>
 
       {item ? (
-        <div>
-          {/* General Fields */}
-          <div>
-            {/* ...existing form fields for item details */}
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="bg-white p-8 rounded-lg space-y-6">
+            <h2>Edit Menu Item</h2>
+            <input
+              type="text"
+              name="item_name"
+              value={item.item_name}
+              onChange={handleInputChange}
+              placeholder="Item Name"
+            />
+            <input
+              type="number"
+              name="item_price"
+              value={item.item_price}
+              onChange={handleInputChange}
+              placeholder="Item Price"
+            />
+            <textarea
+              name="item_description"
+              value={item.item_description}
+              onChange={handleInputChange}
+              placeholder="Item Description"
+            />
 
-          {/* Sizes Section */}
-          <div>
             <h3>Sizes</h3>
-            {sizes.map((size, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <span>{size.name} - ${size.price}</span>
-                <button onClick={() => handleDelete(index, 'size')}>Delete</button>
+            {sizesForm.map((size, index) => (
+              <div key={index}>
+                <input
+                  type="text"
+                  value={size.name}
+                  onChange={(e) => handleSizeChange(index, "name", e.target.value)}
+                  placeholder="Size Name"
+                />
+                <input
+                  type="number"
+                  value={size.price}
+                  onChange={(e) => handleSizeChange(index, "price", e.target.value)}
+                  placeholder="Size Price"
+                />
               </div>
             ))}
-            <div>
-              <input
-                type="text"
-                value={sizeForm.name}
-                onChange={(e) => setSizeForm({ ...sizeForm, name: e.target.value })}
-                placeholder="Size Name"
-              />
-              <input
-                type="number"
-                value={sizeForm.price}
-                onChange={(e) => setSizeForm({ ...sizeForm, price: e.target.value })}
-                placeholder="Price"
-              />
-              <button onClick={handleAddSize}>Add Size</button>
-            </div>
+            <button onClick={handleAddSize}>Add Size</button>
+
+            <h3>Combo</h3>
+            <input
+              type="text"
+              value={comboForm.name || ""}
+              onChange={(e) => handleComboChange("name", e.target.value)}
+              placeholder="Combo Name"
+            />
+            <input
+              type="number"
+              value={comboForm.price || 0}
+              onChange={(e) => handleComboChange("price", e.target.value)}
+              placeholder="Combo Price"
+            />
           </div>
 
-          {/* Combos Section */}
-          <div>
-            <h3>Combos</h3>
-            {combos.map((combo, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <span>{combo.name} - ${combo.price}</span>
-                <button onClick={() => handleDelete(index, 'combo')}>Delete</button>
-              </div>
-            ))}
-            <div>
-              <input
-                type="text"
-                value={comboForm.name}
-                onChange={(e) => setComboForm({ ...comboForm, name: e.target.value })}
-                placeholder="Combo Name"
-              />
-              <input
-                type="number"
-                value={comboForm.price}
-                onChange={(e) => setComboForm({ ...comboForm, price: e.target.value })}
-                placeholder="Price"
-              />
-              <button onClick={handleAddCombo}>Add Combo</button>
-            </div>
+          <div className="bg-gray-50 p-8 rounded-lg">
+            <h3>Item Image</h3>
+            <input type="file" onChange={handleFileInputChange} />
+            {item.item_image && <img src={item.item_image} alt="Item" />}
           </div>
-
-          {/* Save Changes */}
-          <button onClick={handleSaveChanges}>Save Changes</button>
         </div>
       ) : (
-        <div>Loading...</div>
+        <div>No Item Found</div>
       )}
+
+      <button onClick={handleSaveChanges}>Save Changes</button>
     </div>
   );
 };
