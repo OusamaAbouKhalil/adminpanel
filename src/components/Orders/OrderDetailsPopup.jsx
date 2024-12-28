@@ -1,193 +1,337 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { motion } from 'framer-motion';
-import { MdClose, MdPrint } from 'react-icons/md';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
+import React, { useCallback, useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { motion } from "framer-motion";
+import { MdClose, MdPrint } from "react-icons/md";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { getDatabase, ref, get, onValue, set, push } from "firebase/database";
+import { fsdb } from "../../utils/firebaseconfig";
 
-// Initialize pdfMake with fonts
-pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
-pdfMake.fonts = {
-  Roboto: {
-    normal: 'Roboto-Regular.ttf',
-    bold: 'Roboto-Medium.ttf',
-    italics: 'Roboto-Italic.ttf',
-    bolditalics: 'Roboto-MediumItalic.ttf'
-  }
-};
-const generateInvoicePDF = async (order) => {
-  const docDefinition = {
-    pageSize: 'A4',
-    pageMargins: [40, 60, 40, 60],
-    content: [
-      // Header
-      {
-        columns: [
-          {
-            width: '*',
-            stack: [
-              { text: 'SWIFT GO', fontSize: 28, bold: true, color: '#4CAF50' },
-              { text: 'Food Delivery Service', fontSize: 12, color: '#666' }
-            ]
-          },
-          {
-            width: 'auto',
-            stack: [
-              { text: `Invoice #${order.order_id}`, alignment: 'right', bold: true },
-              { text: new Date(order.time.seconds * 1000).toLocaleString(), alignment: 'right' }
-            ]
-          }
-        ],
-        margin: [0, 0, 0, 20]
-      },
+const OrderDetailsPopup = React.memo(({ order, onClose }) => {
+  const [orderItems, setOrderItems] = useState([]);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  // user details from real-time database to be displayed in the order details popup
+  const [userDetails, setUserDetails] = useState(null);
 
-      // Restaurant & Customer Info
-      {
-        columns: [
-          {
-            width: '*',
-            stack: [
-              { text: 'Restaurant Details', style: 'sectionHeader' },
-              { text: order.restaurant_details.rest_name, bold: true },
-              { text: `Rating: ${order.restaurant_details.rating}` },
-              { text: `Estimated Time: ${order.restaurant_details.time}` }
-            ]
-          },
-          {
-            width: '*',
-            stack: [
-              { text: 'Delivery Details', style: 'sectionHeader' },
-              { text: order.recipient_name, bold: true },
-              { text: order.user_address },
-              { text: `Floor: ${order.floor_num}`, margin: [0, 2] },
-              { text: `Unit: ${order.unit_num}`, margin: [0, 2] }
-            ]
-          }
-        ],
-        columnGap: 20,
-        margin: [0, 0, 0, 20]
-      },
-
-      // Order Details
-      {
-        stack: [
-          { text: 'Order Summary', style: 'sectionHeader' },
-          {
-            table: {
-              headerRows: 1,
-              widths: ['*', 'auto', 'auto'],
-              body: [
-                [
-                  { text: 'Description', style: 'tableHeader' },
-                  { text: 'Amount', style: 'tableHeader' },
-                  { text: 'Status', style: 'tableHeader' }
-                ],
-                [
-                  'Order Subtotal',
-                  `$${order.total.toFixed(2)}`,
-                  order.status
-                ],
-                [
-                  'Delivery Fee',
-                  `$${order.delivery_fee.toFixed(2)}`,
-                  ''
-                ],
-                [
-                  { text: 'Total Amount', bold: true },
-                  { text: `$${(order.total + order.delivery_fee).toFixed(2)}`, bold: true },
-                  ''
-                ]
-              ]
-            },
-            layout: {
-              hLineWidth: function (i, currentNode) {
-                return (i === 0 || i === currentNode.table.body.length) ? 2 : 1;
-              },
-              vLineWidth: function () {
-                return 0;
-              },
-              hLineColor: function (i, currentNode) {
-                return (i === 0 || i === currentNode.table.body.length) ? '#4CAF50' : '#dedede';
-              },
-              paddingTop: function (i) {
-                return i === 0 ? 10 : 5;
-              },
-              paddingBottom: function (i, currentNode) {
-                return (i === currentNode.table.body.length - 1) ? 10 : 5;
-              }
-            }
-          }
-        ],
-        margin: [0, 0, 0, 20]
-      },
-
-      // Payment Info
-      {
-        stack: [
-          { text: 'Payment Information', style: 'sectionHeader' },
-          { text: `Payment Method: ${order.payment_method}` },
-          { text: `Credits Cost: ${order.costInCredits}` }
-        ],
-        margin: [0, 0, 0, 20]
-      },
-
-      // Footer
-      {
-        stack: [
-          { text: 'Thank you for choosing Swift Go!', alignment: 'center', fontSize: 14 },
-          { text: 'For support: support@swiftgo.com', alignment: 'center', color: '#666', fontSize: 10 }
-        ]
-      }
-    ],
-    styles: {
-      sectionHeader: {
-        fontSize: 14,
-        bold: true,
-        margin: [0, 0, 0, 10],
-        color: '#4CAF50'
-      },
-      tableHeader: {
-        bold: true,
-        fontSize: 12,
-        color: '#4CAF50'
-      }
-    },
-    defaultStyle: {
-      font: 'Roboto',
-      fontSize: 11,
-      lineHeight: 1.2
+  // Fetch user details from Realtime Database
+  const fetchUserDetails = async (userId) => {
+    try {
+      const userRef = ref(getDatabase(), `users/${order.user_id}`);
+      onValue(userRef, (snapshot) => {
+        setUserDetails(snapshot.val());
+      });
+    } catch (error) {
+      console.error("Error fetching user details:", error);
     }
   };
 
-  return docDefinition;
-};
-
-const OrderDetailsPopup = React.memo(({ order, onClose }) => {
-  console.log(order);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const handleEscape = useCallback((e) => {
-    if (e.key === 'Escape') onClose();
-  }, [onClose]);
+  useEffect(() => {
+    if (order && order.user_id) {
+      fetchUserDetails(order.user_id);
+    }
+  }, [order]);
 
   useEffect(() => {
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [handleEscape]);
+    if (order?.order_id) {
+      const fetchOrderItems = async () => {
+        const items = await getOrderItems(order.order_id);
+        setOrderItems(items);
+      };
+      fetchOrderItems();
+    }
+  }, [order]);
+
+  const getOrderItems = async (orderId) => {
+    try {
+      // First, get the orders collection reference
+      const ordersRef = collection(fsdb, "orders");
+
+      // Create a query to filter by order_id
+      const orderQuery = query(ordersRef, where("order_id", "==", orderId));
+
+      // Execute the query
+      const orderSnapshot = await getDocs(orderQuery);
+
+      // Assuming 'items' are a sub-collection of each order
+      const items = [];
+      for (const doc of orderSnapshot.docs) {
+        const itemsRef = collection(doc.ref, "items"); // Sub-collection 'items' under each order
+        const itemsSnapshot = await getDocs(itemsRef);
+        itemsSnapshot.forEach((itemDoc) => {
+          items.push(itemDoc.data());
+        });
+      }
+
+      return items;
+    } catch (error) {
+      console.error("Error fetching order items:", error);
+      return [];
+    }
+  };
+
+  // Initialize pdfMake with fonts
+  pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
+  pdfMake.fonts = {
+    Roboto: {
+      normal: "Roboto-Regular.ttf",
+      bold: "Roboto-Medium.ttf",
+      italics: "Roboto-Italic.ttf",
+      bolditalics: "Roboto-MediumItalic.ttf",
+    },
+  };
 
   const handlePrint = useCallback(async () => {
-    if (!order) return;
+    if (!order || orderItems.length === 0) {
+      alert("Order items are not available.");
+      return;
+    }
     try {
       setIsGeneratingPDF(true);
       const docDefinition = await generateInvoicePDF(order);
       const pdf = pdfMake.createPdf(docDefinition);
       pdf.open(); // Open in new window instead of download
     } catch (error) {
-      console.error('Error creating PDF:', error);
-      alert('Error generating PDF. Please try again.');
+      console.error("Error creating PDF:", error);
+      alert("Error generating PDF. Please try again.");
     } finally {
       setIsGeneratingPDF(false);
     }
-  }, [order]);
+  }, [order, orderItems]);
+  
+  const generateInvoicePDF = async (order) => {
+    const docDefinition = {
+      pageSize: "A4",
+      pageMargins: [40, 60, 40, 60],
+      content: [
+        {
+          columns: [
+            {
+              width: "*",
+              stack: [
+                {
+                  text: "SWIFT GO",
+                  fontSize: 28,
+                  bold: true,
+                  color: "#4CAF50",
+                },
+                { text: "Food Delivery Service", fontSize: 12, color: "#666" },
+              ],
+            },
+            {
+              width: "auto",
+              stack: [
+                {
+                  text: `Invoice #${order.order_id}`,
+                  alignment: "right",
+                  bold: true,
+                },
+                {
+                  text: new Date(order.time.seconds * 1000).toLocaleString(),
+                  alignment: "right",
+                },
+              ],
+            },
+          ],
+          margin: [0, 0, 0, 20],
+        },
+
+        {
+          columns: [
+            {
+              width: "*",
+              stack: [
+                { text: "Restaurant Details ", style: "sectionHeader" },
+                { text: order.restaurant_details.rest_name, bold: true },
+                { text: `Rating: ${order.restaurant_details.rating}` },
+                { text: `Estimated Time: ${order.restaurant_details.time}` },
+              ],
+            },
+            {
+              width: "*",
+              stack: [
+                { text: "Delivery Details", style: "sectionHeader" },
+                { text: order.recipient_name, bold: true },
+                { text: order.user_address },
+                { text: `Floor: ${order.floor_num}`, margin: [0, 2] },
+                { text: `Unit: ${order.unit_num}`, margin: [0, 2] },
+              ],
+            },
+          ],
+          columnGap: 20,
+          margin: [0, 0, 0, 20],
+        },
+
+        // show order items here as a table
+        {
+          stack: [
+            { text: "Order Items", style: "sectionHeader" },
+            {
+              table: {
+                headerRows: 1,
+                widths: ["*", "auto", "auto", "auto", "auto", "auto"],
+                body: [
+                  // Header Row
+                  [
+                    { text: "Name", style: "tableHeader" },
+                    { text: "Quantity", style: "tableHeader" },
+                    { text: "Size", style: "tableHeader" },
+                    { text: "Addons", style: "tableHeader" },
+                    { text: "Instructions", style: "tableHeader" },
+                    { text: "Total", style: "tableHeader" },
+                  ],
+                  // Data Rows
+                  ...orderItems.map((item) => [
+                    item.item_name, // Name
+                    item.quantity, // Quantity
+                    item.size === "No size selected." ? "N/A" : item.size, // Size
+                    item.addons === "No addons selected." ? "N/A" : item.addons, // Addons
+                    item.instructions === "No instructions provided."
+                      ? "N/A"
+                      : item.instructions, // Instructions
+                    `$${item.total.toFixed(2)}`, // Total
+                  ]),
+                ],
+              },
+              layout: {
+                hLineWidth: function (i, currentNode) {
+                  return i === 0 || i === currentNode.table.body.length ? 2 : 1;
+                },
+                vLineWidth: function () {
+                  return 0;
+                },
+                hLineColor: function (i, currentNode) {
+                  return i === 0 || i === currentNode.table.body.length
+                    ? "#4CAF50"
+                    : "#dedede";
+                },
+                paddingTop: function (i) {
+                  return i === 0 ? 10 : 5;
+                },
+                paddingBottom: function (i, currentNode) {
+                  return i === currentNode.table.body.length - 1 ? 10 : 5;
+                },
+              },
+            },
+          ],
+          margin: [0, 0, 0, 20],
+        },
+
+        {
+          stack: [
+            { text: "Order Summary", style: "sectionHeader" },
+            {
+              table: {
+                headerRows: 1,
+                widths: ["*", "auto", "auto"],
+                body: [
+                  [
+                    { text: "Description", style: "tableHeader" },
+                    { text: "Amount", style: "tableHeader" },
+                    { text: "Status", style: "tableHeader" },
+                  ],
+                  [
+                    "Order Subtotal",
+                    `$${order.total.toFixed(2)}`,
+                    order.status,
+                  ],
+                  ["Delivery Fee", `$${order.delivery_fee.toFixed(2)}`, ""],
+                  [
+                    { text: "Total Amount", bold: true },
+                    {
+                      text: `$${(order.total + order.delivery_fee).toFixed(2)}`,
+                      bold: true,
+                    },
+                    "",
+                  ],
+                ],
+              },
+              layout: {
+                hLineWidth: function (i, currentNode) {
+                  return i === 0 || i === currentNode.table.body.length ? 2 : 1;
+                },
+                vLineWidth: function () {
+                  return 0;
+                },
+                hLineColor: function (i, currentNode) {
+                  return i === 0 || i === currentNode.table.body.length
+                    ? "#4CAF50"
+                    : "#dedede";
+                },
+                paddingTop: function (i) {
+                  return i === 0 ? 10 : 5;
+                },
+                paddingBottom: function (i, currentNode) {
+                  return i === currentNode.table.body.length - 1 ? 10 : 5;
+                },
+              },
+            },
+          ],
+          margin: [0, 0, 0, 20],
+        },
+
+        {
+          stack: [
+            { text: "Payment Information", style: "sectionHeader" },
+            { text: `Payment Method: ${order.payment_method}` },
+            { text: `Credits Cost: ${order.costInCredits}` },
+          ],
+          margin: [0, 0, 0, 20],
+        },
+
+        {
+          stack: [
+            {
+              text: "Thank you for choosing Swift Go!",
+              alignment: "center",
+              fontSize: 14,
+            },
+            {
+              text: "For support: +961 81 999 769",
+              alignment: "center",
+              color: "#666",
+              fontSize: 10,
+            },
+          ],
+        },
+      ],
+      styles: {
+        sectionHeader: {
+          fontSize: 14,
+          bold: true,
+          margin: [0, 0, 0, 10],
+          color: "#4CAF50",
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: "#4CAF50",
+        },
+      },
+      defaultStyle: {
+        font: "Roboto",
+        fontSize: 11,
+        lineHeight: 1.2,
+      },
+    };
+
+    return docDefinition;
+  };
+  
+
+  const handleEscape = useCallback(
+    (e) => {
+      if (e.key === "Escape") onClose();
+    },
+    [onClose]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [handleEscape]);
+
+  
 
   if (!order) return null;
 
@@ -196,7 +340,7 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
     >
       {/* Backdrop */}
       <div
@@ -209,7 +353,7 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="relative z-10 bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl mx-4"
+        className="relative z-10 bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -223,131 +367,172 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
           </button>
         </div>
 
-        {/* Content */}
-        <div className="space-y-6">
-          {/* Order Info */}
-          <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+        {/* Order Info */}
+        <div className="grid grid-cols-2 gap-8 mb-6">
+          <div>
+            <p className="text-sm text-gray-500">Order ID</p>
+            <p className="font-semibold">{order.order_id}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Date</p>
+            <p className="font-semibold">
+              {new Date(order.time.seconds * 1000).toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Status</p>
+            <span
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
+                order.status === "completed"
+                  ? "bg-green-100 text-green-800"
+                  : order.status === "cancelled"
+                  ? "bg-red-100 text-red-800"
+                  : "bg-blue-100 text-blue-800"
+              }`}
+            >
+              {order.status}
+            </span>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Total</p>
+            <p className="font-semibold">
+              ${(order.total + order.delivery_fee).toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-8 mb-6">
+          {/* Restaurant Details */}
+          <div className="flex items-center space-x-4">
+            {order.restaurant_details?.main_image && (
+              <img
+                src={order.restaurant_details.main_image}
+                alt={order.restaurant_details.rest_name}
+                className="w-24 h-24 object-cover rounded-lg"
+              />
+            )}
             <div>
-              <p className="text-sm text-gray-500">Order ID</p>
-              <p className="font-semibold">{order.order_id}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Date</p>
+              <p className="text-sm text-gray-500">Name</p>
               <p className="font-semibold">
-                {new Date(order.time.seconds * 1000).toLocaleString()}
+                {order.restaurant_details.rest_name}
               </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Status</p>
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm
-                ${order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                  order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                    'bg-blue-100 text-blue-800'}`}
-              >
-                {order.status}
-              </span>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Total Amount</p>
-              <p className="font-semibold">
-                ${(order.total + order.delivery_fee).toFixed(2)}
-              </p>
+              <p className="text-sm text-gray-500">Rating</p>
+              <p className="font-semibold">{order.restaurant_details.rating}</p>
+              <p className="text-sm text-gray-500">Estimated Time</p>
+              <p className="font-semibold">{order.restaurant_details.time}</p>
             </div>
           </div>
 
-          {/* Details Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-4 border rounded-lg">
-              <h3 className="font-semibold mb-3">Customer Details</h3>
-              <p className="text-sm text-gray-600">
-                <strong>Name:</strong> {order.recipient_name}
-              </p>
-              {order.phone && (
-                <p className="text-sm text-gray-600">
-                  <strong>Phone:</strong> {order.phone}
-                </p>
-              )}
-              {order.address && (
-                <p className="text-sm text-gray-600">
-                  <strong>Address:</strong> {order.address}
-                </p>
-              )}
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h3 className="font-semibold mb-3">Restaurant Details</h3>
-              {order.restaurant_details?.main_image && (
+          {/* Client Data */}
+          <div>
+            <h4 className="text-xl font-semibold text-gray-800">Client Data</h4>
+            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg mt-4">
+              <div>
+                <p className="text-sm text-gray-500">Profile Pic</p>
                 <img
-                  src={order.restaurant_details.main_image}
-                  alt={order.restaurant_details.rest_name}
-                  className="w-24 h-24 object-cover rounded-lg mb-3"
+                  src={
+                    userDetails?.ProfilePic == null
+                      ? "https://via.placeholder.com/150"
+                      : userDetails?.ProfilePic
+                  }
+                  alt="profile pic"
+                  className="w-16 h-16 object-cover rounded-full"
                 />
-              )}
-              <p className="text-sm text-gray-600">
-                <strong>Name:</strong> {order.restaurant_details?.rest_name}
-              </p>
-              {order.restaurant_details?.address && (
-                <p className="text-sm text-gray-600">
-                  <strong>Address:</strong> {order.restaurant_details.address}
-                </p>
-              )}
-              {order.restaurant_details?.phone && (
-                <p className="text-sm text-gray-600">
-                  <strong>Phone:</strong> {order.restaurant_details.phone}
-                </p>
-              )}
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-500">Full Name</p>
+                <p className="font-semibold">{userDetails?.fullname}</p>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-500">Phone</p>
+                <p className="font-semibold">{userDetails?.phone}</p>
+              </div>
             </div>
           </div>
         </div>
 
+         {/* Items List */}
+        <div className="my-4">
+          <h3 className="text-xl font-semibold text-gray-800">Order Items</h3>
+          <table className="min-w-full mt-2 border-collapse">
+            <thead>
+              <tr className="border-b">
+                <th className="px-4 py-2 text-left text-gray-600">
+                  Item Image
+                </th>
+                <th className="px-4 py-2 text-left text-gray-600">Item Name</th>
+                <th className="px-4 py-2 text-left text-gray-600">Quantity</th>
+                <th className="px-4 py-2 text-left text-gray-600">Size</th>
+                <th className="px-4 py-2 text-left text-gray-600">Addons</th>
+                <th className="px-4 py-2 text-left text-gray-600">
+                  Instructions
+                </th>
+                <th className="px-4 py-2 text-left text-gray-600">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orderItems.map((item, index) => (
+                <tr key={index} className="border-b">
+                  <td className="px-4 py-2">
+                    <img
+                      src={item.item_image}
+                      alt={item.item_name}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                  </td>
+                  <td className="px-4 py-2">{item.item_name}</td>
+                  <td className="px-4 py-2">{item.quantity}</td>
+                  <td className="px-4 py-2">
+                    {item.size == "No size selected." ? "N/A" : item.size}
+                  </td>
+                  <td className="px-4 py-2">
+                    {item.addons == "No addons selected." ? "N/A" : item.addons}
+                  </td>
+                  <td className="px-4 py-2">
+                    {item.instructions == "No instructions provided."
+                      ? "N/A"
+                      : item.instructions}
+                  </td>
+                  <td className="px-4 py-2">${item.total.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {/* Actions */}
-        <div className="flex justify-end gap-4 mt-6 pt-4 border-t">
+        <div className="flex justify-between mt-6">
           <button
             onClick={handlePrint}
+            className="inline-flex items-center px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
             disabled={isGeneratingPDF}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
           >
-            <MdPrint />
-            {isGeneratingPDF ? 'Generating...' : 'Print'}
-          </button>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Close
+            <MdPrint className="mr-2" />
+            {isGeneratingPDF ? "Generating PDF..." : "Print Invoice"}
           </button>
         </div>
       </motion.div>
     </motion.div>
   );
-}, (prevProps, nextProps) => {
-  if (!prevProps.order && !nextProps.order) return true;
-  if (!prevProps.order || !nextProps.order) return false;
-  return prevProps.order.order_id === nextProps.order.order_id;
 });
 
 OrderDetailsPopup.propTypes = {
   order: PropTypes.shape({
     order_id: PropTypes.string.isRequired,
-    restaurant_name: PropTypes.string.isRequired,
-    recipient_name: PropTypes.string.isRequired,
+    time: PropTypes.object.isRequired,
     status: PropTypes.string.isRequired,
-    time: PropTypes.shape({
-      seconds: PropTypes.number.isRequired
-    }).isRequired,
     total: PropTypes.number.isRequired,
     delivery_fee: PropTypes.number.isRequired,
-    phone: PropTypes.string,
-    address: PropTypes.string,
-    restaurant_details: PropTypes.shape({
-      rest_name: PropTypes.string,
-      main_image: PropTypes.string,
-      address: PropTypes.string,
-      phone: PropTypes.string
-    })
+    payment_method: PropTypes.string.isRequired,
+    recipient_name: PropTypes.string.isRequired,
+    user_address: PropTypes.string.isRequired,
+    floor_num: PropTypes.string,
+    unit_num: PropTypes.string,
+    restaurant_details: PropTypes.object.isRequired,
+    costInCredits: PropTypes.number.isRequired,
   }),
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
 };
-
-OrderDetailsPopup.displayName = 'OrderDetailsPopup';
 
 export default OrderDetailsPopup;
