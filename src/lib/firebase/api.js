@@ -5,7 +5,6 @@ import db, {
   fsdb,
   functions,
   httpsCallable,
-  secondaryAuth,
 } from "../../utils/firebaseconfig";
 import {
   getDownloadURL,
@@ -39,59 +38,37 @@ import {
   signOut,
 } from "firebase/auth";
 
-export const getRestaurants = async (
-  lastDocSnapshot = null,
-  searchTerm = ""
-) => {
+export const getRestaurants = async (searchTerm = "", cursor = null) => {
   try {
-    let queryRef;
-
-    if (lastDocSnapshot) {
-      queryRef = query(
-        collection(fsdb, "restaurants"),
-        orderBy("rest_name"),
-        startAfter(lastDocSnapshot),
-        limit(10)
-      );
-    } else {
-      queryRef = query(
-        collection(fsdb, "restaurants"),
-        orderBy("rest_name"),
-        limit(10)
-      );
-    }
-
-    const querySnapshot = await getDocs(queryRef);
-    let restaurantList = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    let queryRef = collection(fsdb, 'restaurants');
+    let queryConstraints = [orderBy('rest_name'), limit(10)];
 
     if (searchTerm) {
-      const searchTermLower = searchTerm.toLowerCase();
-      restaurantList = restaurantList.filter((restaurant) =>
-        restaurant.rest_name.toLowerCase().includes(searchTermLower)
+      queryConstraints.push(
+        where('rest_name', '>=', searchTerm),
+        where('rest_name', '<=', searchTerm + '\uf8ff')
       );
     }
 
-    // Update locations for each restaurant
-    for (let i = 0; i < restaurantList.length; i++) {
-      const location = await getLocationByCoordinates(
-        restaurantList[i].location._lat,
-        restaurantList[i].location._long
-      );
-      restaurantList[i].location = location;
+    if (cursor) {
+      queryConstraints.push(startAfter(cursor));
     }
 
-    const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    const finalQuery = query(queryRef, ...queryConstraints);
+    const snapshot = await getDocs(finalQuery);
 
-    return { restaurantList, lastVisible };
+    return {
+      items: snapshot.docs.map(doc => ({
+        ...doc.data(),
+        rest_id: doc.id
+      })),
+      lastVisible: snapshot.docs[snapshot.docs.length - 1] || null
+    };
   } catch (error) {
-    console.error("Error fetching restaurants: ", error);
+    console.error('Error:', error);
     throw error;
   }
 };
-
 export const getRestaurantById = async (id) => {
   try {
     const restaurantRef = doc(fsdb, "restaurants", id);
@@ -402,24 +379,21 @@ export const createAdmin = async (data, avatarFile) => {
   }
 
   try {
-    // Check if the email is already in use
-    const signInMethods = await fetchSignInMethodsForEmail(
-      secondaryAuth,
-      data.email
-    );
+    // Check if email exists
+    const signInMethods = await fetchSignInMethodsForEmail(auth, data.email);
     if (signInMethods.length > 0) {
       throw new Error("auth/email-already-in-use");
     }
 
-    // Create the new user using the secondary Auth instance
+    // Create user
     const userCredential = await createUserWithEmailAndPassword(
-      secondaryAuth,
+      auth,
       data.email,
       data.password
     );
     const user = userCredential.user;
 
-    // Save the new admin data to Firestore
+    // Save admin data
     const adminRef = doc(fsdb, "admins", user.uid);
     await setDoc(adminRef, {
       name: data.name,
@@ -429,16 +403,9 @@ export const createAdmin = async (data, avatarFile) => {
       permissions: permissions,
     });
 
-    // Sign out the secondary Auth instance
-    await secondaryAuth.signOut();
-
     return { success: true };
   } catch (e) {
     console.error("Error creating admin: ", e);
-
-    // Sign out the secondary Auth instance in case of error
-    await secondaryAuth.signOut();
-
     return { success: false, error: e.message };
   }
 };
@@ -496,6 +463,43 @@ export const getDashboardData = async (startDate, endDate) => {
     };
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
+    throw error;
+  }
+};
+
+export const getUsers = async () => {
+  try {
+    const dbRef = ref(db, 'users');
+    const snapshot = await get(dbRef);
+    if (snapshot.exists()) {
+      return Object.entries(snapshot.val()).map(([id, data]) => ({
+        id,
+        ...data
+      }));
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
+};
+
+export const getUserOrderCounts = async (userId) => {
+  try {
+    const ordersRef = collection(fsdb, "orders");
+    const specialOrdersRef = collection(fsdb, "special_orders");
+
+    const [ordersSnapshot, specialOrdersSnapshot] = await Promise.all([
+      getDocs(query(ordersRef, where("user_id", "==", userId))),
+      getDocs(query(specialOrdersRef, where("userId", "==", userId)))
+    ]);
+
+    return {
+      orders: ordersSnapshot.size,
+      specialOrders: specialOrdersSnapshot.size
+    };
+  } catch (error) {
+    console.error('Error fetching user order counts:', error);
     throw error;
   }
 };

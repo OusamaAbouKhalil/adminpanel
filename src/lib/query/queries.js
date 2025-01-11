@@ -1,20 +1,16 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, getDashboardData, getMenuItem, getOrders, getPermissions, getRestaurantById, getRestaurantMenu, getRestaurants, setMenuItem, updateOrderStatus } from '../firebase/api';
+import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, getDashboardData, getMenuItem, getOrders, getPermissions, getRestaurantById, getRestaurantMenu, getRestaurants, getUserOrderCounts, getUsers, setMenuItem, updateOrderStatus } from '../firebase/api';
 
 // In queries.js
 export const useGetRestaurants = (searchTerm) => {
     return useInfiniteQuery({
         queryKey: ['restaurants', searchTerm],
-        queryFn: ({ pageParam = null }) => getRestaurants(pageParam, searchTerm),
-        getNextPageParam: (lastPage) => lastPage.lastVisible || undefined,
+        queryFn: ({ pageParam }) => getRestaurants(searchTerm, pageParam),
+        getNextPageParam: (lastPage) => lastPage.lastVisible,
         staleTime: 5 * 60 * 1000,
-        cacheTime: 30 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        retry: 2,
-        keepPreviousData: true
+        cacheTime: 30 * 60 * 1000
     });
-}
+};
 export const useGetRestaurantsForOrders = (restaurantIds) => {
     return useQuery({
         queryKey: ['restaurants_for_orders', restaurantIds],
@@ -120,4 +116,61 @@ export const useGetDashboardData = (startDate, endDate) => {
         retry: 2,
         refetchOnWindowFocus: false,
     });
+};
+
+export const useGetUsers = () => {
+    return useQuery({
+        queryKey: ['users'],
+        queryFn: getUsers,
+        staleTime: 5 * 60 * 1000,
+        cacheTime: 30 * 60 * 1000
+    });
+};
+
+export const useGetUserOrderCounts = (userId) => {
+    return useQuery({
+        queryKey: ['user-orders', userId],
+        queryFn: () => getUserOrderCounts(userId),
+        enabled: !!userId
+    });
+};
+
+export const useGetUsersWithOrders = () => {
+    const { data: users = [], isLoading: isLoadingUsers } = useGetUsers();
+    const userIds = users.map(user => user.id);
+
+    const { data: orderCounts = {}, isLoading: isLoadingOrders } = useQuery({
+        queryKey: ['users-orders', userIds],
+        queryFn: async () => {
+            const counts = {};
+            await Promise.all(
+                userIds.map(async (userId) => {
+                    const data = await getUserOrderCounts(userId);
+                    counts[userId] = data;
+                })
+            );
+            return counts;
+        },
+        enabled: userIds.length > 0
+    });
+
+    const enrichedUsers = users.map(user => {
+        const orders = orderCounts[user.id] || { orders: 0, specialOrders: 0 };
+        const ridesCount = Array.isArray(user.RideHistory)
+            ? user.RideHistory.length
+            : Object.keys(user.RideHistory || {}).length;
+
+        return {
+            ...user,
+            ridesCount,
+            ordersCount: orders.orders,
+            specialOrdersCount: orders.specialOrders,
+            totalCount: ridesCount + orders.orders + orders.specialOrders
+        };
+    });
+
+    return {
+        users: enrichedUsers,
+        isLoading: isLoadingUsers || isLoadingOrders
+    };
 };
