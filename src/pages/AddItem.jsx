@@ -13,7 +13,8 @@ function AddItem() {
   const { mutate: createItem } = useCreateItem();
   const navigate = useNavigate();
   const [sizesForm, setSizesForm] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [comboSizesForm, setComboSizesForm] = useState([]); // Combo sizes state
+  const [loading, setLoading] = useState(false);
 
   const [menuData, setMenuData] = useState({
     item_category: "",
@@ -29,7 +30,7 @@ function AddItem() {
   });
 
   const [itemImage, setItemImage] = useState(null);
-  const [categories, setCategories] = useState([]); // State for categories
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -68,9 +69,9 @@ function AddItem() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return; // Prevent multiple submissions
+    if (loading) return;
 
-    setLoading(true); // Set loading state
+    setLoading(true);
     const imageDir = "images";
     try {
       let itemImageUrl = "";
@@ -79,15 +80,19 @@ function AddItem() {
       }
       const itemId = createItem({
         rest_id: id,
-        itemData: { ...menuData, sizes: transformSizesToObject(sizesForm), item_image: itemImageUrl },
+        itemData: {
+          ...menuData,
+          sizes: transformSizesToObject(sizesForm),
+          combo: transformSizesToObject(comboSizesForm),
+          item_image: itemImageUrl,
+        },
       });
-
 
       navigate(`/restaurants/${id}`);
     } catch (error) {
       console.error("Error adding menu item: ", error);
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
@@ -134,9 +139,15 @@ function AddItem() {
               )}
             </div>
           ))}
+          {/* Combo Sizes Section */}
+          <div className="w-full md:w-1/2 p-2">
+            <label className="block">Combo</label>
+            <SizesForm sizesForm={comboSizesForm} setSizesForm={setComboSizesForm} />
+          </div>
+
           <button
             type="submit"
-            disabled={loading} // Disable button while loading
+            disabled={loading}
             className={`${loading ? "bg-gray-500 cursor-not-allowed" : "bg-green-500 hover:bg-green-700"
               } text-white font-bold py-2 px-4 rounded mt-4`}
           >
