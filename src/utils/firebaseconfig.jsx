@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 import { Firestore, getFirestore, initializeFirestore } from "firebase/firestore";
@@ -18,12 +17,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const secondaryApp = initializeApp(firebaseConfig, "Secondary");
 
 // Initialize Firestore with offline persistence
 const fsdb = initializeFirestore(app, {
   cacheSizeBytes: 104857600, // 100 MB
-  
 });
 
 // Initialize Realtime Database
@@ -31,10 +28,9 @@ const db = getDatabase(app);
 
 // Initialize Auth
 const auth = getAuth(app);
-const secondaryAuth = getAuth(secondaryApp);
 
 // Initialize Functions
 const functions = getFunctions(app);
 
-export { fsdb, auth, secondaryAuth, functions, httpsCallable };
+export { fsdb, auth, functions, httpsCallable };
 export default db;
