@@ -12,97 +12,100 @@ import { useGetPermissions } from '../lib/query/queries';
 
 export const ProtectedRoute = ({ children }) => {
   const { currentUser, logOut } = useAuth();
-  const { setBiteDrivers, setOrdersList, dayOrders, setDrivers, ordersList } = useStateContext();
+  const { setBiteDrivers, setOrdersList, dayOrders, setDrivers } = useStateContext();
   const { data: permissions, isPending: loading } = useGetPermissions(currentUser);
   const location = useLocation();
   const navigate = useNavigate();
   const [pendingOrderIds, setPendingOrderIds] = useState(new Set());
 
   useEffect(() => {
-    if (!currentUser || !currentUser.email) {
-      logOut();
-      navigate('/login');
-      return;
-    }
+    let isSubscribed = true;
 
-    const driversRef = ref(db, '/swiftBitesDrivers');
-    const onDriversChange = (snapshot) => {
-      const driversArray = snapshot.exists()
-        ? Object.entries(snapshot.val()).map(([key, value]) => ({ id: key, ...value }))
-        : [];
-      setBiteDrivers(driversArray);
-    };
+    const setupListeners = async () => {
+      if (!currentUser?.email) {
+        await logOut();
+        navigate('/login');
+        return;
+      }
 
-    const fetchOrdersForDay = (date = new Date()) => {
-      const start = startOfDay(date);
-      const end = endOfDay(date);
+      // Firebase Realtime Database: Drivers Listener
+      const driversRef = ref(db, '/swiftBitesDrivers');
+      const onDriversChange = (snapshot) => {
+        if (!isSubscribed) return;
 
+        const driversArray = snapshot.exists()
+          ? Object.entries(snapshot.val()).map(([key, value]) => ({ id: key, ...value }))
+          : [];
+        setBiteDrivers((prevDrivers) =>
+          JSON.stringify(driversArray) !== JSON.stringify(prevDrivers) ? driversArray : prevDrivers
+        );
+      };
+
+      // Firestore: Orders Listener
       const ordersQuery = query(
         collection(fsdb, 'orders'),
-        where('time', '>=', start),
-        where('time', '<=', end)
+        where('time', '>=', startOfDay(dayOrders || new Date())),
+        where('time', '<=', endOfDay(dayOrders || new Date()))
       );
 
-      const unsubscribe = onSnapshot(
-        ordersQuery,
-        (snapshot) => {
-          const newOrdersList = [...ordersList]; // Copy the existing orders list
-          const newPendingOrderIds = new Set(pendingOrderIds); // Copy the existing pending order IDs
+      const unsubscribeOrders = onSnapshot(ordersQuery, (snapshot) => {
+        if (!isSubscribed) return;
+
+        setOrdersList((prevOrdersList) => {
+          const newOrdersList = [...prevOrdersList];
+          const newPendingOrderIds = new Set(pendingOrderIds);
 
           snapshot.docChanges().forEach((change) => {
-            const data = { ...change.doc.data() };
-            const orderData = { ...data, status: data.status.toLowerCase() };
+            const orderData = { ...change.doc.data(), status: change.doc.data().status.toLowerCase() };
 
             if (orderData.status === 'pending' && !newPendingOrderIds.has(orderData.order_id)) {
-              setTimeout(() => {
-                const audio = new Audio(sound);
-                audio.play().catch((error) => {
-                  console.error('Sound play error:', error);
-                });
-              }, 100);
+              const audio = new Audio(sound);
+              audio.play().catch(console.error);
               newPendingOrderIds.add(orderData.order_id);
             }
 
-            const existingOrderIndex = newOrdersList.findIndex(order => order.order_id === orderData.order_id);
+            const existingOrderIndex = newOrdersList.findIndex(
+              (order) => order.order_id === orderData.order_id
+            );
+
             if (existingOrderIndex !== -1) {
-              // Overwrite the existing order
               newOrdersList[existingOrderIndex] = orderData;
             } else {
-              // Push the new order
               newOrdersList.push(orderData);
             }
           });
 
-          setOrdersList(newOrdersList);
           setPendingOrderIds(newPendingOrderIds);
-        },
-        (error) => {
-          console.error('Snapshot error:', error);
-        }
-      );
+          return newOrdersList;
+        });
+      });
 
-      return unsubscribe;
+      // Attach Realtime Database Listener
+      onValue(driversRef, onDriversChange);
+
+      return () => {
+        isSubscribed = false;
+        unsubscribeOrders();
+        off(driversRef, 'value', onDriversChange);
+      };
     };
 
-    onValue(driversRef, onDriversChange, (error) => console.error('Error fetching drivers:', error));
-    const unsubscribe = fetchOrdersForDay(dayOrders || new Date());
-    return () => {
-      unsubscribe();
-      off(driversRef, 'value', onDriversChange);
-    };
-  }, [currentUser, dayOrders, setBiteDrivers, setOrdersList, ordersList, pendingOrderIds]);
+    setupListeners();
+  }, [currentUser, dayOrders, logOut, navigate, setBiteDrivers, setOrdersList, pendingOrderIds]);
 
   useEffect(() => {
     const driversRef = ref(db, '/drivers');
     const onDriversChange = (snapshot) => {
-
       const driversArray = snapshot.exists()
         ? Object.entries(snapshot.val()).map(([key, value]) => ({ id: key, ...value }))
         : [];
-      setDrivers(driversArray);
+      setDrivers((prevDrivers) =>
+        JSON.stringify(driversArray) !== JSON.stringify(prevDrivers) ? driversArray : prevDrivers
+      );
     };
 
-    onValue(driversRef, onDriversChange, (error) => console.error('Error fetching drivers:', error));
+    onValue(driversRef, onDriversChange);
+
     return () => {
       off(driversRef, 'value', onDriversChange);
     };
@@ -120,6 +123,7 @@ export const ProtectedRoute = ({ children }) => {
       </div>
     );
   }
+
   if (!hasAccess) {
     return <AccessDeniedPage />;
   }

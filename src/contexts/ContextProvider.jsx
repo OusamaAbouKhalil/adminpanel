@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 
 const StateContext = createContext();
 
@@ -21,18 +21,18 @@ export const ContextProvider = ({ children }) => {
   const [biteDrivers, setBiteDrivers] = useState([]);
   const [drivers, setDrivers] = useState([]);
 
-  const handleClick = (clicked) => {
-    if (clicked != -1) {
-      setIsClicked({ ...initialState, [clicked]: true });
-    } else {
-      setIsClicked({ ...initialState });
-    }
-  };
+  const handleClick = useCallback((clicked) => {
+    setIsClicked((prev) =>
+      clicked !== -1
+        ? { ...initialState, [clicked]: true }
+        : { ...initialState }
+    );
+  }, []);
 
-  const handleSelectDayOrders = (date) => {
-
+  const handleSelectDayOrders = useCallback((date) => {
     setDayOrders(date);
-  }
+  }, []);
+
   return (
     <StateContext.Provider
       value={{
@@ -53,7 +53,8 @@ export const ContextProvider = ({ children }) => {
         dayOrders,
         setDayOrders,
         drivers,
-        setDrivers
+        setDrivers,
+        handleSelectDayOrders,
       }}
     >
       {children}
@@ -61,4 +62,10 @@ export const ContextProvider = ({ children }) => {
   );
 };
 
-export const useStateContext = () => useContext(StateContext);
+export const useStateContext = () => {
+  const context = useContext(StateContext);
+  if (!context) {
+    throw new Error('useStateContext must be used within a ContextProvider');
+  }
+  return context;
+};
