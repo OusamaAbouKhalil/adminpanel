@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, getDashboardData, getMenuItem, getOrders, getPermissions, getRestaurantById, getRestaurantMenu, getRestaurants, getUserOrderCounts, getUsers, setMenuItem, updateOrderStatus } from '../firebase/api';
+import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, getDashboardData, getMenuItem, getMenuItemAddons, getOrders, getPermissions, getRestaurantById, getRestaurantMenu, getRestaurants, getUserOrderCounts, getUsers, setMenuItem, updateOrderStatus } from '../firebase/api';
 
 // In queries.js
 export const useGetRestaurants = (searchTerm) => {
@@ -173,4 +173,11 @@ export const useGetUsersWithOrders = () => {
         users: enrichedUsers,
         isLoading: isLoadingUsers || isLoadingOrders
     };
+};
+export const useGetAddons = ({ rest_id, item_id }) => {
+    return useQuery({
+        queryKey: ['addons', rest_id, item_id],
+        queryFn: () => getMenuItemAddons(rest_id, item_id),
+        enabled: !!rest_id && !!item_id,
+    });
 };

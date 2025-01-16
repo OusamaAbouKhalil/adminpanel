@@ -143,21 +143,6 @@ export const getRestaurantMenu = async (id) => {
     console.error("Error fetching Menu: ", error);
   }
 };
-export const addAddonToMenuItem = async (
-  restaurantId,
-  menuItemId,
-  addonData
-) => {
-  try {
-    const addonRef = collection(
-      fsdb,
-      `restaurants/${restaurantId}/menu_items/${menuItemId}/addons`
-    );
-    await addDoc(addonRef, addonData);
-  } catch (error) {
-    console.error("Error adding addon: ", error);
-  }
-};
 
 export const getOrders = async () => {
   try {
@@ -500,6 +485,89 @@ export const getUserOrderCounts = async (userId) => {
     };
   } catch (error) {
     console.error('Error fetching user order counts:', error);
+    throw error;
+  }
+};
+// Get menu item addons
+export const getMenuItemAddons = async (restaurantId, itemId) => {
+  try {
+    console.log('Fetching addons with params:', { restaurantId, itemId });
+
+    const addonsRef = collection(
+      fsdb,
+      `restaurants/${restaurantId}/menu_items/${itemId}/addons`
+    );
+
+    const querySnapshot = await getDocs(addonsRef);
+
+    console.log('Query snapshot:', {
+      empty: querySnapshot.empty,
+      size: querySnapshot.size
+    });
+
+    const addons = querySnapshot.docs.map((doc) => ({
+      id: doc.id, // Use actual document ID instead of index
+      ...doc.data()
+    }));
+
+    console.log('Mapped addons:', addons);
+    return addons;
+
+  } catch (error) {
+    console.error("Error fetching addons:", {
+      error,
+      path: `restaurants/${restaurantId}/menu_items/${itemId}/addons`
+    });
+    throw error;
+  }
+};
+
+// Add new addon
+export const addAddonToMenuItem = async (
+  restaurantId,
+  menuItemId,
+  addonData
+) => {
+  try {
+    const addonRef = collection(
+      fsdb,
+      `restaurants/${restaurantId}/menu_items/${menuItemId}/addons`
+    );
+    await addDoc(addonRef, addonData);
+  } catch (error) {
+    console.error("Error adding addon: ", error);
+  }
+};
+
+// Update addon
+export const updateMenuItemAddon = async (restaurantId, itemId, addonId, addonData) => {
+  try {
+    const addonRef = doc(
+      fsdb,
+      `restaurants/${restaurantId}/menu_items/${itemId}/addons/${addonId}`
+    );
+    await updateDoc(addonRef, addonData);
+    return {
+      id: addonId,
+      ...addonData
+    };
+  } catch (error) {
+    console.error("Error updating addon: ", error);
+    throw error;
+  }
+};
+
+// Delete addon
+export const deleteMenuItemAddon = async (restaurantId, itemId, addonId) => {
+  try {
+    const addonRef = doc(
+      fsdb,
+      `restaurants/${restaurantId}/menu_items/${itemId}/addons/${addonId}`
+    );
+    await deleteDoc(addonRef);
+    return addonId;
+  } catch (error) {
+    console.error("Error deleting addon: ", error);
     throw error;
   }
 };
