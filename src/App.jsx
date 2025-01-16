@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthProvider";
 import { Navbar, Sidebar } from "./components";
+import { Toaster } from 'react-hot-toast';
 import {
   Dashboard,
   Add,
@@ -298,6 +299,28 @@ const MainLayout = () => {
 const App = () => (
   <AuthProvider>
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            style: {
+              background: 'green',
+            },
+          },
+          error: {
+            duration: 5000,
+            style: {
+              background: 'red',
+            },
+          },
+        }}
+      />
       <AppRoutes />
     </BrowserRouter>
   </AuthProvider>
