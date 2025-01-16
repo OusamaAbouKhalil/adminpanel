@@ -17,6 +17,7 @@ export const ProtectedRoute = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [pendingOrderIds, setPendingOrderIds] = useState(new Set());
+  const audioInstance = useMemo(() => new Audio(sound), []);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -58,9 +59,14 @@ export const ProtectedRoute = ({ children }) => {
           snapshot.docChanges().forEach((change) => {
             const orderData = { ...change.doc.data(), status: change.doc.data().status.toLowerCase() };
 
-            if (orderData.status === 'pending' && !newPendingOrderIds.has(orderData.order_id)) {
-              const audio = new Audio(sound);
-              audio.play().catch(console.error);
+            // Only play sound for newly added pending orders
+            if (
+              change.type === 'added' &&
+              orderData.status === 'pending' &&
+              !prevOrdersList.some(order => order.order_id === orderData.order_id)
+            ) {
+              audioInstance.currentTime = 0;
+              audioInstance.play().catch(console.error);
               newPendingOrderIds.add(orderData.order_id);
             }
 
