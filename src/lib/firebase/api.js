@@ -26,6 +26,7 @@ import {
   startAfter,
   limit,
   where,
+  deleteDoc,
 } from "firebase/firestore";
 import { getLocationByCoordinates } from "../utils";
 import { permissionsList } from "../../data/dummy";
@@ -559,6 +560,7 @@ export const updateMenuItemAddon = async (restaurantId, itemId, addonId, addonDa
 
 // Delete addon
 export const deleteMenuItemAddon = async (restaurantId, itemId, addonId) => {
+  console.log('Deleting addon:', { restaurantId, itemId, addonId });
   try {
     const addonRef = doc(
       fsdb,

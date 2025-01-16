@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { uploadImage } from '../lib/firebase/api';
-import { useAddAddonToMenuItem, useGetAddons, useGetMenuItem, useSetMenuItem } from '../lib/query/queries';
+import { useAddAddonToMenuItem, useDeleteMenuItemAddon, useGetAddons, useGetMenuItem, useSetMenuItem } from '../lib/query/queries';
 import toast from 'react-hot-toast';
 
 // Reusable Form Input Component
@@ -31,8 +31,10 @@ const RestaurantItem = () => {
   const Navigate = useNavigate();
   const { mutate: setMenuItem } = useSetMenuItem();
   const { data: itemData, isPending } = useGetMenuItem({ rest_id: id, item_id: item_id });
+
   const { data: addonsData, isPending: addonsPending } = useGetAddons({ rest_id: id, item_id: item_id });
   const { mutate: addAddonToMenuItem } = useAddAddonToMenuItem();
+  const { mutate: deleteAddonFromMenuItem } = useDeleteMenuItemAddon();
 
   const [item, setItem] = useState(null);
   const [ItemImage, setItemImage] = useState(null);
@@ -388,6 +390,16 @@ const RestaurantItem = () => {
             {addonsData?.map((addon) => (
               <div key={addon.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-100">
                 <span className="font-medium">{addon.addon_name}: ${addon.addon_price}</span>
+                <button
+                  onClick={() => deleteAddonFromMenuItem({
+                    rest_id: id,
+                    item_id: item_id,
+                    addon_id: addon.id
+                  })}
+                  className="text-red-500 hover:text-red-700 transition duration-300"
+                >
+                  ✕
+                </button>
               </div>
             ))}
           </div>
