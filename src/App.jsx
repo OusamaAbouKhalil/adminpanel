@@ -8,7 +8,7 @@ import {
   Calendar,
   Restaurants,
   Kanban,
-  Test,
+  RestaurantItem,
   AddItem,
   Menu,
   Orders,
@@ -25,7 +25,7 @@ import {
   Rides,
   RevenuePage,
   PaymentMethod,
-  Users,Calculator,
+  Users, Calculator,
   UpdateVersion,
   AddRestaurantOwner
 } from "./pages";
@@ -62,7 +62,7 @@ const AppRoutes = () => (
             <Users />
           </ProtectedRoute>
         }
-        />
+      />
       <Route
         path="addowner"
         element={
@@ -123,7 +123,7 @@ const AppRoutes = () => (
         path="restaurants/:id/:item_id"
         element={
           <ProtectedRoute>
-            <Test />
+            <RestaurantItem />
           </ProtectedRoute>
         }
       />
@@ -247,7 +247,7 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
       />
-       <Route
+      <Route
         path="calculator"
         element={
           <ProtectedRoute>
@@ -255,16 +255,16 @@ const AppRoutes = () => (
           </ProtectedRoute>
         }
       />
-       <Route
+      <Route
         path="version"
         element={
           <ProtectedRoute>
             <UpdateVersion />
           </ProtectedRoute>
         }
-        />
+      />
     </Route>
-    
+
 
   </Routes>
 );

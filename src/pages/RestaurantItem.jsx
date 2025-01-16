@@ -1,19 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, memo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { uploadImage } from '../lib/firebase/api';
 import { useAddAddonToMenuItem, useGetMenuItem, useSetMenuItem } from '../lib/query/queries';
 
-const Test = () => {
-  const { mutate: setMenuItem } = useSetMenuItem();
+// Reusable Form Input Component
+const FormInput = memo(({ label, name, value, onChange, type = "text", ...props }) => (
+  <div className="form-group">
+    <label className="text-lg font-medium text-gray-800">{label}</label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full p-4 bg-gray-50 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+      {...props}
+    />
+  </div>
+));
+
+// Loading Spinner Component
+const LoadingSpinner = memo(() => (
+  <div className="flex justify-center items-center h-64">
+    <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
+  </div>
+));
+
+const RestaurantItem = () => {
   const { id, item_id } = useParams();
+  const Navigate = useNavigate();
+  const { mutate: setMenuItem } = useSetMenuItem();
   const { data: itemData, isPending } = useGetMenuItem({ rest_id: id, item_id: item_id });
   const { mutate: addAddonToMenuItem } = useAddAddonToMenuItem();
+
+  const [item, setItem] = useState(null);
   const [ItemImage, setItemImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [showAddonsForm, setShowAddonsForm] = useState(false);
   const [addonName, setAddonName] = useState('');
   const [addonPrice, setAddonPrice] = useState('');
-  const [showAddonsForm, setShowAddonsForm] = useState(false);
-  const [item, setItem] = useState();
-  const Navigate = useNavigate();
 
   useEffect(() => {
     if (itemData) {
@@ -21,62 +47,105 @@ const Test = () => {
     }
   }, [itemData]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setItem(prevItem => ({
-      ...prevItem,
-      [name]: (name === "item_price" || name === "item_discount") && value ? parseFloat(value) : name === "available" ? value === "true" : value
-    }));
-  };
+  const validateForm = useCallback(() => {
+    const errors = {};
+    if (!item?.item_name) errors.item_name = 'Item name is required';
+    if (!item?.item_price) errors.item_price = 'Price is required';
+    if (item?.item_price < 0) errors.item_price = 'Price cannot be negative';
+    return errors;
+  }, [item]);
 
-  const handleFileInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setItem((prevItem) => ({
+      ...prevItem,
+      [name]: (name === "item_price" || name === "item_discount") && value
+        ? parseFloat(value)
+        : name === "available"
+          ? value === "true"
+          : value
+    }));
+  }, []);
+
+  const handleFileInputChange = useCallback((e) => {
     e.preventDefault();
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 5000000) { // 5MB limit
+        setError('Image size should be less than 5MB');
+        return;
+      }
       setItemImage(file);
     }
-  };
+  }, []);
 
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = useCallback(async () => {
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setError('Please fill in all required fields correctly');
+      return;
+    }
+
+    setError(null);
+    setSuccess(false);
+    setIsLoading(true);
+
     const imageDir = "images";
     try {
-      let updatedImageUrl = item.item_image; // Retain the current image by default
+      let updatedImageUrl = item.item_image;
       if (ItemImage) {
         updatedImageUrl = await uploadImage(ItemImage, imageDir);
       }
-      setItem((prevItem) => ({
-        ...prevItem,
-        item_image: updatedImageUrl, 
-      }));
 
-      const updatedItem = { ...item, item_image: updatedImageUrl };
-      setMenuItem({ rest_id: id, item_id: item_id, itemData: updatedItem, item_image: updatedImageUrl });
+      const updatedItem = {
+        ...item,
+        item_image: updatedImageUrl
+      };
+
+      await setMenuItem({
+        rest_id: id,
+        item_id: item_id,
+        itemData: updatedItem,
+        item_image: updatedImageUrl
+      });
+
+      setSuccess(true);
       Navigate(`/restaurants/${id}`);
     } catch (error) {
+      setError('Failed to save changes. Please try again.');
       console.error("Error uploading image or saving changes:", error);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [item, ItemImage, id, item_id, validateForm, Navigate, setMenuItem]);
 
-  const handleAddAddon = () => {
+  const handleAddAddon = useCallback(() => {
+    if (!addonName || !addonPrice) {
+      setError('Please fill in all addon fields');
+      return;
+    }
+
     const addonData = {
       addon_name: addonName,
       addon_price: parseFloat(addonPrice),
     };
-    addAddonToMenuItem({ rest_id: id, item_id: item_id, addonData: addonData });
-    setAddonName('');
-    setAddonPrice('');
-  };
 
-  const back = () => {
+    try {
+      addAddonToMenuItem({ rest_id: id, item_id: item_id, addonData });
+      setAddonName('');
+      setAddonPrice('');
+      setSuccess(true);
+    } catch (error) {
+      setError('Failed to add addon. Please try again.');
+    }
+  }, [addonName, addonPrice, id, item_id, addAddonToMenuItem]);
+
+  const back = useCallback(() => {
     Navigate(`/restaurants/${id}`);
-  };
+  }, [id, Navigate]);
 
-  if (isPending) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
-      </div>
-    );
+  if (isPending || isLoading) {
+    return <LoadingSpinner />;
   }
 
   return (
@@ -84,7 +153,7 @@ const Test = () => {
       {/* Back Button */}
       <button
         onClick={back}
-        className="mb-8 bg-gray-700 hover:bg-gray-800 text-white rounded-full p-4 transition duration-300 ease-in-out transform hover:scale-105"
+        className="w-10 h-10 flex items-center justify-center bg-gray-700 hover:bg-gray-800 text-white rounded-full p-2 pt-1 transition duration-300 ease-in-out transform hover:scale-105"
       >
         <span className="text-2xl">&#x2190;</span>
       </button>
@@ -246,4 +315,4 @@ const Test = () => {
   );
 };
 
-export default Test;
+export default memo(RestaurantItem);
