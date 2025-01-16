@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { uploadImage } from '../lib/firebase/api';
-import { useAddAddonToMenuItem, useGetMenuItem, useSetMenuItem } from '../lib/query/queries';
+import { useAddAddonToMenuItem, useGetAddons, useGetMenuItem, useSetMenuItem } from '../lib/query/queries';
+import toast from 'react-hot-toast';
 
 // Reusable Form Input Component
 const FormInput = memo(({ label, name, value, onChange, type = "text", ...props }) => (
@@ -30,6 +31,7 @@ const RestaurantItem = () => {
   const Navigate = useNavigate();
   const { mutate: setMenuItem } = useSetMenuItem();
   const { data: itemData, isPending } = useGetMenuItem({ rest_id: id, item_id: item_id });
+  const { data: addonsData, isPending: addonsPending } = useGetAddons({ rest_id: id, item_id: item_id });
   const { mutate: addAddonToMenuItem } = useAddAddonToMenuItem();
 
   const [item, setItem] = useState(null);
@@ -41,9 +43,48 @@ const RestaurantItem = () => {
   const [addonName, setAddonName] = useState('');
   const [addonPrice, setAddonPrice] = useState('');
 
+  const [sizes, setSizes] = useState({});
+  const [showSizesForm, setShowSizesForm] = useState(false);
+  const [sizeName, setSizeName] = useState('');
+  const [sizePrice, setSizePrice] = useState('');
+
+  const [combo, setCombos] = useState({});
+  const [showCombosForm, setShowCombosForm] = useState(false);
+  const [comboName, setComboName] = useState('');
+  const [comboPrice, setComboPrice] = useState('');
+
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  useEffect(() => {
+    if (itemData) {
+      const hasChanges =
+        JSON.stringify(itemData.sizes) !== JSON.stringify(sizes) ||
+        JSON.stringify(itemData.combo) !== JSON.stringify(combo) ||
+        JSON.stringify(itemData) !== JSON.stringify(item) ||
+        ItemImage !== null;
+
+      setHasUnsavedChanges(hasChanges);
+    }
+  }, [itemData, sizes, combo, item, ItemImage]);
+
+  // Add beforeunload event
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   useEffect(() => {
     if (itemData) {
       setItem(itemData);
+      setSizes(itemData.sizes || {});
+      setCombos(itemData.combo || {});
     }
   }, [itemData]);
 
@@ -54,6 +95,50 @@ const RestaurantItem = () => {
     if (item?.item_price < 0) errors.item_price = 'Price cannot be negative';
     return errors;
   }, [item]);
+
+  const handleAddSize = useCallback(() => {
+    if (!sizeName || !sizePrice) {
+      setError('Please fill in all size fields');
+      return;
+    }
+
+    setSizes(prev => ({
+      ...prev,
+      [sizeName]: parseFloat(sizePrice)
+    }));
+    setSizeName('');
+    setSizePrice('');
+  }, [sizeName, sizePrice]);
+
+  const handleAddCombo = useCallback(() => {
+    if (!comboName || !comboPrice) {
+      setError('Please fill in all combo fields');
+      return;
+    }
+
+    setCombos(prev => ({
+      ...prev,
+      [comboName]: parseFloat(comboPrice)
+    }));
+    setComboName('');
+    setComboPrice('');
+  }, [comboName, comboPrice]);
+
+  const handleRemoveSize = useCallback((key) => {
+    setSizes(prev => {
+      const newSizes = { ...prev };
+      delete newSizes[key];
+      return newSizes;
+    });
+  }, []);
+
+  const handleRemoveCombo = useCallback((key) => {
+    setCombos(prev => {
+      const newCombos = { ...prev };
+      delete newCombos[key];
+      return newCombos;
+    });
+  }, []);
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -99,7 +184,9 @@ const RestaurantItem = () => {
 
       const updatedItem = {
         ...item,
-        item_image: updatedImageUrl
+        item_image: updatedImageUrl,
+        sizes,
+        combo
       };
 
       await setMenuItem({
@@ -109,15 +196,15 @@ const RestaurantItem = () => {
         item_image: updatedImageUrl
       });
 
-      setSuccess(true);
-      Navigate(`/restaurants/${id}`);
+      setHasUnsavedChanges(false);
+      toast.success('Changes saved successfully!');
     } catch (error) {
-      setError('Failed to save changes. Please try again.');
-      console.error("Error uploading image or saving changes:", error);
+      toast.error('Failed to save changes. Please try again.');
+      console.error("Error:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [item, ItemImage, id, item_id, validateForm, Navigate, setMenuItem]);
+  }, [item, ItemImage, id, item_id, validateForm, Navigate, setMenuItem, sizes, combo]);
 
   const handleAddAddon = useCallback(() => {
     if (!addonName || !addonPrice) {
@@ -150,6 +237,24 @@ const RestaurantItem = () => {
 
   return (
     <div className="container mx-auto p-8 space-y-12">
+      {hasUnsavedChanges && (
+        <div className="sticky top-0 z-50 transition-all duration-300 ease-in-out">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 shadow-md">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">
+                  You have unsaved changes
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Back Button */}
       <button
         onClick={back}
@@ -265,52 +370,168 @@ const RestaurantItem = () => {
         </div>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex justify-between gap-6 mt-8">
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Addons Section */}
+        <div className="bg-white p-8 rounded-lg shadow-xl space-y-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-semibold text-gray-800">Addons</h3>
+            <button
+              onClick={() => setShowAddonsForm(!showAddonsForm)}
+              className="py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300"
+            >
+              {showAddonsForm ? 'Cancel' : 'Add Addon'}
+            </button>
+          </div>
+
+          {/* Display existing addons */}
+          <div className="grid grid-cols-1 gap-4">
+            {addonsData?.map((addon) => (
+              <div key={addon.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <span className="font-medium">{addon.addon_name}: ${addon.addon_price}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Addon input form */}
+          {showAddonsForm && (
+            <div className="space-y-4 mt-6">
+              <input
+                type="text"
+                value={addonName}
+                onChange={(e) => setAddonName(e.target.value)}
+                placeholder="Addon Name"
+                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500"
+              />
+              <input
+                type="number"
+                value={addonPrice}
+                onChange={(e) => setAddonPrice(e.target.value)}
+                placeholder="Addon Price"
+                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500"
+              />
+              <button
+                onClick={handleAddAddon}
+                className="w-full py-3 px-6 bg-green-500 hover:bg-green-600 text-white rounded-xl transition duration-300"
+              >
+                Add Addon
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Sizes Section */}
+        <div className="bg-white p-8 rounded-lg shadow-xl space-y-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-semibold text-gray-800">Sizes</h3>
+            <button
+              onClick={() => setShowSizesForm(!showSizesForm)}
+              className="py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300"
+            >
+              {showSizesForm ? 'Cancel' : 'Add Size'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {Object.entries(sizes).map(([name, price]) => (
+              <div key={name} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <span className="font-medium">{name}: ${price}</span>
+                <button
+                  onClick={() => handleRemoveSize(name)}
+                  className="text-red-500 hover:text-red-700 transition duration-300"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {showSizesForm && (
+            <div className="space-y-4 mt-6">
+              <input
+                type="text"
+                value={sizeName}
+                onChange={(e) => setSizeName(e.target.value)}
+                placeholder="Size Name"
+                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500"
+              />
+              <input
+                type="number"
+                value={sizePrice}
+                onChange={(e) => setSizePrice(e.target.value)}
+                placeholder="Size Price"
+                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500"
+              />
+              <button
+                onClick={handleAddSize}
+                className="w-full py-3 px-6 bg-green-500 hover:bg-green-600 text-white rounded-xl transition duration-300"
+              >
+                Add Size
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Combos Section */}
+        <div className="bg-white p-8 rounded-lg shadow-xl space-y-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-semibold text-gray-800">Combos</h3>
+            <button
+              onClick={() => setShowCombosForm(!showCombosForm)}
+              className="py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300"
+            >
+              {showCombosForm ? 'Cancel' : 'Add Combo'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {Object.entries(combo).map(([name, price]) => (
+              <div key={name} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <span className="font-medium">{name}: ${price}</span>
+                <button
+                  onClick={() => handleRemoveCombo(name)}
+                  className="text-red-500 hover:text-red-700 transition duration-300"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {showCombosForm && (
+            <div className="space-y-4 mt-6">
+              <input
+                type="text"
+                value={comboName}
+                onChange={(e) => setComboName(e.target.value)}
+                placeholder="Combo Name"
+                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500"
+              />
+              <input
+                type="number"
+                value={comboPrice}
+                onChange={(e) => setComboPrice(e.target.value)}
+                placeholder="Combo Price"
+                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500"
+              />
+              <button
+                onClick={handleAddCombo}
+                className="w-full py-3 px-6 bg-green-500 hover:bg-green-600 text-white rounded-xl transition duration-300"
+              >
+                Add Combo
+              </button>
+            </div>
+          )}
+        </div>
+        {/* Action Buttons */}
+        <div className="flex justify-between gap-6 mt-8">
+        </div>
         <button
           onClick={handleSaveChanges}
           className="w-full md:w-auto py-3 px-6 bg-green-500 text-white font-semibold rounded-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
         >
           Save Changes
         </button>
-        <button
-          onClick={() => setShowAddonsForm(!showAddonsForm)}
-          className="w-full md:w-auto py-3 px-6 bg-blue-500 text-white font-semibold rounded-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
-        >
-          {showAddonsForm ? 'Cancel Addon' : 'Add Addon'}
-        </button>
       </div>
-
-      {/* Addon Form */}
-      {showAddonsForm && (
-        <div className="mt-12 bg-white p-8 rounded-lg shadow-xl space-y-6">
-          <h3 className="text-2xl font-semibold text-gray-800">Add Addon</h3>
-          <div className="form-group">
-            <input
-              type="text"
-              value={addonName}
-              onChange={(e) => setAddonName(e.target.value)}
-              placeholder="Addon Name"
-              className="w-full p-4 bg-gray-50 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="number"
-              value={addonPrice}
-              onChange={(e) => setAddonPrice(e.target.value)}
-              placeholder="Addon Price"
-              className="w-full p-4 bg-gray-50 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-          <button
-            onClick={handleAddAddon}
-            className="w-full py-3 px-6 bg-blue-500 text-white font-semibold rounded-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
-          >
-            Add Addon
-          </button>
-        </div>
-      )}
     </div>
   );
 };
