@@ -49,12 +49,12 @@ export const ProtectedRoute = ({ children }) => {
       const driversArray = snapshot.exists()
         ? Object.entries(snapshot.val()).map(([key, value]) => ({ id: key, ...value }))
         : [];
-      setDrivers(driversArray);
+      setBiteDrivers(driversArray);
     };
 
     onValue(driversRef, onDriversChange);
     return () => off(driversRef, 'value', onDriversChange);
-  }, [setDrivers]);
+  }, [setBiteDrivers]);
 
   const hasAccess = useMemo(() => {
     const route = location.pathname.split('/')[1];
