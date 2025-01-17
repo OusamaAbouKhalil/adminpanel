@@ -11,9 +11,11 @@ import { startOfDay, endOfDay } from 'date-fns';
 import { useGetPermissions } from '../lib/query/queries';
 
 export const ProtectedRoute = ({ children }) => {
-  const { currentUser, logOut } = useAuth();
+  const { currentUser, logOut, loading: authLoading } = useAuth();
   const { setBiteDrivers, setOrdersList, dayOrders, setDrivers } = useStateContext();
-  const { data: permissions, isPending: loading } = useGetPermissions(currentUser);
+  const { data: permissions, isPending: permissionsLoading } = useGetPermissions(currentUser, {
+    enabled: !!currentUser
+  });
   const location = useLocation();
   const navigate = useNavigate();
   const [pendingOrderIds, setPendingOrderIds] = useState(new Set());
@@ -117,17 +119,28 @@ export const ProtectedRoute = ({ children }) => {
     };
   }, [setDrivers]);
 
+  useEffect(() => {
+    if (!authLoading && !currentUser) {
+      navigate('/login', { state: { from: location } });
+    }
+  }, [authLoading, currentUser, navigate, location]);
+
   const hasAccess = useMemo(() => {
+    if (!permissions) return false;
     const route = location.pathname.split('/')[1];
-    return permissions?.[route] || false;
+    return permissions[route] || false;
   }, [location.pathname, permissions]);
 
-  if (loading) {
+  if (authLoading || permissionsLoading) {
     return (
-      <div>
-        <p>Loading...</p>
+      <div className="flex justify-center items-center h-screen">
+        <div className="w-16 h-16 border-4 border-t-4 border-green-600 rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  if (!currentUser) {
+    return null;
   }
 
   if (!hasAccess) {
