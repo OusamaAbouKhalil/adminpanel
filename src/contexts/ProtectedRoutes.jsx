@@ -3,14 +3,15 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import { useStateContext } from './ContextProvider';
 import { useGetPermissions } from '../lib/query/queries';
-import { collection, query, onSnapshot } from 'firebase/firestore';
+import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import { ref, onValue, off } from 'firebase/database';
 import sound from '/success.mp3';
 import db, { fsdb } from '../utils/firebaseconfig';
+import { endOfDay, startOfDay } from 'date-fns';
 
 export const ProtectedRoute = ({ children }) => {
   const { currentUser, logOut } = useAuth();
-  const { setBiteDrivers, setOrdersList, setDrivers } = useStateContext();
+  const { setBiteDrivers, setOrdersList, dayOrders, setDrivers } = useStateContext();
   const { data: permissions, isPending: loading } = useGetPermissions(currentUser);
   const location = useLocation();
   const navigate = useNavigate();
@@ -19,28 +20,53 @@ export const ProtectedRoute = ({ children }) => {
 
   // Setup Orders Listener
   useEffect(() => {
+    console.log('Current dayOrders:', dayOrders); // Debug log
+
     const ordersRef = collection(fsdb, 'orders');
-    const ordersQuery = query(ordersRef);
+    const today = dayOrders || new Date();
+    const startTime = startOfDay(today);
+    const endTime = endOfDay(today);
+
+    console.log('Query range:', { startTime, endTime }); // Debug log
+
+    const ordersQuery = query(
+      ordersRef,
+      where('time', '>=', startTime),
+      where('time', '<=', endTime)
+    );
 
     const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        const order = {
-          ...change.doc.data(),
-          order_id: change.doc.id
-        };
+      console.log('Snapshot received, docs count:', snapshot.size); // Debug log
 
-        if (order.status?.toLowerCase() === 'pending') {
-          // Only play sound if this is a new pending order we haven't seen
-          if (!pendingOrderIds.has(order.order_id)) {
-            audioInstance.play();
-            setPendingOrderIds(prev => new Set([...prev, order.order_id]));
-          }
+      if (snapshot.empty) {
+        console.log('No orders found for the date range');
+        setOrdersList([]);
+        return;
+      }
+
+      const orders = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        order_id: doc.id,
+        status: doc.data().status?.toLowerCase() || 'unknown'
+      }));
+
+      console.log('Processed orders:', orders); // Debug log
+      setOrdersList(orders);
+
+      // Handle pending orders notification
+      orders.forEach(order => {
+        if (order.status === 'pending' && !pendingOrderIds.has(order.order_id)) {
+          audioInstance.play().catch(console.error);
+          setPendingOrderIds(prev => new Set([...prev, order.order_id]));
         }
       });
-    });
+    },
+      (error) => {
+        console.error('Error fetching orders:', error);
+      });
 
     return () => unsubscribe();
-  }, [audioInstance, pendingOrderIds]);
+  }, [audioInstance, pendingOrderIds, setOrdersList, dayOrders]);
 
   // Regular Drivers Listener
   useEffect(() => {
