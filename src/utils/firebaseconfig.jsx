@@ -1,5 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getDatabase, ref, onValue } from "firebase/database";
+import { FirebaseConnectionMonitor } from "./firebase-connection-monitor";
 import { Firestore, getFirestore, initializeFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
