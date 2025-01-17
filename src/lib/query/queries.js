@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, deleteMenuItemAddon, getDashboardData, getMenuItem, getMenuItemAddons, getOrders, getPermissions, getRestaurantById, getRestaurantMenu, getRestaurants, getUserOrderCounts, getUsers, setMenuItem, updateOrderStatus } from '../firebase/api';
+import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, deleteMenuItemAddon, getDashboardData, getMenuItem, getMenuItemAddons, getOrders, getPermissions, getPrices, getRestaurantById, getRestaurantMenu, getRestaurants, getUserOrderCounts, getUsers, setMenuItem, updateOrderStatus, updatePrices } from '../firebase/api';
 
 // In queries.js
 export const useGetRestaurants = (searchTerm) => {
@@ -91,12 +91,15 @@ export const useGetRestaurantMenu = (id) => {
         refetchOnMount: false, // Don't refetch if data is cached
     });
 }
-export const useGetPermissions = (currentUser) => {
+export const useGetPermissions = (currentUser, options = {}) => {
     return useQuery({
-        queryKey: ['permissions'],
+        queryKey: ['permissions', currentUser?.uid],
         queryFn: () => getPermissions(currentUser),
+        enabled: !!currentUser && options.enabled !== false,
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        cacheTime: 30 * 60 * 1000, // 30 minutes
     });
-}
+};
 export const useCreateAdmin = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -191,3 +194,20 @@ export const useDeleteMenuItemAddon = () => {
         },
     });
 }
+export const useGetPrices = () => {
+    return useQuery({
+        queryKey: ['prices'],
+        queryFn: getPrices,
+    });
+};
+
+export const useUpdatePrices = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: updatePrices,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['prices']);
+        },
+    });
+};
