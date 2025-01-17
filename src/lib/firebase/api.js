@@ -336,16 +336,21 @@ export const createItem = async (id, formData) => {
   }
 };
 export const getPermissions = async (currentUser) => {
+  if (!currentUser) {
+    return null;
+  }
+
   try {
     const userRef = doc(fsdb, "admins", currentUser.uid);
     const userDoc = await getDoc(userRef);
     if (userDoc.exists()) {
       return userDoc.data().permissions;
     }
-    console.error("No such document!");
-    return [];
+    console.warn("No permissions found for user:", currentUser.uid);
+    return {};
   } catch (error) {
     console.error("Error fetching user permissions:", error);
+    throw error;
   }
 };
 
@@ -572,4 +577,20 @@ export const deleteMenuItemAddon = async (restaurantId, itemId, addonId) => {
     console.error("Error deleting addon: ", error);
     throw error;
   }
+};
+export const getPrices = () => {
+  return new Promise((resolve, reject) => {
+    const pricesRef = ref(db, 'Prices');
+    onValue(pricesRef,
+      (snapshot) => resolve(snapshot.val()),
+      (error) => reject(error),
+      { onlyOnce: true }
+    );
+  });
+};
+
+export const updatePrices = async (prices) => {
+  const pricesRef = ref(db, 'Prices');
+  await update(pricesRef, prices);
+  return prices;
 };
