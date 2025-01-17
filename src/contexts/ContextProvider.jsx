@@ -1,95 +1,136 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
-const StateContext = createContext();
+const StateContext = createContext(null);
 
-const initialState = {
-  ui: {
-    chat: false,
-    cart: false,
-    userProfile: false,
-    notification: false,
-    activeMenu: true,
-    screenSize: window.innerWidth,
-  },
-  app: {
-    ordersList: [],
-    dayOrders: "",
-    scheduleDates: [],
-    financials: { expense: 0, budget: 0 },
-    cards: [],
-    biteDrivers: [],
-    drivers: [],
-  }
+const initialUIState = {
+  activeMenu: true,
+  screenSize: window.innerWidth,
+  chat: false,
+  cart: false,
+  userProfile: false,
+  notification: false,
 };
 
+const initialAppState = {
+  ordersList: [],
+  dayOrders: "",
+  scheduleDates: [],
+  financials: { expense: 0, budget: 0 },
+  cards: [],
+  biteDrivers: [],
+  drivers: [],
+};
+
+class ErrorBoundary extends React.Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <div className="error-boundary">Something went wrong</div>;
+    }
+    return this.props.children;
+  }
+}
+
 export const ContextProvider = ({ children }) => {
-  const [uiState, setUiState] = useState(initialState.ui);
-  const [appState, setAppState] = useState(initialState.app);
-  const [isLoading, setIsLoading] = useState(false);
+  const [ui, setUI] = useState(initialUIState);
+  const [app, setApp] = useState(initialAppState);
+  const [loading, setLoading] = useState(false);
+
+  const updateUI = useCallback((updates) => {
+    setUI(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const updateApp = useCallback((updates) => {
+    setApp(prev => ({ ...prev, ...updates }));
+  }, []);
 
   const setActiveMenu = useCallback((value) => {
-    setUiState(prev => ({ ...prev, activeMenu: value }));
-  }, []);
+    updateUI({ activeMenu: Boolean(value) });
+  }, [updateUI]);
 
   const setScreenSize = useCallback((size) => {
-    setUiState(prev => ({ ...prev, screenSize: size }));
-  }, []);
+    updateUI({ screenSize: Number(size) });
+  }, [updateUI]);
 
   const handleClick = useCallback((clicked) => {
-    setUiState(prev => ({
-      ...prev,
+    updateUI({
       chat: false,
       cart: false,
       userProfile: false,
       notification: false,
       [clicked]: true
-    }));
-  }, []);
+    });
+  }, [updateUI]);
 
-  // App State Handlers
   const setOrdersList = useCallback((orders) => {
-    setAppState(prev => ({ ...prev, ordersList: orders }));
-  }, []);
+    const validOrders = Array.isArray(orders) ? orders : [];
+    updateApp({ ordersList: validOrders });
+  }, [updateApp]);
 
   const setBiteDrivers = useCallback((drivers) => {
-    setAppState(prev => ({ ...prev, biteDrivers: drivers }));
-  }, []);
+    const validDrivers = Array.isArray(drivers) ? drivers : [];
+    updateApp({ biteDrivers: validDrivers });
+  }, [updateApp]);
 
   const setDrivers = useCallback((drivers) => {
-    setAppState(prev => ({ ...prev, drivers: drivers }));
-  }, []);
+    const validDrivers = Array.isArray(drivers) ? drivers : [];
+    updateApp({ drivers: validDrivers });
+  }, [updateApp]);
 
   const setDayOrders = useCallback((date) => {
-    setAppState(prev => ({ ...prev, dayOrders: date }));
-  }, []);
+    updateApp({ dayOrders: String(date) });
+  }, [updateApp]);
 
-  const contextValue = useMemo(() => ({
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setScreenSize(width);
+      setActiveMenu(width > 900);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, [setScreenSize, setActiveMenu]);
+
+  const value = useMemo(() => ({
     // UI State
-    activeMenu: uiState.activeMenu,
-    setActiveMenu,
-    screenSize: uiState.screenSize,
-    setScreenSize,
+    activeMenu: ui.activeMenu,
+    screenSize: ui.screenSize,
     isClicked: {
-      chat: uiState.chat,
-      cart: uiState.cart,
-      userProfile: uiState.userProfile,
-      notification: uiState.notification
+      chat: ui.chat,
+      cart: ui.cart,
+      userProfile: ui.userProfile,
+      notification: ui.notification
     },
+    // UI Actions
+    setActiveMenu,
+    setScreenSize,
     handleClick,
-    isLoading,
-    setIsLoading,
-
+    // Loading State
+    loading,
+    setLoading,
     // App State
-    ...appState,
+    ...app,
+    ordersList: Array.isArray(app.ordersList) ? app.ordersList : [],
+    biteDrivers: Array.isArray(app.biteDrivers) ? app.biteDrivers : [],
+    drivers: Array.isArray(app.drivers) ? app.drivers : [],
+    // App Actions
     setOrdersList,
     setBiteDrivers,
     setDrivers,
     setDayOrders,
   }), [
-    uiState,
-    appState,
-    isLoading,
+    ui,
+    app,
+    loading,
     setActiveMenu,
     setScreenSize,
     handleClick,
@@ -100,9 +141,11 @@ export const ContextProvider = ({ children }) => {
   ]);
 
   return (
-    <StateContext.Provider value={contextValue}>
-      {children}
-    </StateContext.Provider>
+    <ErrorBoundary>
+      <StateContext.Provider value={value}>
+        {children}
+      </StateContext.Provider>
+    </ErrorBoundary>
   );
 };
 
