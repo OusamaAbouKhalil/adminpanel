@@ -9,8 +9,7 @@ import { useStateContext } from "../contexts/ContextProvider";
 import { startOfDay, endOfDay } from 'date-fns';
 
 const Orders = () => {
-  const [specialOrders, setSpecialOrders] = useState([]);
-  const { ordersList, setDayOrders, dayOrders } = useStateContext();
+  const { ordersList, setDayOrders, dayOrders, specialOrders } = useStateContext();
   const [openPendingOrders, setOpenPendingOrders] = useState(false);
   const [showCanceledOrders, setShowCanceledOrders] = useState(false); // State to toggle canceled orders view
   const [userHasInteracted, setUserHasInteracted] = useState(false); // Track user interaction
@@ -46,7 +45,13 @@ const Orders = () => {
   const handlePendingOrdersClick = () => {
     setOpenPendingOrders(!openPendingOrders);
   };
+  const pendingSpecialOrders = specialOrders.filter(order =>
+    order.status === 'pending'
+  );
 
+  const nonPendingSpecialOrders = specialOrders.filter(order =>
+    order.status !== 'pending'
+  );
   return (
     <>
       <div className="container mx-auto p-6 space-y-6">
@@ -88,15 +93,18 @@ const Orders = () => {
 
         {!openPendingOrders && !showCanceledOrders && (
           <>
-            {specialOrders.length > 0 && (
+            {pendingSpecialOrders.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {specialOrders.map((order) => (
-                  <SpecialOrderCard key={order.id} order={order} />
+                {pendingSpecialOrders.map((order) => (
+                  <SpecialOrderCard key={order.order_id} order={order} />
                 ))}
               </div>
             )}
 
-            <OrdersTable orders={ordersList} onStatusChange={handleStatusChange} />
+            <OrdersTable
+              orders={[...ordersList, ...nonPendingSpecialOrders]}
+              onStatusChange={handleStatusChange}
+            />
           </>
         )}
       </div>

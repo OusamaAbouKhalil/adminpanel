@@ -11,23 +11,75 @@ import { endOfDay, startOfDay } from 'date-fns';
 
 export const ProtectedRoute = ({ children }) => {
   const { currentUser, logOut } = useAuth();
-  const { setBiteDrivers, setOrdersList, dayOrders, setDrivers } = useStateContext();
+  const {
+    setBiteDrivers,
+    setOrdersList,
+    setSpecialOrdersList, // Add this
+    dayOrders,
+    setDrivers
+  } = useStateContext();
   const { data: permissions, isPending: loading } = useGetPermissions(currentUser);
   const location = useLocation();
   const navigate = useNavigate();
   const [pendingOrderIds, setPendingOrderIds] = useState(new Set());
   const audioInstance = useMemo(() => new Audio(sound), []);
 
+  useEffect(() => {
+    const specialOrdersRef = collection(fsdb, 'special_orders');
+    const specialOrdersQuery = query(specialOrdersRef);
+
+    const unsubscribe = onSnapshot(specialOrdersQuery, (snapshot) => {
+      if (snapshot.empty) {
+        setSpecialOrdersList([]);
+        return;
+      }
+
+      const specialOrders = snapshot.docs.map(doc => {
+        const data = doc.data();
+        const [datePart, timePart] = data.createdAt.split(' ');
+        const [day, month, year] = datePart.split('/');
+        const timestamp = new Date(`${year}-${month}-${day} ${timePart}`);
+
+        const processedOrder = {
+          orderId: data.orderId,
+          fromAddress: data.FromAddress,
+          additionalText: data.additionalText,
+          contactNumber: data.contactNumber,
+          total: data.cost,
+          createdAt: data.createdAt,
+          deliveryAddress: data.deliveryAddress,
+          deliveryTime: data.deliveryTime,
+          recipientName: data.recipientName,
+          status: data.status?.toLowerCase() || 'unknown',
+          userId: data.userId,
+          order_id: doc.id,
+          time: timestamp
+        };
+        return processedOrder;
+      });
+
+      setSpecialOrdersList(specialOrders);
+
+      specialOrders.forEach(order => {
+        if (order.status === 'pending' && !pendingOrderIds.has(order.orderId)) {
+          audioInstance.play().catch(error => console.error('Audio error:', error));
+          setPendingOrderIds(prev => new Set([...prev, order.orderId]));
+        }
+      });
+    },
+      (error) => {
+        console.error('Query error details:', error);
+      });
+
+    return () => unsubscribe();
+  }, [audioInstance, pendingOrderIds, setSpecialOrdersList]);
   // Setup Orders Listener
   useEffect(() => {
-    console.log('Current dayOrders:', dayOrders); // Debug log
 
     const ordersRef = collection(fsdb, 'orders');
     const today = dayOrders || new Date();
     const startTime = startOfDay(today);
     const endTime = endOfDay(today);
-
-    console.log('Query range:', { startTime, endTime }); // Debug log
 
     const ordersQuery = query(
       ordersRef,
@@ -36,10 +88,8 @@ export const ProtectedRoute = ({ children }) => {
     );
 
     const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
-      console.log('Snapshot received, docs count:', snapshot.size); // Debug log
 
       if (snapshot.empty) {
-        console.log('No orders found for the date range');
         setOrdersList([]);
         return;
       }
@@ -50,7 +100,6 @@ export const ProtectedRoute = ({ children }) => {
         status: doc.data().status?.toLowerCase() || 'unknown'
       }));
 
-      console.log('Processed orders:', orders); // Debug log
       setOrdersList(orders);
 
       // Handle pending orders notification

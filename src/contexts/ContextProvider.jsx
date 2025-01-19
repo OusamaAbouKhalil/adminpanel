@@ -14,6 +14,7 @@ const initialUIState = {
 
 const initialAppState = {
   ordersList: [],
+  specialOrders: [],
   dayOrders: "",
   scheduleDates: [],
   financials: { expense: 0, budget: 0 },
@@ -68,6 +69,11 @@ export const ContextProvider = ({ children }) => {
     });
   }, [updateUI]);
 
+  const setSpecialOrdersList = useCallback((orders) => {
+    const validOrders = Array.isArray(orders) ? orders : [];
+    updateApp({ specialOrders: validOrders });
+  }, [updateApp]);
+
   const setOrdersList = useCallback((orders) => {
     const validOrders = Array.isArray(orders) ? orders : [];
     updateApp({ ordersList: validOrders });
@@ -119,10 +125,12 @@ export const ContextProvider = ({ children }) => {
     setLoading,
     // App State
     ...app,
+    specialOrders: Array.isArray(app.specialOrders) ? app.specialOrders : [],
     ordersList: Array.isArray(app.ordersList) ? app.ordersList : [],
     biteDrivers: Array.isArray(app.biteDrivers) ? app.biteDrivers : [],
     drivers: Array.isArray(app.drivers) ? app.drivers : [],
     // App Actions
+    setSpecialOrdersList,
     setOrdersList,
     setBiteDrivers,
     setDrivers,
@@ -137,7 +145,9 @@ export const ContextProvider = ({ children }) => {
     setOrdersList,
     setBiteDrivers,
     setDrivers,
-    setDayOrders
+    setDayOrders,
+    app.specialOrders,
+    setSpecialOrdersList
   ]);
 
   return (
