@@ -3,6 +3,7 @@ import { Header } from "../components";
 import { useStateContext } from "../contexts/ContextProvider";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetRestaurantMenu } from "../lib/query/queries";
+import BulkItemEntryForm from "../components/BulkItemEntryForm";
 
 export default function Menu() {
   const { id } = useParams();
@@ -12,8 +13,7 @@ export default function Menu() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
-  const tableMenuDsiplay = ["Item Image", "Name", "Price", "Description", "Discount percentage", "Availabilty", "Order Count"];
-
+  const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
 
   const filteredItems = useMemo(() => {
     return menu?.filter((item) =>
@@ -44,12 +44,20 @@ export default function Menu() {
 
       {/* Search and Add Section */}
       <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-        <button
-          onClick={additem}
-          className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
-        >
-          Add
-        </button>
+        <div className="flex gap-2 w-full md:w-auto">
+          <button
+            onClick={additem}
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
+          >
+            Add Item
+          </button>
+          <button
+            onClick={() => setIsBulkAddOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
+          >
+            Bulk Add
+          </button>
+        </div>
         <input
           type="text"
           placeholder="Search by name..."
@@ -141,6 +149,11 @@ export default function Menu() {
           )}
         </nav>
       </div>
+      <BulkItemEntryForm
+        isOpen={isBulkAddOpen}
+        onClose={() => setIsBulkAddOpen(false)}
+        restaurantId={id}
+      />
     </div>
   );
 }
