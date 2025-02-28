@@ -8,6 +8,7 @@ import useDebounce from "../hooks/useDebounce";
 import ReactModal from "react-modal";
 import { getRestaurantReviews } from "../lib/firebase/api";
 import { useInView } from 'react-intersection-observer';
+import BulkEntryForm from '../components/BulkEntryForm';
 
 export default function Restaurants() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function Restaurants() {
   const debouncedValue = useDebounce(searchTerm, 500);
   const { ref, inView } = useInView();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
   const {
@@ -75,12 +77,24 @@ export default function Restaurants() {
     <div className="m-4 md:m-8 lg:m-12 mt-12 p-4 md:p-8 bg-gray-50 rounded-lg shadow-lg">
       <Header category="Page" title="Restaurants" />
       <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-        <button
-          onClick={add}
-          className="bg-green-600 hover:bg-green-700 text-white text-sm px-6 py-2 rounded-lg transition duration-300"
-        >
-          Add
-        </button>
+        <div className="flex space-x-4">
+          <button
+            onClick={add}
+            className="bg-green-600 hover:bg-green-700 text-white text-sm px-6 py-2 rounded-lg transition duration-300"
+          >
+            Add
+          </button>
+          <button
+            onClick={() => setIsBulkUploadOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-2 rounded-lg transition duration-300"
+          >
+            Bulk Upload
+          </button>
+        </div>
+        <BulkEntryForm
+          isOpen={isBulkUploadOpen}
+          onClose={() => setIsBulkUploadOpen(false)}
+        />
         <input
           type="text"
           placeholder="Search by name..."
