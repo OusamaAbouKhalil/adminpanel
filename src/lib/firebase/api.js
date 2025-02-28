@@ -310,18 +310,17 @@ export const createRestaurant = async (formData, menuData) => {
     const collectionRef = collection(fsdb, "restaurants");
     const docRef = await addDoc(collectionRef, formData);
 
-
-
-    const menuRef = collection(fsdb, `restaurants/${docRef.id}/menu_items`);
-    const menuItemRef = await addDoc(menuRef, menuData);
-
-    await setDoc(menuItemRef, { item_id: menuItemRef.id }, { merge: true });
-
+    if (menuData && Object.keys(menuData).length > 0) {
+      const menuRef = collection(fsdb, `restaurants/${docRef.id}/menu_items`);
+      const menuItemRef = await addDoc(menuRef, menuData);
+      await setDoc(menuItemRef, { item_id: menuItemRef.id }, { merge: true });
+    }
 
     await setDoc(docRef, { ...formData, rest_id: docRef.id }, { merge: true });
+    return docRef.id;
   } catch (error) {
     console.error("Error adding document: ", error);
-    return null; // Explicitly return null in case of error
+    return null;
   }
 };
 export const createItem = async (id, formData) => {
