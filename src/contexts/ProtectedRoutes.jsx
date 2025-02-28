@@ -131,6 +131,20 @@ export const ProtectedRoute = ({ children }) => {
     return () => off(driversRef, 'value', onDriversChange);
   }, [setBiteDrivers]);
 
+  // Updated Drivers Listener
+  useEffect(() => {
+    const driversRef = ref(db, '/drivers');
+    const onDriversChange = (snapshot) => {
+      const driversArray = snapshot.exists()
+        ? Object.entries(snapshot.val()).map(([key, value]) => ({ id: key, ...value }))
+        : [];
+      setDrivers(driversArray);
+    };
+
+    onValue(driversRef, onDriversChange);
+    return () => off(driversRef, 'value', onDriversChange);
+  }, [setDrivers]);
+
   const hasAccess = useMemo(() => {
     const route = location.pathname.split('/')[1];
     return permissions?.[route] || false;
