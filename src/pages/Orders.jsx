@@ -45,13 +45,6 @@ const Orders = () => {
   const handlePendingOrdersClick = () => {
     setOpenPendingOrders(!openPendingOrders);
   };
-  const pendingSpecialOrders = specialOrders.filter(order =>
-    order.status === 'pending'
-  );
-
-  const nonPendingSpecialOrders = specialOrders.filter(order =>
-    order.status !== 'pending'
-  );
   return (
     <>
       <div className="container mx-auto p-6 space-y-6">
@@ -81,28 +74,33 @@ const Orders = () => {
           />
         )}
 
-        {showCanceledOrders && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ordersList
-              .filter(order => order.status === "canceled")
-              .map(order => (
-                <SpecialOrderCard key={order.id} order={order} />
-              ))}
-          </div>
-        )}
-
-        {!openPendingOrders && !showCanceledOrders && (
+        {!openPendingOrders && (
           <>
-            {pendingSpecialOrders.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pendingSpecialOrders.map((order) => (
-                  <SpecialOrderCard key={order.order_id} order={order} />
-                ))}
-              </div>
-            )}
+            {specialOrders.length > 0 && (
+              <>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-gray-800">Special Orders</h2>
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    {specialOrders.length} orders
+                  </span>
+                </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 auto-rows-auto grid-flow-dense">
+                  {specialOrders
+                    .sort((a, b) => {
+                      if (a.status === "pending" && b.status !== "pending") return -1;
+                      if (a.status !== "pending" && b.status === "pending") return 1;
+                      return new Date(b.time || 0) - new Date(a.time || 0);
+                    })
+                    .map((order) => (
+                      <SpecialOrderCard key={order.order_id} order={order} />
+                    ))
+                  }
+                </div>
+              </>
+            )}
             <OrdersTable
-              orders={[...ordersList, ...nonPendingSpecialOrders]}
+              orders={ordersList}
               onStatusChange={handleStatusChange}
             />
           </>
