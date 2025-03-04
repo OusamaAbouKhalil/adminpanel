@@ -14,7 +14,7 @@ export const ProtectedRoute = ({ children }) => {
   const {
     setBiteDrivers,
     setOrdersList,
-    setSpecialOrdersList, // Add this
+    setSpecialOrdersList,
     dayOrders,
     setDrivers
   } = useStateContext();
@@ -26,7 +26,51 @@ export const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     const specialOrdersRef = collection(fsdb, 'special_orders');
-    const specialOrdersQuery = query(specialOrdersRef);
+
+    console.log('Day orders type:', typeof dayOrders, dayOrders instanceof Date);
+    console.log('Day orders value:', dayOrders);
+
+    let today;
+    try {
+      if (dayOrders instanceof Date && !isNaN(dayOrders.getTime())) {
+        today = dayOrders;
+        console.log("Using provided date object");
+      } else if (dayOrders && typeof dayOrders === 'object' && dayOrders.seconds) {
+        today = new Date(dayOrders.seconds * 1000);
+        console.log("Converting from Firestore timestamp");
+      } else if (dayOrders && typeof dayOrders === 'string') {
+        today = new Date(dayOrders);
+        console.log("Parsing from string");
+      } else {
+        today = new Date();
+        console.log("Using current date as fallback");
+      }
+
+      if (isNaN(today.getTime())) {
+        console.error("Invalid date after parsing", today);
+        today = new Date();
+      }
+    } catch (error) {
+      console.error("Error parsing date:", error);
+      today = new Date();
+    }
+
+    console.log("Using date for query:", today);
+
+
+    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+
+    console.log("Using formatted date string:", formattedDate);
+
+    const startOfDayStr = `${formattedDate} 00:00:00`;
+    const endOfDayStr = `${formattedDate} 23:59:59`;
+
+
+    const specialOrdersQuery = query(
+      specialOrdersRef,
+      where('createdAt', '>=', startOfDayStr),
+      where('createdAt', '<=', endOfDayStr)
+    );
 
     const unsubscribe = onSnapshot(specialOrdersQuery, (snapshot) => {
       if (snapshot.empty) {
@@ -40,7 +84,7 @@ export const ProtectedRoute = ({ children }) => {
         const [day, month, year] = datePart.split('/');
         const timestamp = new Date(`${year}-${month}-${day} ${timePart}`);
 
-        const processedOrder = {
+        return {
           orderId: data.orderId,
           fromAddress: data.FromAddress,
           additionalText: data.additionalText,
@@ -55,24 +99,24 @@ export const ProtectedRoute = ({ children }) => {
           order_id: doc.id,
           time: timestamp
         };
-        return processedOrder;
       });
 
+      console.log('Special orders for', formattedDate, ':', specialOrders);
       setSpecialOrdersList(specialOrders);
 
+      // Handle notifications
       specialOrders.forEach(order => {
         if (order.status === 'pending' && !pendingOrderIds.has(order.orderId)) {
           audioInstance.play().catch(error => console.error('Audio error:', error));
           setPendingOrderIds(prev => new Set([...prev, order.orderId]));
         }
       });
-    },
-      (error) => {
-        console.error('Query error details:', error);
-      });
+    }, (error) => {
+      console.error('Query error details:', error);
+    });
 
     return () => unsubscribe();
-  }, [audioInstance, pendingOrderIds, setSpecialOrdersList]);
+  }, [audioInstance, pendingOrderIds, setSpecialOrdersList, dayOrders]);
   // Setup Orders Listener
   useEffect(() => {
 
