@@ -27,6 +27,7 @@ import {
   limit,
   where,
   deleteDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { getLocationByCoordinates } from "../utils";
 import { permissionsList } from "../../data/dummy";
@@ -592,4 +593,55 @@ export const updatePrices = async (prices) => {
   const pricesRef = ref(db, 'Prices');
   await update(pricesRef, prices);
   return prices;
+};
+
+export const updateOrderPrices = async (orderData) => {
+  try {
+    const { order_id, total, delivery_fee, costInCredits, items } = orderData;
+
+    // Find the order document by order_id
+    const ordersRef = collection(fsdb, "orders");
+    const orderQuery = query(ordersRef, where("order_id", "==", order_id));
+    const orderSnapshot = await getDocs(orderQuery);
+
+    if (orderSnapshot.empty) {
+      throw new Error("Order not found");
+    }
+
+    // Get the order document
+    const orderDoc = orderSnapshot.docs[0];
+
+    // Start a batch update
+    const batch = writeBatch(fsdb);
+
+    // Update the main order document
+    batch.update(orderDoc.ref, {
+      total: parseFloat(total) || 0,
+      delivery_fee: parseFloat(delivery_fee) || 0,
+      costInCredits: parseFloat(costInCredits) || 0
+    });
+
+    // Update each order item in the sub-collection
+    if (items && items.length > 0) {
+      const itemsRef = collection(orderDoc.ref, "items");
+      const itemsSnapshot = await getDocs(itemsRef);
+
+      itemsSnapshot.docs.forEach((itemDoc, index) => {
+        if (index < items.length) {
+          const updatedItem = items[index];
+          batch.update(itemDoc.ref, {
+            total: parseFloat(updatedItem.total) || 0
+          });
+        }
+      });
+    }
+
+    // Commit all the batch updates
+    await batch.commit();
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating order prices:", error);
+    return { success: false, error: error.message };
+  }
 };

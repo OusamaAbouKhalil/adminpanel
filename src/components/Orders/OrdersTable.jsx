@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { getDocs, collection } from "firebase/firestore";
-import { fsdb } from "../../utils/firebaseconfig";
-import { MdOutlineErrorOutline } from "react-icons/md"; // Importing an icon
+import React, { useState, useMemo } from "react";
+import { MdOutlineErrorOutline } from "react-icons/md";
 import OrderDetailsPopup from "./OrderDetailsPopup";
 import { useGetRestaurantsForOrders } from "../../lib/query/queries";
 

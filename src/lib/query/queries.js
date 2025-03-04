@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, deleteMenuItemAddon, getDashboardData, getMenuItem, getMenuItemAddons, getOrders, getPermissions, getPrices, getRestaurantById, getRestaurantMenu, getRestaurants, getUserOrderCounts, getUsers, setMenuItem, updateOrderStatus, updatePrices } from '../firebase/api';
+import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, deleteMenuItemAddon, getDashboardData, getMenuItem, getMenuItemAddons, getOrders, getPermissions, getPrices, getRestaurantById, getRestaurantMenu, getRestaurants, getUserOrderCounts, getUsers, setMenuItem, updateOrderPrices, updateOrderStatus, updatePrices } from '../firebase/api';
 
 // In queries.js
 export const useGetRestaurants = (searchTerm) => {
@@ -208,6 +208,18 @@ export const useUpdatePrices = () => {
         mutationFn: updatePrices,
         onSuccess: () => {
             queryClient.invalidateQueries(['prices']);
+        },
+    });
+};
+
+export const useUpdateOrderPrices = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: updateOrderPrices,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['orders'] });
+            queryClient.invalidateQueries({ queryKey: ['special_orders'] });
         },
     });
 };

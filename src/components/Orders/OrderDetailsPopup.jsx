@@ -7,6 +7,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { getDatabase, ref, get, onValue, set, push } from "firebase/database";
 import { fsdb } from "../../utils/firebaseconfig";
+import { useUpdateOrderPrices } from "../../lib/query/queries";
+import { useStateContext } from "../../contexts/ContextProvider";
 
 const OrderDetailsPopup = React.memo(({ order, onClose }) => {
   const [orderItems, setOrderItems] = useState([]);
@@ -14,8 +16,14 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
   // user details from real-time database to be displayed in the order details popup
   const [userDetails, setUserDetails] = useState(null);
 
+  const [editMode, setEditMode] = useState(false);
+  const [editedOrder, setEditedOrder] = useState(null);
+  const [editedOrderItems, setEditedOrderItems] = useState([]);
+  const updateOrderPricesMutation = useUpdateOrderPrices();
+
+  const { ordersList, setOrdersList } = useStateContext();
   // Fetch user details from Realtime Database
-  const fetchUserDetails = async (userId) => {
+  const fetchUserDetails = async () => {
     try {
       const userRef = ref(getDatabase(), `users/${order.user_id}`);
       onValue(userRef, (snapshot) => {
@@ -28,7 +36,7 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
 
   useEffect(() => {
     if (order && order.user_id) {
-      fetchUserDetails(order.user_id);
+      fetchUserDetails();
     }
   }, [order]);
 
@@ -69,7 +77,22 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
       return [];
     }
   };
+  useEffect(() => {
+    if (order) {
+      setEditedOrder({
+        ...order,
+        total: order.total,
+        delivery_fee: order.delivery_fee,
+        costInCredits: order.costInCredits
+      });
+    }
+  }, [order]);
 
+  useEffect(() => {
+    if (orderItems.length > 0) {
+      setEditedOrderItems([...orderItems]);
+    }
+  }, [orderItems]);
   // Initialize pdfMake with fonts
   pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
   pdfMake.fonts = {
@@ -98,7 +121,7 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
       setIsGeneratingPDF(false);
     }
   }, [order, orderItems]);
-  
+
   const generateInvoicePDF = async (order) => {
     const docDefinition = {
       pageSize: "A4",
@@ -317,7 +340,7 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
 
     return docDefinition;
   };
-  
+
 
   const handleEscape = useCallback(
     (e) => {
@@ -331,8 +354,85 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
     return () => window.removeEventListener("keydown", handleEscape);
   }, [handleEscape]);
 
-  
+  const handlePriceChange = (field, value) => {
+    const newValue = parseFloat(value) || 0;
+    if (field === 'total') {
+      return;
+    }
 
+    setEditedOrder(prev => ({
+      ...prev,
+      [field]: newValue
+    }));
+  };
+  const handleItemPriceChange = (index, value) => {
+    const newValue = parseFloat(value) || 0;
+
+    // Update this specific item's price
+    const updatedItems = [...editedOrderItems];
+    updatedItems[index] = {
+      ...updatedItems[index],
+      total: newValue
+    };
+    setEditedOrderItems(updatedItems);
+
+    // Recalculate and update the product total
+    const newProductTotal = updatedItems.reduce((sum, item) => sum + item.total, 0);
+
+    setEditedOrder(prev => ({
+      ...prev,
+      total: parseFloat(newProductTotal.toFixed(2))
+    }));
+  };
+  useEffect(() => {
+    if (editMode && editedOrderItems.length > 0) {
+      const itemsTotal = editedOrderItems.reduce((sum, item) => sum + parseFloat(item.total || 0), 0);
+
+      // Only update if the calculated total is different (to prevent infinite loops)
+      if (Math.abs(itemsTotal - (editedOrder?.total || 0)) > 0.01) {
+        setEditedOrder(prev => ({
+          ...prev,
+          total: parseFloat(itemsTotal.toFixed(2))
+        }));
+      }
+    }
+  }, [editedOrderItems, editMode]);
+  const handleSaveChanges = async () => {
+    try {
+      setIsGeneratingPDF(true);
+
+      const result = await updateOrderPricesMutation.mutateAsync({
+        order_id: editedOrder.order_id,
+        total: editedOrder.total,
+        delivery_fee: editedOrder.delivery_fee,
+        costInCredits: editedOrder.costInCredits,
+        items: editedOrderItems
+      });
+
+      if (result.success) {
+        const updatedOrdersList = ordersList.map(o =>
+          o.order_id === editedOrder.order_id
+            ? {
+              ...o,
+              total: editedOrder.total,
+              delivery_fee: editedOrder.delivery_fee,
+              costInCredits: editedOrder.costInCredits
+            }
+            : o
+        );
+        onClose();
+        setOrdersList(updatedOrdersList);
+        setEditMode(false);
+      } else {
+        alert(`Error saving changes: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error updating order:", error);
+      alert(`Error saving changes: ${error.message}`);
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
   if (!order) return null;
 
   return (
@@ -382,22 +482,74 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
           <div>
             <p className="text-sm text-gray-500">Status</p>
             <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
-                order.status === "completed"
-                  ? "bg-green-100 text-green-800"
-                  : order.status === "cancelled"
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${order.status === "completed"
+                ? "bg-green-100 text-green-800"
+                : order.status === "cancelled"
                   ? "bg-red-100 text-red-800"
                   : "bg-blue-100 text-blue-800"
-              }`}
+                }`}
             >
               {order.status}
             </span>
           </div>
+        </div>
+
+        {/* Add price editing section */}
+        <div className="grid grid-cols-2 gap-8 mb-6">
           <div>
-            <p className="text-sm text-gray-500">Total</p>
+            <p className="text-sm text-gray-500">Product Total</p>
             <p className="font-semibold">
-              ${(order.total + order.delivery_fee).toFixed(2)}
+              ${editMode
+                ? editedOrderItems.reduce((sum, item) => sum + parseFloat(item.total || 0), 0).toFixed(2)
+                : order.total.toFixed(2)}
             </p>
+            {editMode && (
+              <p className="text-xs text-gray-500 mt-1">
+                (Calculated from item prices)
+              </p>
+            )}
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Delivery Fee</p>
+            {editMode ? (
+              <input
+                type="number"
+                step="0.01"
+                className="font-semibold border rounded p-1 w-28"
+                value={editedOrder?.delivery_fee || 0}
+                onChange={(e) => handlePriceChange('delivery_fee', e.target.value)}
+              />
+            ) : (
+              <p className="font-semibold">${order.delivery_fee.toFixed(2)}</p>
+            )}
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Cost in Credits</p>
+            {editMode ? (
+              <input
+                type="number"
+                step="0.01"
+                className="font-semibold border rounded p-1 w-28"
+                value={editedOrder?.costInCredits || 0}
+                onChange={(e) => handlePriceChange('costInCredits', e.target.value)}
+              />
+            ) : (
+              <p className="font-semibold">{order.costInCredits.toFixed(2)}</p>
+            )}
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Grand Total</p>
+            <p className="font-semibold text-lg text-green-600">
+              ${(
+                parseFloat((editMode ? editedOrder?.total : order.total) || 0) +
+                parseFloat((editMode ? editedOrder?.delivery_fee : order.delivery_fee) || 0)
+              ).toFixed(2)}
+            </p>
+            {editMode && (
+              <p className="text-xs text-gray-500 mt-1">
+                (Sum of Product Total + Delivery Fee)
+              </p>
+            )}
           </div>
         </div>
 
@@ -453,7 +605,7 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
           </div>
         </div>
 
-         {/* Items List */}
+        {/* Items List */}
         <div className="my-4">
           <h3 className="text-xl font-semibold text-gray-800">Order Items</h3>
           <table className="min-w-full mt-2 border-collapse">
@@ -473,7 +625,7 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
               </tr>
             </thead>
             <tbody>
-              {orderItems.map((item, index) => (
+              {(editMode ? editedOrderItems : orderItems).map((item, index) => (
                 <tr key={index} className="border-b">
                   <td className="px-4 py-2">
                     <img
@@ -485,17 +637,29 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
                   <td className="px-4 py-2">{item.item_name}</td>
                   <td className="px-4 py-2">{item.quantity}</td>
                   <td className="px-4 py-2">
-                    {item.size == "No size selected." ? "N/A" : item.size}
+                    {item.size === "No size selected." ? "N/A" : item.size}
                   </td>
                   <td className="px-4 py-2">
-                    {item.addons == "No addons selected." ? "N/A" : item.addons}
+                    {item.addons === "No addons selected." ? "N/A" : item.addons}
                   </td>
                   <td className="px-4 py-2">
-                    {item.instructions == "No instructions provided."
+                    {item.instructions === "No instructions provided."
                       ? "N/A"
                       : item.instructions}
                   </td>
-                  <td className="px-4 py-2">${item.total.toFixed(2)}</td>
+                  <td className="px-4 py-2">
+                    {editMode ? (
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="font-semibold border rounded p-1 w-28"
+                        value={item.total}
+                        onChange={(e) => handleItemPriceChange(index, e.target.value)}
+                      />
+                    ) : (
+                      `$${item.total.toFixed(2)}`
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -503,14 +667,39 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
         </div>
         {/* Actions */}
         <div className="flex justify-between mt-6">
-          <button
-            onClick={handlePrint}
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
-            disabled={isGeneratingPDF}
-          >
-            <MdPrint className="mr-2" />
-            {isGeneratingPDF ? "Generating PDF..." : "Print Invoice"}
-          </button>
+          {editMode ? (
+            <>
+              <button
+                onClick={handleSaveChanges}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => setEditMode(false)}
+                className="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setEditMode(true)}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Edit Prices
+              </button>
+              <button
+                onClick={handlePrint}
+                className="inline-flex items-center px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                disabled={isGeneratingPDF}
+              >
+                <MdPrint className="mr-2" />
+                {isGeneratingPDF ? "Generating PDF..." : "Print Invoice"}
+              </button>
+            </>
+          )}
         </div>
       </motion.div>
     </motion.div>
