@@ -189,9 +189,14 @@ const BulkEntryForm = ({ isOpen, onClose }) => {
 
         if (imageFiles[i]?.main_image) {
           updatedEntry.main_image = await uploadImage(imageFiles[i].main_image, imageDir);
+        } else {
+          updatedEntry.main_image = "";
         }
+
         if (imageFiles[i]?.bg_image) {
           updatedEntry.bg_image = await uploadImage(imageFiles[i].bg_image, imageDir);
+        } else {
+          updatedEntry.bg_image = "";
         }
 
         await addRestaurant({

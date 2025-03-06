@@ -18,6 +18,7 @@ const BulkItemEntryForm = ({ isOpen, onClose, restaurantId }) => {
         combo: {},
         likes: [],
         orders_count: 0,
+        item_image: "",
     };
 
     // State for form fields
@@ -269,6 +270,8 @@ const BulkItemEntryForm = ({ isOpen, onClose, restaurantId }) => {
 
                 if (imageFiles[i]) {
                     updatedItem.item_image = await uploadImage(imageFiles[i], imageDir);
+                } else {
+                    updatedItem.item_image = "";
                 }
 
                 updatedItem.sizes = itemSizes[i] || {};
