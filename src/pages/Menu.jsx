@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { Header } from "../components";
-import { useStateContext } from "../contexts/ContextProvider";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetRestaurantMenu } from "../lib/query/queries";
 import BulkItemEntryForm from "../components/BulkItemEntryForm";
+import RestaurantAddonsForm from "../components/RestaurantAddonsForm";
 
 export default function Menu() {
   const { id } = useParams();
@@ -14,6 +14,7 @@ export default function Menu() {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
   const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
+  const [isAddonsFormOpen, setIsAddonsFormOpen] = useState(false);
 
   const filteredItems = useMemo(() => {
     return menu?.filter((item) =>
@@ -44,7 +45,7 @@ export default function Menu() {
 
       {/* Search and Add Section */}
       <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-        <div className="flex gap-2 w-full md:w-auto">
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <button
             onClick={additem}
             className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
@@ -56,6 +57,12 @@ export default function Menu() {
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
           >
             Bulk Add
+          </button>
+          <button
+            onClick={() => setIsAddonsFormOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
+          >
+            Manage Addons
           </button>
         </div>
         <input
@@ -152,6 +159,11 @@ export default function Menu() {
       <BulkItemEntryForm
         isOpen={isBulkAddOpen}
         onClose={() => setIsBulkAddOpen(false)}
+        restaurantId={id}
+      />
+      <RestaurantAddonsForm
+        isOpen={isAddonsFormOpen}
+        onClose={() => setIsAddonsFormOpen(false)}
         restaurantId={id}
       />
     </div>
