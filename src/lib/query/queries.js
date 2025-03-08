@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { addAddonToMenuItem, createAdmin, createItem, createRestaurant, deleteMenuItemAddon, getDashboardData, getMenuItem, getMenuItemAddons, getOrders, getPermissions, getPrices, getRestaurantById, getRestaurantMenu, getRestaurants, getUserOrderCounts, getUsers, setMenuItem, updateOrderPrices, updateOrderStatus, updatePrices } from '../firebase/api';
+import { addAddonToRestaurant, createAdmin, createItem, createRestaurant, deleteAddon, deleteMenuItemAddon, getDashboardData, getMenuItem, getMenuItemAddons, getOrders, getPermissions, getPrices, getRestaurantAddons, getRestaurantById, getRestaurantMenu, getRestaurants, getUserOrderCounts, getUsers, saveItemAddons, setMenuItem, updateAddon, updateOrderPrices, updateOrderStatus, updatePrices } from '../firebase/api';
 
 // In queries.js
 export const useGetRestaurants = (searchTerm) => {
@@ -66,20 +66,18 @@ export const useSetMenuItem = () => {
         mutationFn: (data) => setMenuItem(data.rest_id, data.item_id, data.itemData),
     });
 }
-export const useAddAddonToMenuItem = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (data) => addAddonToMenuItem(data.rest_id, data.item_id, data.addonData),
-        onSuccess: () => queryClient.invalidateQueries('menu_item'),
-    });
-}
 export const useCreateItem = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data) => createItem(data.rest_id, data.itemData),
-        onSuccess: () => queryClient.invalidateQueries('menu_item'),
+        mutationFn: async (data) => {
+            const result = await createItem(data.rest_id, data.itemData);
+            return result;
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['restaurant_menu', variables.rest_id]);
+        },
     });
-}
+};
 export const useGetRestaurantMenu = (id) => {
     return useQuery({
         queryKey: ['restaurant_menu', id],
@@ -88,7 +86,6 @@ export const useGetRestaurantMenu = (id) => {
         cacheTime: 30 * 60 * 1000, // Cache kept for 30 minutes
         retry: 2, // Retry failed requests 2 times
         refetchOnWindowFocus: false, // Don't refetch when window regains focus
-        refetchOnMount: false, // Don't refetch if data is cached
     });
 }
 export const useGetPermissions = (currentUser, options = {}) => {
@@ -220,6 +217,68 @@ export const useUpdateOrderPrices = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['orders'] });
             queryClient.invalidateQueries({ queryKey: ['special_orders'] });
+        },
+    });
+};
+export const useAddAddonToRestaurant = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ restaurantId, addonData }) => addAddonToRestaurant(restaurantId, addonData),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['restaurant_addons'] });
+        },
+    });
+};
+export const useGetRestaurantAddons = (restaurantId) => {
+    return useQuery({
+        queryKey: ['restaurant_addons', restaurantId],
+        queryFn: () => getRestaurantAddons(restaurantId),
+        enabled: !!restaurantId,
+    });
+};
+
+export const useSaveItemAddons = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ restaurantId, itemId, selectedAddons }) =>
+            saveItemAddons(restaurantId, itemId, selectedAddons),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: ['item_addons', variables.restaurantId, variables.itemId]
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['restaurant_menu', variables.restaurantId]
+            });
+        },
+    });
+};
+
+export const useUpdateAddon = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ restaurantId, addonId, addonData }) =>
+            updateAddon(restaurantId, addonId, addonData),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: ['restaurant_addons', variables.restaurantId]
+            });
+        },
+    });
+};
+
+export const useDeleteAddon = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ restaurantId, addonId }) =>
+            deleteAddon(restaurantId, addonId),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: ['restaurant_addons', variables.restaurantId]
+            });
         },
     });
 };
