@@ -29,7 +29,7 @@ function Calender() {
   //     const eventRef = ref(db, `scheduleData/${updatedEvent.Id}`);
   //     set(eventRef, updatedEvent)
   //       .then(() => {
-  //         console.log('Event updated successfully');
+  //         
   //       })
   //       .catch((error) => {
   //         console.error('Error updating event:', error);
@@ -53,7 +53,7 @@ function Calender() {
   //     const eventRef = ref(db, `scheduleData/${newEvent.Id}`);
   //     set(eventRef, newEvent)
   //       .then(() => {
-  //         console.log('Event created successfully');
+  //         
   //       })
   //       .catch((error) => {
   //         console.error('Error creating event:', error);

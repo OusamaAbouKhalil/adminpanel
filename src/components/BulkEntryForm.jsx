@@ -96,7 +96,7 @@ const BulkEntryForm = ({ isOpen, onClose }) => {
         case 'isClosed':
           const newValue = !newEntries[index].isClosed;
           newEntries[index].isClosed = newValue;
-          console.log(`Restaurant ${index} is now ${newValue ? 'Closed' : 'Open'}`);
+
           break;
         default:
           newEntries[index][field] = value;
@@ -106,7 +106,7 @@ const BulkEntryForm = ({ isOpen, onClose }) => {
   };
 
   const handleTitleSelect = (index, selectedTitle) => {
-    console.log("Title clicked:", selectedTitle);
+
 
     setEntries(prev => {
       const newEntries = JSON.parse(JSON.stringify(prev)); // Deep copy
@@ -122,14 +122,14 @@ const BulkEntryForm = ({ isOpen, onClose }) => {
       if (titleIndex >= 0) {
         // Remove if already selected
         newEntries[index].title.splice(titleIndex, 1);
-        console.log("Removed title:", selectedTitle);
+
       } else {
         // Add if not selected
         newEntries[index].title.push(selectedTitle);
-        console.log("Added title:", selectedTitle);
+
       }
 
-      console.log("Updated titles:", newEntries[index].title);
+
       return newEntries;
     });
   };

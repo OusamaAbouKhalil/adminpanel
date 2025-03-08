@@ -10,7 +10,7 @@ export class FirebaseConnectionMonitor {
   startMonitoring(onConnected, onDisconnected) {
     this.connectionListener = onValue(this.connectedRef, (snap) => {
       if (snap.val() === true) {
-        console.log("Connected to Firebase");
+
         onConnected?.();
       } else {
         console.warn("Disconnected from Firebase");

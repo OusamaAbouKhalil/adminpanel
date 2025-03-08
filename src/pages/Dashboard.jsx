@@ -82,14 +82,14 @@ export default function Dashboard() {
         const snapshot = await getDocs(revenueRef);
 
         const revenueEntries = snapshot.docs.map(doc => doc.data());
-        console.log('Revenue Entries:', revenueEntries);
+
 
         const filteredEntries = revenueEntries.filter(entry => {
           const entryDate = new Date(entry.date);
           return entryDate >= startDate && entryDate <= endDate;
         });
 
-        console.log('Filtered Entries:', filteredEntries);
+
 
         const deliveryChargeData = {
           labels: [],
@@ -211,7 +211,7 @@ export default function Dashboard() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    
+
     link.href = url;
     link.setAttribute('download', 'report.csv');
     document.body.appendChild(link);

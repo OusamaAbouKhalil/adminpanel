@@ -87,17 +87,6 @@ const CalculatorPage = () => {
         break;
     }
 
-    console.log('Swift Drive Cost Calculation:', {
-      Base_Fare,
-      Cost_Per_Min,
-      Cost_Per_Km,
-      time,
-      distance,
-      Booking_Fee,
-      passengers,
-      result: swiftDriveCost
-    });
-
     // Swift Bites Calculation
     let swiftBitesCost;
     if (distance < 2.6) {
@@ -107,13 +96,6 @@ const CalculatorPage = () => {
     } else {
       swiftBitesCost = Cost_Per_Km_SB * distance;
     }
-    console.log('Swift Bites Cost Calculation:', {
-      Base_Fare,
-      Cost_Per_Km_SB,
-      distance,
-      Booking_Fee,
-      result: swiftBitesCost
-    });
 
     setResult({ swiftDriveCost, swiftBitesCost });
   };

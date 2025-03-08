@@ -42,7 +42,7 @@ try {
     const testRef = getDatabase().ref('.info/connected');
     testRef.once('value', (snapshot) => {
         if (snapshot.val() === true) {
-            console.log('Successfully connected to Firebase Admin Database');
+
         } else {
             console.warn('Not connected to Firebase Admin Database');
         }

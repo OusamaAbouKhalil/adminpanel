@@ -11,7 +11,7 @@ export const getLocationByCoordinates = async (lat, lng) => {
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=en`
     );
     const data = await response.json();
-    // console.log(data);
+    // 
     return (
       data.display_name ||
       `${data.address?.city || ''}, ${data.address?.state || ''}, ${data.address?.country || ''}`

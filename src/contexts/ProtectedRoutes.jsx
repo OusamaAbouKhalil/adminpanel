@@ -27,23 +27,23 @@ export const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     const specialOrdersRef = collection(fsdb, 'special_orders');
 
-    console.log('Day orders type:', typeof dayOrders, dayOrders instanceof Date);
-    console.log('Day orders value:', dayOrders);
+
+
 
     let today;
     try {
       if (dayOrders instanceof Date && !isNaN(dayOrders.getTime())) {
         today = dayOrders;
-        console.log("Using provided date object");
+
       } else if (dayOrders && typeof dayOrders === 'object' && dayOrders.seconds) {
         today = new Date(dayOrders.seconds * 1000);
-        console.log("Converting from Firestore timestamp");
+
       } else if (dayOrders && typeof dayOrders === 'string') {
         today = new Date(dayOrders);
-        console.log("Parsing from string");
+
       } else {
         today = new Date();
-        console.log("Using current date as fallback");
+
       }
 
       if (isNaN(today.getTime())) {
@@ -55,12 +55,12 @@ export const ProtectedRoute = ({ children }) => {
       today = new Date();
     }
 
-    console.log("Using date for query:", today);
+
 
 
     const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-    console.log("Using formatted date string:", formattedDate);
+
 
     const startOfDayStr = `${formattedDate} 00:00:00`;
     const endOfDayStr = `${formattedDate} 23:59:59`;
@@ -101,7 +101,7 @@ export const ProtectedRoute = ({ children }) => {
         };
       });
 
-      console.log('Special orders for', formattedDate, ':', specialOrders);
+
       setSpecialOrdersList(specialOrders);
 
       // Handle notifications
