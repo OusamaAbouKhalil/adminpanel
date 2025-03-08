@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { useCreateItem } from "../lib/query/queries";
+import { useCreateItem, useGetRestaurantAddons, useSaveItemAddons } from "../lib/query/queries";
 import { uploadImage } from "../lib/firebase/api";
 import { doc, getDoc } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
@@ -44,8 +44,33 @@ const BulkItemEntryForm = ({ isOpen, onClose, restaurantId }) => {
     const [itemSizes, setItemSizes] = useState([{}]);
     const [itemCombos, setItemCombos] = useState([{}]);
 
+    const [itemsSelectedAddons, setItemsSelectedAddons] = useState([[]]);
+    const { data: restaurantAddons = [], isLoading: loadingRestaurantAddons } =
+        useGetRestaurantAddons(restaurantId);
+    const { mutate: saveItemAddons } = useSaveItemAddons();
+    const handleAddonToggle = (itemIndex, addon) => {
+        const newItemsSelectedAddons = [...itemsSelectedAddons];
+        const currentItemAddons = [...(newItemsSelectedAddons[itemIndex] || [])];
+
+        const isSelected = currentItemAddons.some(a => a.original_id === addon.id);
+
+        if (isSelected) {
+            newItemsSelectedAddons[itemIndex] = currentItemAddons.filter(a => a.original_id !== addon.id);
+        } else {
+            newItemsSelectedAddons[itemIndex] = [
+                ...currentItemAddons,
+                {
+                    addon_name: addon.addon_name,
+                    addon_price: addon.addon_price,
+                    original_id: addon.id
+                }
+            ];
+        }
+
+        setItemsSelectedAddons(newItemsSelectedAddons);
+    };
     // Get the mutation function from React Query
-    const { mutate: createItem } = useCreateItem();
+    const { mutateAsync: createItem } = useCreateItem();
 
     // Fetch restaurant categories when the modal opens
     useEffect(() => {
@@ -228,6 +253,7 @@ const BulkItemEntryForm = ({ isOpen, onClose, restaurantId }) => {
         setComboPrices([...comboPrices, ""]);
         setItemSizes([...itemSizes, {}]);
         setItemCombos([...itemCombos, {}]);
+        setItemsSelectedAddons([...itemsSelectedAddons, []]);
     };
 
     // Remove an item from the form
@@ -248,6 +274,7 @@ const BulkItemEntryForm = ({ isOpen, onClose, restaurantId }) => {
         setComboPrices(comboPrices.filter((_, i) => i !== index));
         setItemSizes(itemSizes.filter((_, i) => i !== index));
         setItemCombos(itemCombos.filter((_, i) => i !== index));
+        setItemsSelectedAddons(itemsSelectedAddons.filter((_, i) => i !== index));
     };
 
     // Handle form submission
@@ -274,16 +301,51 @@ const BulkItemEntryForm = ({ isOpen, onClose, restaurantId }) => {
                     updatedItem.item_image = "";
                 }
 
+                // Make sure these are proper objects and not empty/undefined
                 updatedItem.sizes = itemSizes[i] || {};
                 updatedItem.combo = itemCombos[i] || {};
 
-                console.log("Saving item with sizes:", updatedItem.sizes);
-                console.log("Saving item with combos:", updatedItem.combo);
-
-                await createItem({
+                // Log the data being sent for debugging
+                console.log(`Item ${i + 1} data:`, {
                     rest_id: restaurantId,
                     itemData: updatedItem
                 });
+
+                // Create the menu item
+                const result = await createItem({
+                    rest_id: restaurantId,
+                    itemData: updatedItem
+                });
+
+                // Check if we successfully got back an item ID
+                if (result?.id) {
+                    console.log(`Item ${i + 1} created with ID: ${result.id}`);
+
+                    // Make sure addons have valid original_id values
+                    const validAddons = itemsSelectedAddons[i]?.filter(addon =>
+                        addon && addon.original_id && addon.addon_name && addon.addon_price
+                    );
+
+                    // Save addons for this item if there are any valid ones
+                    if (validAddons && validAddons.length > 0) {
+                        console.log(`Saving ${validAddons.length} addons for item ${result.id}`, validAddons);
+
+                        try {
+                            await saveItemAddons({
+                                restaurantId: restaurantId,
+                                itemId: result.id,
+                                selectedAddons: validAddons
+                            });
+                            console.log(`Addons saved successfully for item ${result.id}`);
+                        } catch (addonError) {
+                            console.error(`Error saving addons for item ${result.id}:`, addonError);
+                            toast.error(`Item ${i + 1} created but addons failed to save: ${addonError.message}`);
+                        }
+                    }
+                } else {
+                    console.error(`Failed to get item ID for item ${i + 1}`);
+                    toast.error(`Item ${i + 1} may not have been created properly`);
+                }
 
                 const newProcessedCount = i + 1;
                 setProcessedCount(newProcessedCount);
@@ -295,7 +357,7 @@ const BulkItemEntryForm = ({ isOpen, onClose, restaurantId }) => {
             resetForm();
         } catch (error) {
             console.error('Error adding items:', error);
-            toast.error('Failed to add items');
+            toast.error('Failed to add items: ' + error.message);
         } finally {
             setIsSubmitting(false);
         }
@@ -316,6 +378,7 @@ const BulkItemEntryForm = ({ isOpen, onClose, restaurantId }) => {
         setItemCombos([{}]);
         setProgress(0);
         setProcessedCount(0);
+        setItemsSelectedAddons([[]]);
     };
 
     // Don't render anything if the modal is closed
@@ -544,6 +607,64 @@ const BulkItemEntryForm = ({ isOpen, onClose, restaurantId }) => {
                                     </div>
                                 )}
                             </div>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow border space-y-4 mt-4">
+                            <h3 className="text-xl font-semibold text-gray-800">Available Addons</h3>
+
+                            {loadingRestaurantAddons ? (
+                                <p className="text-gray-500">Loading available addons...</p>
+                            ) : restaurantAddons.length === 0 ? (
+                                <p className="text-gray-500">No addons available for this restaurant.</p>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {restaurantAddons.map(addon => (
+                                        <div
+                                            key={addon.id}
+                                            onClick={() => handleAddonToggle(index, addon)}
+                                            className={`p-3 rounded-lg border cursor-pointer transition-all ${itemsSelectedAddons[index]?.some(a => a.original_id === addon.id)
+                                                ? 'border-green-500 bg-green-50'
+                                                : 'border-gray-200 hover:bg-gray-50'
+                                                }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="w-[85%]">
+                                                    <p className="font-medium truncate">{addon.addon_name}</p>
+                                                    <p className="text-sm text-green-600">
+                                                        ${parseFloat(addon.addon_price).toFixed(2)}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    {itemsSelectedAddons[index]?.some(a => a.original_id === addon.id) ? (
+                                                        <svg className="h-6 w-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                        </svg>
+                                                    ) : (
+                                                        <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {itemsSelectedAddons[index]?.length > 0 && (
+                                <div className="mt-4">
+                                    <h4 className="font-medium text-gray-700 mb-2">Selected Addons:</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {itemsSelectedAddons[index].map(addon => (
+                                            <span
+                                                key={addon.original_id}
+                                                className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm"
+                                            >
+                                                {addon.addon_name}: ${parseFloat(addon.addon_price).toFixed(2)}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}
