@@ -1,20 +1,25 @@
 import React from "react";
+import { AiOutlineCalendar } from "react-icons/ai";
+import { FiStar, FiShoppingCart } from "react-icons/fi";
+import { BsKanban, BsChatLeft, BsCurrencyDollar } from "react-icons/bs";
 import {
-  AiOutlineCalendar,
-} from "react-icons/ai";
-import {
-  FiStar,
-  FiShoppingCart,
-} from "react-icons/fi";
-import {
-  BsKanban,
-  BsChatLeft, BsCurrencyDollar
-} from "react-icons/bs";
-import {
-  FaDollarSign, FaBell, FaEdit, FaPercentage, FaGift,
+  FaDollarSign,
+  FaBell,
+  FaEdit,
+  FaPercentage,
+  FaGift,
   FaRegEdit,
-  FaApple, FaImage, FaDesktop, FaReceipt, FaStore, FaShieldAlt, FaBitcoin, FaPeopleArrows, FaCalculator, FaCode
-} from 'react-icons/fa'; // Import the money icon
+  FaApple,
+  FaImage,
+  FaDesktop,
+  FaReceipt,
+  FaStore,
+  FaShieldAlt,
+  FaBitcoin,
+  FaPeopleArrows,
+  FaCalculator,
+  FaCode,
+} from "react-icons/fa"; // Import the money icon
 
 export const gridOrderImage = (props) => (
   <div>
@@ -74,7 +79,6 @@ export const restaurantGrid = [
     value: "title",
     inputType: "text",
   },
-
 ];
 export const menuGrid = [
   {
@@ -139,10 +143,6 @@ export const kanbanGrid = [
     allowToggle: true,
   },
 ];
-
-
-
-
 
 export const customersGrid = [
   {
@@ -240,10 +240,9 @@ export const driverGrid = [
   },
 ];
 
-
 export const links = [
   {
-    title: "Core Center", 
+    title: "Core Center",
     links: [
       {
         name: "dashboard",
@@ -251,6 +250,10 @@ export const links = [
       },
       {
         name: "users",
+        icon: <FaPeopleArrows size={20} />,
+      },
+      {
+        name: "map",
         icon: <FaPeopleArrows size={20} />,
       },
     ],
@@ -349,7 +352,6 @@ export const links = [
         name: "banners",
         icon: <FaImage size={20} />, // Changed to Bell icon
       },
-
     ],
   },
   {
@@ -363,7 +365,6 @@ export const links = [
         name: "editadmin", // Route name for the new page
         icon: <FaRegEdit size={20} />, // Changed to Bell icon
       },
-
     ],
   },
   {
@@ -378,7 +379,6 @@ export const links = [
   {
     title: "Apps",
     links: [
-      
       {
         name: "calendar",
         icon: <AiOutlineCalendar size={20} />,
@@ -390,8 +390,6 @@ export const links = [
     ],
   },
 ];
-
-
 
 export const weeklyStats = [
   {
@@ -421,6 +419,7 @@ export const weeklyStats = [
 ];
 export const permissionsList = [
   { id: "dashboard", label: "Dashboard" },
+  { id: "map", label: "Map" },
   { id: "revenue", label: "Revenues Pages" },
   { id: "restaurants", label: "Restaurants Pages" },
   { id: "add", label: "add Restaurants" },
@@ -430,7 +429,7 @@ export const permissionsList = [
   { id: "prices", label: "Pricing" },
   { id: "methods", label: "Payment Methods" },
   { id: "users", label: "Users" },
-  {id: "calculator", label: "Calculator"},
+  { id: "calculator", label: "Calculator" },
   { id: "notification", label: "Notification Center" },
   { id: "editnotification", label: "Edit Notification" },
   { id: "offers", label: "Promotions Center" },
@@ -989,4 +988,3 @@ export const kanbanData = [
     ClassName: "e-story, e-low, e-margaret-hamilt",
   },
 ];
-

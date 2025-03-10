@@ -28,7 +28,8 @@ import {
   PaymentMethod,
   Users, Calculator,
   UpdateVersion,
-  AddRestaurantOwner
+  AddRestaurantOwner,
+  DriversMap
 } from "./pages";
 import "./App.css";
 import { useStateContext } from "./contexts/ContextProvider";
@@ -61,6 +62,14 @@ const AppRoutes = () => (
         element={
           <ProtectedRoute>
             <Users />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="map"
+        element={
+          <ProtectedRoute>
+            <DriversMap />
           </ProtectedRoute>
         }
       />

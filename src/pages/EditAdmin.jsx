@@ -18,6 +18,7 @@ import {
 } from "firebase/storage";
 const permissionsList = [
   { id: "dashboard", label: "Dashboard" },
+  { id: "map", label: "Map" },
   { id: "revenue", label: "Revenues Pages" },
   { id: "restaurants", label: "Restaurants Pages" },
   { id: "add", label: "add Restaurants" },
@@ -27,7 +28,7 @@ const permissionsList = [
   { id: "prices", label: "Pricing" },
   { id: "methods", label: "Payment Methods" },
   { id: "users", label: "Users" },
-  {id: "calculator", label: "Calculator"},
+  { id: "calculator", label: "Calculator" },
   { id: "notification", label: "Notification Center" },
   { id: "editnotification", label: "Edit Notification" },
   { id: "offers", label: "Promotions Center" },
