@@ -11,12 +11,15 @@ import {
   TableRow,
   Paper,
   Avatar,
-  Tabs,
-  Tab,
   CircularProgress,
   Alert,
   styled,
   TablePagination,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Chip,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import dayjs from "dayjs";
@@ -24,75 +27,60 @@ import dayjs from "dayjs";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#00796b",
+      main: "#0288d1",
     },
     secondary: {
-      main: "#004d40",
+      main: "#26a69a",
     },
     background: {
-      default: "#e8f5e9",
+      default: "#f5f7fa",
+    },
+    grey: {
+      200: "#e0e7ff",
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Poppins", "Roboto", "Arial", sans-serif',
     h4: {
-      fontWeight: 600,
+      fontWeight: 700,
+      color: "#1a237e",
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 12,
   },
 });
 
-const StyledTabs = styled(Tabs)(({ theme }) => ({
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  "& .MuiTab-root": {
-    textTransform: "none",
-    fontWeight: 600,
-  },
-  "& .Mui-selected": {
-    color: theme.palette.primary.main,
-  },
-}));
-
-const StyledTab = styled(Tab)(({ theme }) => ({
-  minWidth: 120,
-}));
-
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  width: "100%",
-  height: "calc(100vh - 160px)",
-  overflowY: "auto",
+  background: "#fff",
   borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[3],
+  boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+  marginTop: theme.spacing(3),
 }));
 
 const TableCellStyled = styled(TableCell)(({ theme }) => ({
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
+  borderBottom: `1px solid ${theme.palette.grey[200]}`,
+  padding: "16px",
 }));
 
 const statusColors = {
-  waiting: "#fbc02d", // Yellow
-  arrived: "#4caf50", // Green
-  accepted: "#2196f3", // Blue
-  completed: "#9c27b0", // Purple
-  canceled: "#e53935", // Red
+  waiting: "#ff9800",
+  arrived: "#4caf50",
+  accepted: "#2196f3",
+  completed: "#673ab7",
+  canceled: "#f44336",
+  all: "#757575", // Added color for "all" status
 };
 
 const formatDate = (dateString) => {
-  return dayjs(dateString).format("MMMM D, YYYY h:mm A");
+  return dayjs(dateString).format("MMM D, YYYY h:mm A");
 };
 
-const RideTable = ({ rides, users, drivers }) => {
+const RideTable = ({ rides, users, drivers, statusFilter }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
+  const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -102,7 +90,7 @@ const RideTable = ({ rides, users, drivers }) => {
     const user = users[userId] || {};
     return {
       name: user.fullname || "Unknown",
-      phone: user.phone || "Unknown",
+      phone: user.phone || "N/A",
       profilePic: user.ProfilePic || "https://via.placeholder.com/50",
     };
   };
@@ -110,62 +98,36 @@ const RideTable = ({ rides, users, drivers }) => {
   const getDriverDetails = (driverId) => {
     const driver = drivers[driverId] || {};
     return {
-      name: driver.fullname || "Unknown",
-      phone: driver.phone || "Unknown",
+      name: driver.fullname || "Unassigned",
+      phone: driver.phone || "N/A",
       profilePic: driver.ProfilePic || "https://via.placeholder.com/50",
     };
   };
 
-  // Sort rides by created_at date in descending order
-  const sortedRides = rides
+  const filteredRides = statusFilter === "all" 
+    ? rides 
+    : rides.filter(ride => ride.status.toLowerCase() === statusFilter);
+
+  const sortedRides = filteredRides
     .slice()
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   return (
     <StyledTableContainer component={Paper}>
-      <Table size="small">
+      <Table>
         <TableHead>
           <TableRow>
-            <TableCellStyled style={{ width: "8%" }}>
-              Order Hash
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "12%" }}>
-              Created At
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "8%" }}>Cost</TableCellStyled>
-            <TableCellStyled style={{ width: "8%" }}>Cost Lira</TableCellStyled>
-            <TableCellStyled style={{ width: "12%" }}>
-              Cost In Credits
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "10%" }}>
-              Payment Method
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "10%" }}>
-              Payment Status
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "15%" }}>
-              Pickup Address
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "15%" }}>
-              Destination Address
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "8%" }}>Ride Type</TableCellStyled>
-            <TableCellStyled style={{ width: "12%" }}>
-              Rider Name
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "12%" }}>
-              Rider Phone
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "10%" }}>
-              Rider Profile Picture
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "12%" }}>
-              Driver Name
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "12%" }}>
-              Driver Phone
-            </TableCellStyled>
-            <TableCellStyled style={{ width: "8%" }}>Status</TableCellStyled>
+            <TableCellStyled>Order #</TableCellStyled>
+            <TableCellStyled>Created</TableCellStyled>
+            <TableCellStyled>Cost ($)</TableCellStyled>
+            <TableCellStyled>Cost (L.L)</TableCellStyled>
+            <TableCellStyled>Credits</TableCellStyled>
+            <TableCellStyled>Payment</TableCellStyled>
+            <TableCellStyled>Status</TableCellStyled>
+            <TableCellStyled>Pickup</TableCellStyled>
+            <TableCellStyled>Destination</TableCellStyled>
+            <TableCellStyled>Rider</TableCellStyled>
+            <TableCellStyled>Driver</TableCellStyled>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -174,38 +136,35 @@ const RideTable = ({ rides, users, drivers }) => {
             .map((ride) => {
               const riderDetails = getUserDetails(ride.client_id);
               const driverDetails = getDriverDetails(ride.driver_id);
-              const statusColor =
-                statusColors[ride.status.toLowerCase()] || "#ffffff"; // Default to white if status not found
+              const statusColor = statusColors[ride.status.toLowerCase()] || "#757575";
               return (
-                <TableRow key={ride.id}>
+                <TableRow key={ride.id} hover>
                   <TableCellStyled>{ride.order_hash}</TableCellStyled>
-                  <TableCellStyled>
-                    {formatDate(ride.created_at)}
-                  </TableCellStyled>
+                  <TableCellStyled>{formatDate(ride.created_at)}</TableCellStyled>
                   <TableCellStyled>${ride.cost}</TableCellStyled>
                   <TableCellStyled>L.L{ride.cost_lira}</TableCellStyled>
-                  <TableCellStyled>🪙
-                    {parseFloat(ride.costInCredits).toFixed(2)}
-                  </TableCellStyled>
+                  <TableCellStyled>🪙{parseFloat(ride.costInCredits).toFixed(2)}</TableCellStyled>
                   <TableCellStyled>{ride.payment_method}</TableCellStyled>
-                  <TableCellStyled>{ride.payment_status}</TableCellStyled>
-                  <TableCellStyled>{ride.pickup_address}</TableCellStyled>
-                  <TableCellStyled>{ride.destination_address}</TableCellStyled>
-                  <TableCellStyled>{ride.ride_type}</TableCellStyled>
-                  <TableCellStyled>{riderDetails.name}</TableCellStyled>
-                  <TableCellStyled>{riderDetails.phone}</TableCellStyled>
                   <TableCellStyled>
-                    <Avatar
-                      src={riderDetails.profilePic}
-                      alt={riderDetails.name}
+                    <Chip 
+                      label={ride.status} 
+                      size="small"
+                      sx={{ backgroundColor: statusColor, color: "#fff" }}
                     />
                   </TableCellStyled>
-                  <TableCellStyled>{driverDetails.name}</TableCellStyled>
-                  <TableCellStyled>{driverDetails.phone}</TableCellStyled>
-                  <TableCellStyled
-                    style={{ backgroundColor: statusColor, color: "#ffffff" }}
-                  >
-                    {ride.status}
+                  <TableCellStyled>{ride.pickup_address}</TableCellStyled>
+                  <TableCellStyled>{ride.destination_address}</TableCellStyled>
+                  <TableCellStyled>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Avatar src={riderDetails.profilePic} sx={{ width: 32, height: 32 }} />
+                      {riderDetails.name}
+                    </Box>
+                  </TableCellStyled>
+                  <TableCellStyled>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Avatar src={driverDetails.profilePic} sx={{ width: 32, height: 32 }} />
+                      {driverDetails.name}
+                    </Box>
                   </TableCellStyled>
                 </TableRow>
               );
@@ -213,23 +172,20 @@ const RideTable = ({ rides, users, drivers }) => {
         </TableBody>
       </Table>
       <TablePagination
-        rowsPerPageOptions={[10]}
+        rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={rides.length}
+        count={filteredRides.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        style={{ padding: "0 16px" }} // Align pagination with table
       />
     </StyledTableContainer>
   );
 };
 
 const Rides = () => {
-  const [tabValue, setTabValue] = useState(0);
-  const [currentRides, setCurrentRides] = useState([]);
-  const [historyRides, setHistoryRides] = useState([]);
+  const [rides, setRides] = useState([]);
   const [users, setUsers] = useState({});
   const [drivers, setDrivers] = useState({});
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -237,31 +193,41 @@ const Rides = () => {
   const [loadingRides, setLoadingRides] = useState(true);
   const [error, setError] = useState(null);
   const [statusCounts, setStatusCounts] = useState({
-    canceled: 0,
-    completed: 0,
-    accepted: 0,
     waiting: 0,
+    arrived: 0,
+    accepted: 0,
+    completed: 0,
+    canceled: 0,
   });
+  const [statusFilter, setStatusFilter] = useState("waiting");
   const db = getDatabase();
 
   useEffect(() => {
-    const fetchRidesData = async (path, setRides) => {
+    const fetchRidesData = async () => {
       try {
-        const ridesRef = ref(db, path);
-        const snapshot = await new Promise((resolve) =>
-          onValue(ridesRef, resolve)
+        const rideRefs = [
+          ref(db, "RideRequests"),
+          ref(db, "RideRequestsHistory")
+        ];
+        
+        const snapshots = await Promise.all(
+          rideRefs.map(r => new Promise((resolve) => onValue(r, resolve)))
         );
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          const rideArray = Object.keys(data).map((key) => ({
-            id: key,
-            ...data[key],
-          }));
-          setRides(rideArray);
-          updateStatusCounts(rideArray);
-        } else {
-          setRides([]);
-        }
+
+        let allRides = [];
+        snapshots.forEach(snapshot => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            const rideArray = Object.keys(data).map((key) => ({
+              id: key,
+              ...data[key],
+            }));
+            allRides = [...allRides, ...rideArray];
+          }
+        });
+
+        setRides(allRides);
+        updateStatusCounts(allRides);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -303,12 +269,11 @@ const Rides = () => {
 
     fetchUsers();
     fetchDrivers();
-    fetchRidesData("RideRequests", setCurrentRides),
-      fetchRidesData("RideRequestsHistory", setHistoryRides);
+    fetchRidesData();
   }, [db]);
 
   const updateStatusCounts = (rides) => {
-    const counts = { canceled: 0, completed: 0, accepted: 0, waiting: 0 };
+    const counts = { waiting: 0, arrived: 0, accepted: 0, completed: 0, canceled: 0 };
     rides.forEach((ride) => {
       if (counts[ride.status.toLowerCase()] !== undefined) {
         counts[ride.status.toLowerCase()]++;
@@ -319,61 +284,136 @@ const Rides = () => {
 
   if (loadingRides || loadingUsers || loadingDrivers) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <CircularProgress />
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress size={60} thickness={4} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <Alert severity="error">{error}</Alert>
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <Alert severity="error" sx={{ borderRadius: theme.shape.borderRadius }}>
+          {error}
+        </Alert>
       </Box>
     );
   }
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: "85%", p: 2 }}>
-        <StyledTabs
-          value={tabValue}
-          onChange={(event, newValue) => setTabValue(newValue)}
-          aria-label="rides tabs"
-        >
-          <StyledTab
-            label={`Current Rides (${statusCounts.waiting} waiting, ${statusCounts.accepted} accepted)`}
-          />
-          <StyledTab
-            label={`Ride History (${statusCounts.completed} completed, ${statusCounts.canceled} canceled)`}
-          />
-        </StyledTabs>
-        {tabValue === 0 && (
-          <Box>
-            <Typography variant="h4" gutterBottom>
-              Current Rides
-            </Typography>
-            <RideTable rides={currentRides} users={users} drivers={drivers} />
-          </Box>
-        )}
-        {tabValue === 1 && (
-          <Box>
-            <Typography variant="h4" gutterBottom>
-              Ride History
-            </Typography>
-            <RideTable rides={historyRides} users={users} drivers={drivers} />
-          </Box>
-        )}
+      <Box sx={{ width: "90%", maxWidth: 1600, mx: "auto", p: 3 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <Typography variant="h4">
+            Ride Management
+          </Typography>
+          <FormControl sx={{ minWidth: 200 }}>
+            <InputLabel>Filter by Status</InputLabel>
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              label="Filter by Status"
+              sx={{
+                '& .MuiSelect-select': {
+                  display: 'flex',
+                  alignItems: 'center',
+                }
+              }}
+            >
+              <MenuItem value="all">
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Chip
+                    size="small"
+                    label=""
+                    sx={{ 
+                      backgroundColor: statusColors.all,
+                      width: 20,
+                      height: 20,
+                    }}
+                  />
+                  All Statuses ({rides.length})
+                </Box>
+              </MenuItem>
+              <MenuItem value="waiting">
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Chip
+                    size="small"
+                    label=""
+                    sx={{ 
+                      backgroundColor: statusColors.waiting,
+                      width: 20,
+                      height: 20,
+                    }}
+                  />
+                  Waiting ({statusCounts.waiting})
+                </Box>
+              </MenuItem>
+              <MenuItem value="arrived">
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Chip
+                    size="small"
+                    label=""
+                    sx={{ 
+                      backgroundColor: statusColors.arrived,
+                      width: 20,
+                      height: 20,
+                    }}
+                  />
+                  Arrived ({statusCounts.arrived})
+                </Box>
+              </MenuItem>
+              <MenuItem value="accepted">
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Chip
+                    size="small"
+                    label=""
+                    sx={{ 
+                      backgroundColor: statusColors.accepted,
+                      width: 20,
+                      height: 20,
+                    }}
+                  />
+                  Accepted ({statusCounts.accepted})
+                </Box>
+              </MenuItem>
+              <MenuItem value="completed">
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Chip
+                    size="small"
+                    label=""
+                    sx={{ 
+                      backgroundColor: statusColors.completed,
+                      width: 20,
+                      height: 20,
+                    }}
+                  />
+                  Completed ({statusCounts.completed})
+                </Box>
+              </MenuItem>
+              <MenuItem value="canceled">
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Chip
+                    size="small"
+                    label=""
+                    sx={{ 
+                      backgroundColor: statusColors.canceled,
+                      width: 20,
+                      height: 20,
+                    }}
+                  />
+                  Canceled ({statusCounts.canceled})
+                </Box>
+              </MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
+        <RideTable 
+          rides={rides} 
+          users={users} 
+          drivers={drivers} 
+          statusFilter={statusFilter}
+        />
       </Box>
     </ThemeProvider>
   );
