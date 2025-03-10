@@ -1,25 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { getDatabase, ref, onValue } from "firebase/database";
-// Import Firebase configuration from firebaseconfig
-import db from "../utils/firebaseconfig"; // Now using the db export from firebaseconfig
+import { getDatabase, ref } from "firebase/database";
+import { GeoFire } from "geofire"; // Import GeoFire
+import db from "../utils/firebaseconfig"; // Firebase config
 
-function distanceBetween(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Earth's radius in kilometers
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Returns the distance in kilometers
-}
-
-// Custom icons for drivers
+// Custom icons
 const carIcon = new L.Icon({
-  iconUrl: "https://img.icons8.com/ios-filled/50/000000/car.png",
+  iconUrl: "https://imgs.search.brave.com/_YR6waPmQyvD53rjHHDs47LvAB2yF-V1ff5VaSPLJnI/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly93d3cu/dWJlci1hc3NldHMu/Y29tL2ltYWdlL3Vw/bG9hZC9mX2F1dG8s/cV9hdXRvOmVjbyxj/X2ZpbGwsaF8zNjgs/d181NTIvdjE1NTUz/Njc1MzgvYXNzZXRz/LzMxL2FkMjFiNy01/OTVjLTQyZTgtYWM1/My01Mzk2NmI0YTVm/ZWUvb3JpZ2luYWwv/RmluYWxfQmxhY2su/cG5n",
   iconSize: [30, 30],
 });
 
@@ -32,7 +21,6 @@ const DriversMap = () => {
   const [drivers, setDrivers] = useState([]);
   const [currentLocation, setCurrentLocation] = useState(null);
 
-  // Function to get the user's current location
   const getUserLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -42,57 +30,61 @@ const DriversMap = () => {
         },
         (error) => {
           console.error("Error getting location:", error);
-          setCurrentLocation({ latitude: 33.8886, longitude: 35.4955 }); // Default to Beirut if location is not available
+          setCurrentLocation({ latitude: 33.8886, longitude: 35.4955 }); // Default to Beirut
         }
       );
     } else {
       console.error("Geolocation is not supported by this browser.");
-      setCurrentLocation({ latitude: 33.8886, longitude: 35.4955 }); // Default to Beirut if geolocation is not supported
+      setCurrentLocation({ latitude: 33.8886, longitude: 35.4955 });
     }
   };
 
   useEffect(() => {
-    // Fetch the user's current location on component mount
     getUserLocation();
 
-    const radius = 50; // 10 km
-    const fetchDrivers = (dbRef, type) => {
-      onValue(dbRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const driversArray = Object.keys(data).map((key) => {
-            const driver = data[key];
-            const { latitude, longitude } = driver.location || {}; // Safe access to location
+    if (!currentLocation) return;
 
-            // Ensure latitude and longitude exist
-            if (latitude && longitude) {
-              return {
-                id: key,
-                type,
-                location: { latitude, longitude },
-              };
-            }
-            return null; // Return null for invalid data
-          }).filter(driver => driver !== null); // Filter out null entries
+    const database = getDatabase();
+    const geoFire = new GeoFire(ref(database, "availableDrivers"));
+    const geoQuery = geoFire.query({
+      center: [currentLocation.latitude, currentLocation.longitude],
+      radius: 50, // 50 km radius
+    });
 
-          setDrivers(driversArray);
-        }
+    geoQuery.on("key_entered", (key, location) => {
+      setDrivers((prevDrivers) => {
+        // Remove any existing driver with the same ID
+        const filteredDrivers = prevDrivers.filter((driver) => driver.id !== key);
+
+        // Add new driver entry with updated location and a fresh icon
+        return [
+          ...filteredDrivers,
+          { id: key, location: { latitude: location[0], longitude: location[1] } },
+        ];
       });
-    };
+    });
 
-    // Assuming db reference to the driver's data location in Firebase
-    const driversRef = ref(getDatabase(), "drivers/");
-    fetchDrivers(driversRef, "car");
-  }, []);
+    geoQuery.on("key_exited", (key) => {
+      setDrivers((prevDrivers) => prevDrivers.filter((driver) => driver.id !== key));
+    });
+
+    return () => {
+      geoQuery.cancel();
+    };
+  }, [currentLocation]);
 
   return (
-    <MapContainer center={[currentLocation?.latitude || 33.8886, currentLocation?.longitude || 35.4955]} zoom={13} style={{ height: "100vh", width: "100%" }}>
+    <MapContainer
+      center={[currentLocation?.latitude || 33.8886, currentLocation?.longitude || 35.4955]}
+      zoom={13}
+      style={{ height: "100vh", width: "100%" }}
+    >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       {drivers.map((driver) => (
         <Marker
           key={driver.id}
           position={[driver.location.latitude, driver.location.longitude]}
-          icon={driver.type === "car" ? carIcon : bikeIcon}
+          icon={carIcon} // Default to car icon, you can change this logic based on the driver's vehicle type
         >
           <Popup>{`Driver ID: ${driver.id}`}</Popup>
         </Marker>
