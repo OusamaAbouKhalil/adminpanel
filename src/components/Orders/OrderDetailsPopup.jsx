@@ -9,6 +9,8 @@ import { getDatabase, ref, get, onValue, set, push } from "firebase/database";
 import { fsdb } from "../../utils/firebaseconfig";
 import { useUpdateOrderPrices } from "../../lib/query/queries";
 import { useStateContext } from "../../contexts/ContextProvider";
+import { useJsApiLoader } from '@react-google-maps/api';
+import LocationRender from '../Map';
 
 const OrderDetailsPopup = React.memo(({ order, onClose }) => {
   const [orderItems, setOrderItems] = useState([]);
@@ -22,6 +24,23 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
   const updateOrderPricesMutation = useUpdateOrderPrices();
 
   const { ordersList, setOrdersList } = useStateContext();
+  const { isLoaded } = useJsApiLoader({
+      id: "google-map-script",
+      googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    });
+  const getUserLocation = () => {
+    if (order.user_location && 
+        typeof order.user_location.latitude === 'number' && 
+        typeof order.user_location.longitude === 'number') {
+      return {
+        lat: order.user_location.latitude,
+        lng: order.user_location.longitude
+      };
+    }
+    
+    // Fallback to a default location if user_location is not available
+    return { lat: 33.8938, lng: 35.5018 }; // Default coordinates (Beirut)
+  };
   // Fetch user details from Realtime Database
   const fetchUserDetails = async () => {
     try {
@@ -604,7 +623,22 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
             </div>
           </div>
         </div>
-
+        <div className="col-span-2 mt-6 mb-6">
+          <h4 className="text-xl font-semibold text-gray-800 mb-4">Delivery Location</h4>
+          {order.user_location ? (
+            <div className="border rounded-lg overflow-hidden">
+              <LocationRender 
+                markerPosition={getUserLocation()} 
+                isLoaded={isLoaded}
+                onMapClick={() => {}}
+              />
+            </div>
+          ) : (
+            <div className="bg-gray-100 rounded-lg p-4 text-gray-500 text-center">
+              No location data available for this order
+            </div>
+          )}
+        </div>         
         {/* Items List */}
         <div className="my-4">
           <h3 className="text-xl font-semibold text-gray-800">Order Items</h3>
