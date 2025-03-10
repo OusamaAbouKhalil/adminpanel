@@ -11,6 +11,7 @@ import { useUpdateOrderPrices } from "../../lib/query/queries";
 import { useStateContext } from "../../contexts/ContextProvider";
 import { useJsApiLoader } from '@react-google-maps/api';
 import LocationRender from '../Map';
+import toast from "react-hot-toast";
 
 const OrderDetailsPopup = React.memo(({ order, onClose }) => {
   const [orderItems, setOrderItems] = useState([]);
@@ -626,19 +627,44 @@ const OrderDetailsPopup = React.memo(({ order, onClose }) => {
         <div className="col-span-2 mt-6 mb-6">
           <h4 className="text-xl font-semibold text-gray-800 mb-4">Delivery Location</h4>
           {order.user_location ? (
-            <div className="border rounded-lg overflow-hidden">
-              <LocationRender 
-                markerPosition={getUserLocation()} 
-                isLoaded={isLoaded}
-                onMapClick={() => {}}
-              />
-            </div>
+            <>
+              <div className="border rounded-lg overflow-hidden">
+                <LocationRender 
+                  markerPosition={getUserLocation()} 
+                  isLoaded={isLoaded}
+                  onMapClick={() => {}}
+                />
+              </div>
+              <div className="mt-3 flex">
+                <input
+                  type="text"
+                  readOnly
+                  value={`https://www.google.com/maps?q=${order.user_location.latitude},${order.user_location.longitude}`}
+                  className="flex-1 p-2 border border-gray-300 rounded-l-lg bg-gray-50 text-gray-700 font-mono text-sm"
+                  onClick={(e) => e.target.select()}
+                />
+                <button
+                  onClick={() => {
+                    const url = `https://www.google.com/maps?q=${order.user_location.latitude},${order.user_location.longitude}`;
+                    navigator.clipboard.writeText(url);
+                    toast.success("Location URL copied to clipboard.");
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700 transition-colors flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                  </svg>
+                  Copy
+                </button>
+              </div>
+            </>
           ) : (
             <div className="bg-gray-100 rounded-lg p-4 text-gray-500 text-center">
               No location data available for this order
             </div>
           )}
-        </div>         
+        </div> 
         {/* Items List */}
         <div className="my-4">
           <h3 className="text-xl font-semibold text-gray-800">Order Items</h3>
