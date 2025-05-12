@@ -710,3 +710,61 @@ export const deleteAddon = async (restaurantId, addonId) => {
     throw error;
   }
 };
+
+export const updateRidePaymentStatus = async (rideId, driverId, isMoneyTurnedIn) => {
+  try {
+    console.log(`Updating payment status: ride ${rideId}, turned in: ${isMoneyTurnedIn}`);
+    await set(ref(db, `drivers/${driverId}/RidesHistory/${rideId}/moneyTurnedIn`), isMoneyTurnedIn);
+    return true;
+  } catch (error) {
+    console.error("Error updating ride payment status:", error);
+    throw error;
+  }
+};
+
+export const getDriverRides = async (driverId) => {
+  try {
+    const ridesRef = ref(db, `drivers/${driverId}/RidesHistory`);
+    console.log(`Fetching rides for driver: ${driverId}`);
+
+    const snapshot = await get(ridesRef);
+    if (!snapshot.exists()) {
+      console.log(`No rides found for driver: ${driverId}`);
+      return [];
+    }
+
+    const rides = [];
+    snapshot.forEach(child => {
+      rides.push({
+        id: child.key,
+        ...child.val(),
+        driver_id: driverId
+      });
+    });
+
+    console.log(`Found ${rides.length} rides for driver ${driverId}`);
+    return rides;
+  } catch (error) {
+    console.error("Error fetching driver rides:", error);
+    throw error;
+  }
+};
+
+export const getDriverOutstandingAmount = async (driverId) => {
+  try {
+    const rides = await getDriverRides(driverId);
+
+    const acceptedRides = rides.filter(ride => ride.status === "accepted");
+    const outstandingRides = acceptedRides.filter(ride => !ride.moneyTurnedIn);
+
+    const outstandingAmount = outstandingRides.reduce((sum, ride) => {
+      return sum + parseFloat(ride.cost || 0);
+    }, 0);
+
+    console.log(`Driver ${driverId}: ${outstandingRides.length} outstanding rides, total: $${outstandingAmount.toFixed(2)}`);
+    return outstandingAmount;
+  } catch (error) {
+    console.error("Error calculating driver outstanding amount:", error);
+    return 0;
+  }
+};
