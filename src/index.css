@@ -1,15 +1,120 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
-
-body {
-    margin: 0;
-    padding: 0;
-    font-family: "Open Sans", sans-serif;
-}
-
-.login-container {
-    background-image: url("/admin-wallpapers.jpg")
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --main-bg: #ffffff;
+  --main-dark-bg: #111827;
+  --secondary-dark-bg: #1f2937;
+  --light-gray: #f3f4f6;
+  --color-text: #111827;
+  --color-text-dark: #f9fafb;
+}
+
+.dark {
+  --main-bg: #111827;
+  --main-dark-bg: #1f2937;
+  --secondary-dark-bg: #374151;
+  --light-gray: #1f2937;
+  --color-text: #f9fafb;
+  --color-text-dark: #111827;
+}
+
+body {
+  @apply font-body antialiased;
+  color: var(--color-text);
+  background-color: var(--main-bg);
+}
+
+.login-container {
+  background-image: url("/admin-wallpapers.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-500;
+}
+
+/* Transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+/* Card hover effects */
+.hover-card {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.hover-card:hover {
+  @apply transform -translate-y-1 shadow-lg;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply px-4 py-2 bg-primary-600 text-white rounded-lg shadow-md hover:bg-primary-700 transition-all duration-300;
+}
+
+.btn-secondary {
+  @apply px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300;
+}
+
+/* Form styles */
+.input-field {
+  @apply w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300;
+}
+
+/* Table styles */
+.table-container {
+  @apply w-full overflow-x-auto shadow-md rounded-lg;
+}
+
+.table-header {
+  @apply bg-gray-100 dark:bg-gray-800 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider;
+}
+
+.table-cell {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  @apply animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-primary-600;
+}
