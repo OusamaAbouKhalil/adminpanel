@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStateContext } from '../../contexts/ContextProvider';
 import { driverGrid } from '../../data/dummy';
 import VehicleInfoModal from './VehicleInfoModal';
 import AddDriverModal from './AddDriver';
-import { addDriver, saveDriver } from '../../lib/firebase/api';
+import DriverRidesModal from './DriverRidesModal';
+import { addDriver, saveDriver, getDriverOutstandingAmount } from '../../lib/firebase/api';
 
 const Drivers = () => {
   const { drivers } = useStateContext();
@@ -11,6 +12,32 @@ const Drivers = () => {
   const [editedDriver, setEditedDriver] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showRidesModal, setShowRidesModal] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [driverOutstanding, setDriverOutstanding] = useState({});
+
+  useEffect(() => {
+    // Calculate outstanding payments for each driver
+    const calculateOutstanding = async () => {
+      const outstanding = {};
+
+      for (const driver of drivers) {
+        try {
+          const totalOutstanding = await getDriverOutstandingAmount(driver.id);
+          outstanding[driver.id] = totalOutstanding;
+        } catch (error) {
+          console.error(`Error calculating outstanding for driver ${driver.id}:`, error);
+          outstanding[driver.id] = 0;
+        }
+      }
+
+      setDriverOutstanding(outstanding);
+    };
+
+    if (drivers.length > 0) {
+      calculateOutstanding();
+    }
+  }, [drivers]);
 
   const handleEdit = (index) => {
     setEditIdx(index);
@@ -62,6 +89,37 @@ const Drivers = () => {
     setShowAddModal(false);
   };
 
+  const handleShowRidesModal = (driver) => {
+    setSelectedDriver(driver);
+    setShowRidesModal(true);
+  };
+
+  const handleCloseRidesModal = () => {
+    setShowRidesModal(false);
+    setSelectedDriver(null);
+
+    // Refresh outstanding amounts after closing the rides modal
+    if (drivers.length > 0) {
+      const calculateOutstanding = async () => {
+        const outstanding = {};
+
+        for (const driver of drivers) {
+          try {
+            const totalOutstanding = await getDriverOutstandingAmount(driver.id);
+            outstanding[driver.id] = totalOutstanding;
+          } catch (error) {
+            console.error(`Error calculating outstanding for driver ${driver.id}:`, error);
+            outstanding[driver.id] = 0;
+          }
+        }
+
+        setDriverOutstanding(outstanding);
+      };
+
+      calculateOutstanding();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-6 py-10">
       <div className="max-w-7xl mx-auto">
@@ -92,6 +150,12 @@ const Drivers = () => {
                       {col.headerText}
                     </th>
                   ))}
+                  <th className="py-4 px-6 text-left font-semibold tracking-wide uppercase">
+                    Outstanding
+                  </th>
+                  <th className="py-4 px-6 text-left font-semibold tracking-wide uppercase">
+                    Rides
+                  </th>
                   <th className="py-4 px-6 text-left font-semibold tracking-wide uppercase">
                     Actions
                   </th>
@@ -124,6 +188,25 @@ const Drivers = () => {
                         )}
                       </td>
                     ))}
+                    <td className="py-4 px-6">
+                      {driverOutstanding[driver.id] > 0 ? (
+                        <span className="bg-red-100 text-red-800 font-medium px-3 py-1.5 rounded-lg">
+                          ${driverOutstanding[driver.id].toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="bg-green-100 text-green-800 font-medium px-3 py-1.5 rounded-lg">
+                          $0.00
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-4 px-6">
+                      <button
+                        onClick={() => handleShowRidesModal(driver)}
+                        className="px-4 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-all duration-200 font-medium text-sm"
+                      >
+                        View Rides
+                      </button>
+                    </td>
                     <td className="py-4 px-6">
                       {editIdx === index ? (
                         <div className="flex gap-2">
@@ -168,6 +251,12 @@ const Drivers = () => {
           <AddDriverModal
             onClose={handleCloseAddModal}
             onSave={handleAddDriver}
+          />
+        )}
+        {showRidesModal && selectedDriver && (
+          <DriverRidesModal
+            driver={selectedDriver}
+            onClose={handleCloseRidesModal}
           />
         )}
       </div>
