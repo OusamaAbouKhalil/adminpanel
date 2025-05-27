@@ -9,11 +9,11 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
       type="button"
       onClick={() => customFunc()}
       style={{ color }}
-      className="relative text-xl rounded-full p-3 hover:bg-light-gray"
+      className="relative text-xl rounded-full p-2 hover:bg-gray-100 transition-colors duration-200"
     >
       <span
         style={{ background: dotColor }}
-        className="absolute inline-flex rounded-full h-2 w-2 right-2 top-2"
+        className="absolute inline-flex rounded-full h-2 w-2 right-1 top-1"
       />
       {icon}
     </button>
@@ -46,7 +46,7 @@ const Navbar = () => {
 
   const handleClickOutside = (event) => {
     if (navbarRef.current && !navbarRef.current.contains(event.target)) {
-      handleClick(-1)
+      handleClick(-1);
     }
   };
 
@@ -59,38 +59,61 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div ref={navbarRef} className="flex justify-between p-2 md:ml-6 md:mr-6 relative">
-      <NavButton title="Menu" customFunc={handleActiveMenu} color={currentColor} icon={<AiOutlineMenuFold />} />
-      {/* <div className="flex">
-        <NavButton title="Chat" dotColor="#03C9D7" customFunc={() => handleClick('chat')} color={currentColor} icon={<BsChatLeft />} />
-        <NavButton title="Notification" dotColor="rgb(254, 201, 15)" customFunc={() => handleClick('notification')} color={currentColor} icon={<RiNotification3Line />} />
+    <nav
+      ref={navbarRef}
+      className="flex items-center justify-between px-4 py-3 bg-white shadow-md md:px-6 sticky top-0 z-50"
+    >
+      {/* Left Side: Menu Button */}
+      <NavButton
+        title="Menu"
+        customFunc={handleActiveMenu}
+        color={currentColor}
+        icon={<AiOutlineMenuFold />}
+      />
+
+      {/* Right Side: Navigation Items */}
+      {/* Uncomment and style this section if you want to include the additional nav items */}
+      {/* <div className="flex items-center space-x-4">
+        <NavButton
+          title="Chat"
+          dotColor="#03C9D7"
+          customFunc={() => handleClick('chat')}
+          color={currentColor}
+          icon={<BsChatLeft />}
+        />
+        <NavButton
+          title="Notification"
+          dotColor="rgb(254, 201, 15)"
+          customFunc={() => handleClick('notification')}
+          color={currentColor}
+          icon={<RiNotification3Line />}
+        />
         <TooltipComponent content="Profile" position="BottomCenter">
           <div
-            className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg"
+            className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 rounded-xl transition-colors duration-200"
             onClick={() => handleClick('userProfile')}
           >
             <img
-              className="rounded-full w-8 h-8"
+              className="rounded-full w-9 h-9 object-cover"
               src={avatar}
               alt="user-profile"
             />
-            <p>
-              <span className="text-gray-400 text-14">Hi,</span>{' '}
-              <span className="text-gray-400 font-bold ml-1 text-14">
-                Ali
-              </span>
-            </p>
-            <MdKeyboardArrowDown className="text-gray-400 text-14" />
+            <div className="flex items-center">
+              <p className="text-gray-600 text-sm">
+                <span className="text-gray-500">Hi, </span>
+                <span className="font-semibold">Ali</span>
+              </p>
+              <MdKeyboardArrowDown className="text-gray-500 ml-1" />
+            </div>
           </div>
         </TooltipComponent>
 
-        {isClicked.cart && (<Cart />)}
-        {isClicked.chat && (<Chat />)}
-        {isClicked.notification && (<Notification />)}
-        {isClicked.userProfile && (<UserProfile />)}
+        {isClicked.cart && <Cart />}
+        {isClicked.chat && <Chat />}
+        {isClicked.notification && <Notification />}
+        {isClicked.userProfile && <UserProfile />}
       </div> */}
-    </div>
-    
+    </nav>
   );
 };
 

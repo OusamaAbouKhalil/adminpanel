@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import { FaChevronDown, FaChevronUp, FaMapMarkerAlt, FaClock, FaUser, FaMoneyBill } from "react-icons/fa";
 
 const SpecialOrderCard = ({ order }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
+  const [showMore, setShowMore] = useState({
+    fromAddress: false,
+    deliveryAddress: false,
+    additionalText: false
+  });
   const isPending = order.status === 'pending';
-
-  // Always show full card for pending orders, and conditionally for others
   const shouldShowFullCard = isPending || expanded;
 
   const toggleExpand = () => {
@@ -14,111 +17,139 @@ const SpecialOrderCard = ({ order }) => {
     }
   };
 
+  const toggleShowMore = (field) => {
+    setShowMore(prev => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const truncateText = (text, maxLength) => {
+    if (text.length <= maxLength) return text;
+    return showMore[text] ? text : `${text.slice(0, maxLength)}...`;
+  };
+
   return (
     <div
-      className={`border rounded-lg shadow-md bg-white hover:shadow-lg transition-all duration-300
+      className={`border border-gray-200 rounded-xl shadow-sm bg-white hover:shadow-md transition-all duration-300 w-full
         ${!isPending && 'cursor-pointer'} 
-        ${shouldShowFullCard ? 'p-4' : 'p-2'}`}
+        ${shouldShowFullCard ? 'p-6' : 'p-4'}`}
       onClick={!isPending ? toggleExpand : undefined}
-      style={{
-        height: shouldShowFullCard ? 'auto' : '70px',
-        maxHeight: shouldShowFullCard ? 'none' : '70px',
-        overflow: shouldShowFullCard ? 'visible' : 'hidden'
-      }}
     >
-      <div className={`flex justify-between items-center ${shouldShowFullCard ? 'mb-3' : 'mb-1'}`}>
-        <h2 className={`font-bold text-gray-800 ${shouldShowFullCard ? 'text-lg' : 'text-sm'}`}>
-          Special Order
-        </h2>
-        <div className="flex items-center">
-          <span className={`px-2 py-0.5 rounded-full text-xs font-medium mr-2
-            ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-              order.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                order.status === 'rejected' ? 'bg-red-100 text-red-800' :
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="font-semibold text-lg text-gray-900">Special Order</h2>
+        <div className="flex items-center gap-3">
+          <span className={`px-3 py-1 rounded-full text-sm font-medium
+            ${order.status === 'pending' ? 'bg-amber-100 text-amber-800' :
+              order.status === 'accepted' ? 'bg-emerald-100 text-emerald-800' :
+                order.status === 'rejected' ? 'bg-rose-100 text-rose-800' :
                   'bg-gray-100 text-gray-800'}`}>
             {order.status?.charAt(0).toUpperCase() + order.status?.slice(1)}
           </span>
           {!isPending && (
-            expanded ?
-              <FaChevronUp className="text-gray-500" /> :
-              <FaChevronDown className="text-gray-500" />
+            expanded ? 
+              <FaChevronUp className="text-gray-500 hover:text-gray-700 transition-colors" size={18} /> :
+              <FaChevronDown className="text-gray-500 hover:text-gray-700 transition-colors" size={18} />
           )}
         </div>
       </div>
 
-      {/* Show minimal info for non-expanded cards */}
       {!shouldShowFullCard ? (
-        <div className="flex justify-between items-center text-xs text-gray-700">
-          <div className="flex items-center">
-            <FaMapMarkerAlt className="text-gray-500 mr-1 flex-shrink-0" size={10} />
-            <span className="truncate max-w-[100px]">{order.deliveryAddress}</span>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm text-gray-600 gap-4">
+          <div className="flex items-center gap-2">
+            <FaMapMarkerAlt className="text-blue-500" size={14} />
+            <span className="truncate max-w-[200px]">{truncateText(order.deliveryAddress, 30)}</span>
+            {showMore.deliveryAddress }
+           
           </div>
-          <div className="flex items-center ml-2">
-            <FaClock className="text-gray-500 mr-1 flex-shrink-0" size={10} />
+          <div className="flex items-center gap-2">
+            <FaClock className="text-green-500" size={14} />
             <span>{order.deliveryTime?.replace('Time: ', '')}</span>
           </div>
-          <div className="flex items-center text-gray-700">
-            <FaMoneyBill className="text-gray-500 mr-1 flex-shrink-0" size={10} />
-            <span className="font-medium text-gray-900">${order.total}</span>
+          <div className="flex items-center gap-2">
+            <FaMoneyBill className="text-purple-500" size={14} />
+            <span className="font-semibold text-gray-900">${order.total}</span>
           </div>
         </div>
       ) : (
-        <>
-          {/* Full content for expanded cards */}
-          <div className="text-sm mb-4">
-            <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 space-y-4">
+            <div className="flex items-center gap-2">
+              <FaMoneyBill className="text-purple-500" size={16} />
               <div>
-                <p className="font-semibold text-gray-600">Order ID:</p>
-                <p className="text-gray-800">{order.orderId}</p>
+                <p className="text-xs font-medium text-gray-500">Cost</p>
+                <p className="text-sm text-gray-900">${order.total}</p>
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <FaMapMarkerAlt className="text-blue-500" size={16} />
               <div>
-                <p className="font-semibold text-gray-600">Cost:</p>
-                <p className="text-gray-800">${order.total}</p>
+                <p className="text-xs font-medium text-gray-500">From Address</p>
+                <p className="text-sm text-gray-900">
+                  {order.fromAddress}
+                  
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <FaMapMarkerAlt className="text-blue-500" size={16} />
+              <div>
+                <p className="text-xs font-medium text-gray-500">Delivery Address</p>
+                <p className="text-sm text-gray-900">
+                  {order.deliveryAddress}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex-1 space-y-4">
+            <div className="flex items-center gap-2">
+              <FaUser className="text-indigo-500" size={16} />
+              <div>
+                <p className="text-xs font-medium text-gray-500">Recipient</p>
+                <p className="text-sm text-gray-900">{order.recipientName}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <FaClock className="text-green-500" size={16} />
+              <div>
+                <p className="text-xs font-medium text-gray-500">Delivery Time</p>
+                <p className="text-sm text-gray-900">{order.deliveryTime}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <FaClock className="text-green-500" size={16} />
+              <div>
+                <p className="text-xs font-medium text-gray-500">Created At</p>
+                <p className="text-sm text-gray-900">{order.createdAt}</p>
               </div>
             </div>
           </div>
 
-          <div className="space-y-3 text-sm">
-            <div>
-              <p className="font-semibold text-gray-600">From Address:</p>
-              <p className="text-gray-800">{order.fromAddress}</p>
-            </div>
-
-            <div>
-              <p className="font-semibold text-gray-600">Delivery Address:</p>
-              <p className="text-gray-800">{order.deliveryAddress}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <div className="flex-1 space-y-4">
+            <div className="flex items-center gap-2">
               <div>
-                <p className="font-semibold text-gray-600">Recipient:</p>
-                <p className="text-gray-800">{order.recipientName}</p>
-              </div>
-              <div>
-                <p className="font-semibold text-gray-600">Contact:</p>
-                <p className="text-gray-800">{order.contactNumber}</p>
+                <p className="text-xs font-medium text-gray-500">Order ID</p>
+                <p className="text-sm text-gray-900">{
+                  // take order id first 8 characters only using slice
+                  order.order_id.slice(0, 8) 
+                  }</p>
               </div>
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
               <div>
-                <p className="font-semibold text-gray-600">Created At:</p>
-                <p className="text-gray-800">{order.createdAt}</p>
-              </div>
-              <div>
-                <p className="font-semibold text-gray-600">Delivery Time:</p>
-                <p className="text-gray-800">{order.deliveryTime}</p>
+                <p className="text-xs font-medium text-gray-500">Contact</p>
+                <p className="text-sm text-gray-900">{order.contactNumber}</p>
               </div>
             </div>
-
             {order.additionalText && (
               <div>
-                <p className="font-semibold text-gray-600">Additional Notes:</p>
-                <p className="text-gray-800">{order.additionalText}</p>
+                <p className="text-xs font-medium text-gray-500">Additional Notes</p>
+                <p className="text-sm text-gray-900">
+                  {order.additionalText}
+               
+                </p>
               </div>
             )}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

@@ -19,6 +19,7 @@ import {
   FaPeopleArrows,
   FaCalculator,
   FaCode,
+  FaMap
 } from "react-icons/fa"; // Import the money icon
 
 export const gridOrderImage = (props) => (
@@ -254,7 +255,7 @@ export const links = [
       },
       {
         name: "map",
-        icon: <FaPeopleArrows size={20} />,
+        icon: <FaMap size={20} />,
       },
     ],
   },

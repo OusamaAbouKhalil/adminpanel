@@ -9,13 +9,13 @@ import {
 } from "firebase/firestore";
 import { fsdb } from "../utils/firebaseconfig";
 import CryptoJS from "crypto-js";
-
 import {
   getStorage,
   ref as storageRef,
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
+
 const permissionsList = [
   { id: "dashboard", label: "Dashboard" },
   { id: "map", label: "Map" },
@@ -44,7 +44,7 @@ const permissionsList = [
 ];
 
 const placeholderImage =
-  "https://avatar.iran.liara.run/public/boy?username=Ash"; // Placeholder URL for avatars
+  "https://avatar.iran.liara.run/public/boy?username=Ash";
 
 const EditAdminPage = () => {
   const [admins, setAdmins] = useState([]);
@@ -82,7 +82,7 @@ const EditAdminPage = () => {
         Object.keys(data.permissions).forEach((permissionId) => {
           setValue(permissionId, data.permissions[permissionId]);
         });
-        setValue("avatar", data.avatarURL || ""); // Set avatar URL if exists
+        setValue("avatar", data.avatarURL || "");
       }
     } catch (e) {
       console.error("Error fetching admin data: ", e);
@@ -110,8 +110,6 @@ const EditAdminPage = () => {
         const imagePath = `adminPP/${selectedAdmin}`;
         const imageRef = storageRef(getStorage(), imagePath);
         await uploadBytes(imageRef, avatarFile[0]);
-
-        // Retrieve the download URL
         avatarURL = await getDownloadURL(imageRef);
       } catch (e) {
         console.error("Error uploading avatar: ", e);
@@ -136,159 +134,149 @@ const EditAdminPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-green-50 p-6">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-4xl font-bold text-green-800 text-center mb-8">
-          Admin Management
-        </h2>
-        <table className="w-full mt-6 border-collapse">
-          <thead>
-            <tr className="bg-green-500 text-white rounded-t-lg">
-              <th className="px-4 py-2 border-b border-gray-200 rounded-tl-lg">
-                Avatar
-              </th>
-              <th className="px-4 py-2 border-b border-gray-200">Name</th>
-              <th className="px-4 py-2 border-b border-gray-200">Email</th>
-              <th className="px-4 py-2 border-b border-gray-200 rounded-tr-lg">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {admins.map((admin) => (
-              <tr key={admin.id} className="text-center hover:bg-green-100">
-                <td className="px-4 py-2 border-b border-gray-200">
-                  <img
-                    src={admin.avatarURL || placeholderImage}
-                    alt={admin.name}
-                    className="w-24 h-24 object-cover rounded-full"
-                  />
-                </td>
-                <td className="px-4 py-2 border-b border-gray-200">
-                  {admin.name}
-                </td>
-                <td className="px-4 py-2 border-b border-gray-200">
-                  {admin.email}
-                </td>
-                <td className="px-4 py-2 border-b border-gray-200">
-                  <button
-                    onClick={() => handleEditClick(admin.id)}
-                    className="bg-green-500 text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out transform hover:bg-green-600 hover:scale-105"
+    <div className="min-h-screen bg-gray-100 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            Admin Management
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-800 text-white">
+                  <th className="px-6 py-4 text-left rounded-tl-xl">Avatar</th>
+                  <th className="px-6 py-4 text-left">Name</th>
+                  <th className="px-6 py-4 text-left">Email</th>
+                  <th className="px-6 py-4 text-left rounded-tr-xl">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {admins.map((admin) => (
+                  <tr
+                    key={admin.id}
+                    className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
                   >
-                    Edit
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {selectedAdmin && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
-            <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-auto relative">
-              <button
-                onClick={handleCloseModal}
-                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl"
-              >
-                &times;
-              </button>
-              <h3 className="text-3xl font-bold text-green-800 mb-6">
-                Edit Admin
-              </h3>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div className="mb-6">
-                  <label
-                    className="block text-green-600 font-semibold mb-2"
-                    htmlFor="name"
-                  >
-                    Name
-                  </label>
-                  <input
-                    id="name"
-                    {...register("name", { required: true })}
-                    className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    type="text"
-                    placeholder="Admin Name"
-                  />
-                </div>
-                <div className="mb-6">
-                  <label
-                    className="block text-green-600 font-semibold mb-2"
-                    htmlFor="email"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    {...register("email", { required: true })}
-                    className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    type="email"
-                    placeholder="Admin Email"
-                  />
-                </div>
-                <div className="mb-6">
-                  <label
-                    className="block text-green-600 font-semibold mb-2"
-                    htmlFor="password"
-                  >
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    {...register("password")}
-                    className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    type="password"
-                    placeholder="Admin Password (optional)"
-                  />
-                </div>
-                <div className="mb-6">
-                  <label
-                    className="block text-green-600 font-semibold mb-2"
-                    htmlFor="avatar"
-                  >
-                    Avatar
-                  </label>
-                  <input
-                    id="avatar"
-                    {...register("avatar")}
-                    className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    type="file"
-                    accept="image/*"
-                  />
-                </div>
-                <div className="mb-6">
-                  <label className="block text-green-600 font-semibold mb-2">
-                    Permissions
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    {permissionsList.map((permission) => (
-                      <div key={permission.id} className="flex items-center">
-                        <input
-                          id={permission.id}
-                          {...register(permission.id)}
-                          type="checkbox"
-                          className="mr-2"
-                        />
-                        <label
-                          htmlFor={permission.id}
-                          className="text-gray-700"
-                        >
-                          {permission.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-600 transition duration-300 ease-in-out"
-                >
-                  Update Admin
-                </button>
-              </form>
-            </div>
+                    <td className="px-6 py-4">
+                      <img
+                        src={admin.avatarURL || placeholderImage}
+                        alt={admin.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">{admin.name}</td>
+                    <td className="px-6 py-4 text-gray-700">{admin.email}</td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleEditClick(admin.id)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
+
+          {selectedAdmin && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <button
+                  onClick={handleCloseModal}
+                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                >
+                  ×
+                </button>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+                  Edit Admin
+                </h3>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Name
+                    </label>
+                    <input
+                      id="name"
+                      {...register("name", { required: true })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      type="text"
+                      placeholder="Admin Name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      {...register("email", { required: true })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      type="email"
+                      placeholder="Admin Email"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Password
+                    </label>
+                    <input
+                      id="password"
+                      {...register("password")}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      type="password"
+                      placeholder="Admin Password (optional)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Avatar
+                    </label>
+                    <input
+                      id="avatar"
+                      {...register("avatar")}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      type="file"
+                      accept="image/*"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Permissions
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {permissionsList.map((permission) => (
+                        <div
+                          key={permission.id}
+                          className="flex items-center space-x-2"
+                        >
+                          <input
+                            id={permission.id}
+                            {...register(permission.id)}
+                            type="checkbox"
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label
+                            htmlFor={permission.id}
+                            className="text-gray-700 text-sm"
+                          >
+                            {permission.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                  >
+                    Update Admin
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
