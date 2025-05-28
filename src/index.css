@@ -4,72 +4,93 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --main-bg: #ffffff;
-  --main-dark-bg: #111827;
-  --secondary-dark-bg: #1f2937;
-  --light-gray: #f3f4f6;
-  --color-text: #111827;
-  --color-text-dark: #f9fafb;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
 }
 
-.dark {
-  --main-bg: #111827;
-  --main-dark-bg: #1f2937;
-  --secondary-dark-bg: #374151;
-  --light-gray: #1f2937;
-  --color-text: #f9fafb;
-  --color-text-dark: #111827;
-}
-
-body {
-  @apply font-body antialiased;
-  color: var(--color-text);
-  background-color: var(--main-bg);
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
 }
 
 .login-container {
   background-image: url("/admin-wallpapers.jpg");
   background-size: cover;
   background-position: center;
+  @apply relative overflow-hidden;
+}
+
+.login-container::before {
+  content: '';
+  @apply absolute inset-0 bg-black/40 backdrop-blur-sm;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  @apply w-2;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500 dark:bg-gray-500;
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full hover:bg-gray-500 dark:hover:bg-gray-500 transition-colors;
 }
 
 /* Transitions */
 .transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+  @apply transition-all duration-300 ease-in-out;
 }
 
 /* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out;
 }
@@ -80,34 +101,34 @@ body {
 
 /* Card hover effects */
 .hover-card {
-  @apply transition-all duration-300 ease-in-out;
-}
-
-.hover-card:hover {
-  @apply transform -translate-y-1 shadow-lg;
+  @apply transition-all duration-300 ease-in-out hover:transform hover:-translate-y-1 hover:shadow-lg;
 }
 
 /* Button styles */
 .btn-primary {
-  @apply px-4 py-2 bg-primary-600 text-white rounded-lg shadow-md hover:bg-primary-700 transition-all duration-300;
+  @apply px-4 py-2 bg-primary-600 text-white rounded-lg shadow-md hover:bg-primary-700 
+         transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
 }
 
 .btn-secondary {
-  @apply px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300;
+  @apply px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg 
+         shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300;
 }
 
 /* Form styles */
 .input-field {
-  @apply w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300;
+  @apply w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 
+         rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300;
 }
 
 /* Table styles */
 .table-container {
-  @apply w-full overflow-x-auto shadow-md rounded-lg;
+  @apply w-full overflow-x-auto shadow-md rounded-lg border border-gray-200 dark:border-gray-700;
 }
 
 .table-header {
-  @apply bg-gray-100 dark:bg-gray-800 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider;
+  @apply bg-gray-100 dark:bg-gray-800 text-left text-xs font-semibold text-gray-600 
+         dark:text-gray-300 uppercase tracking-wider;
 }
 
 .table-cell {
@@ -117,4 +138,44 @@ body {
 /* Loading spinner */
 .loading-spinner {
   @apply animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-primary-600;
+}
+
+/* Toast notifications */
+.Toastify__toast {
+  @apply rounded-lg shadow-lg;
+}
+
+.Toastify__toast--success {
+  @apply bg-success-500 text-white;
+}
+
+.Toastify__toast--error {
+  @apply bg-error-500 text-white;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm;
+}
+
+.modal-content {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 max-w-lg w-full mx-4 
+         transform transition-all duration-300 ease-out;
+}
+
+/* Navigation active states */
+.nav-link-active {
+  @apply bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300;
+}
+
+/* Dashboard card styles */
+.dashboard-card {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl 
+         transition-all duration-300 border border-gray-200 dark:border-gray-700;
+}
+
+/* Chart container styles */
+.chart-container {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-200 
+         dark:border-gray-700 hover:shadow-xl transition-all duration-300;
 }
